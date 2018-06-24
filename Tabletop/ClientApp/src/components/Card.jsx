@@ -1,6 +1,7 @@
 ﻿import React from 'react';
 import { connect } from 'react-redux';
 import { flipCard, moveCard, cardUp, cardDown } from '../store/table/TableActions';
+import CallbackService from '../services/CallbackService';
 
 const mapStateToProps = state =>
 {
@@ -24,12 +25,16 @@ const mapDispatchToProps = function (dispatch) {
     }
 }
 
-const Card = function ({ id, x = 0, y = 0, mx = 0, my = 0, z = id, h = 142, w = 102, active = false, visible = false, contentTop = 'TOP', contentBottom = 'BOTTOM', onFlipCard, onMoveCard, onCardUp, onCardDown }) {
+const Card = function ({ id, x, y, mx, my, z, h, w, active, visible, content, onFlipCard, onMoveCard, onCardUp, onCardDown }) {
+
+    let callbackService = CallbackService.getInstance();
 
     function MouseDown(e) {
-        //console.log('Down', x, y);
+        //console.log('Down', id);
         if (e.button === 0) {
             onCardUp(id, x - e.clientX, y - e.clientY, z);
+            callbackService.onMouseUp(id, MouseUp);
+            callbackService.onMouseMove(id, MouseMove.bind(null, x - e.clientX, y - e.clientY));
         }
         e.stopPropagation();
         return false;
@@ -41,24 +46,18 @@ const Card = function ({ id, x = 0, y = 0, mx = 0, my = 0, z = id, h = 142, w = 
         return false;
     }
 
-    function MouseMove(e) {
-        //console.log('Move', x, y);
+    function MouseMove(mx, my, e) {
+        //console.log('Move', id);
         onMoveCard(id, e.clientX + mx, e.clientY + my);
         return false;
     }
 
     function MouseUp(e) {
-        //console.log('Up', x, y);
+        //console.log('Up', id);
         onCardDown(id, x, y);
+        callbackService.unsubscribeOnMouseUp(id);
+        callbackService.unsubscribeOnMouseMove(id);
         return false;
-    }
-
-    if (active) {
-        document.onmousemove = MouseMove;
-        document.onmouseup = MouseUp;
-    } else {
-        document.onmousemove = undefined;
-        document.onmouseup = undefined;
     }
 
     return (
@@ -66,8 +65,8 @@ const Card = function ({ id, x = 0, y = 0, mx = 0, my = 0, z = id, h = 142, w = 
             style={{ top: y, left: x, width: w, height: h, zIndex: z }}
             onMouseDown={MouseDown}
             onContextMenu={OnContextMenu}
-            className="card noselect">
-            {visible ? contentTop : contentBottom}
+            className={'card noselect ' + (active ? 'grabbed' : '')}>
+            <img alt={content} src={process.env.PUBLIC_URL + content} />
         </div>
     );
 };

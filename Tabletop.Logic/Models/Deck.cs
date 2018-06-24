@@ -23,6 +23,8 @@ namespace Tabletop.Logic.Models
             Height = height;
             Width = width;
             _cards = cards.ToList();
+            X = (int)Math.Round( cards.Average( i => i.X ) );
+            Y = (int)Math.Round( cards.Average( i => i.Y ) );
         }
 
         #region impl
@@ -62,7 +64,7 @@ namespace Tabletop.Logic.Models
         }
         #endregion
 
-        private readonly List<Card> _cards;
+        private List<Card> _cards;
         private readonly Random _rnd = new Random();
 
         public Guid Id { get; } = Guid.NewGuid();
@@ -75,12 +77,12 @@ namespace Tabletop.Logic.Models
 
         public void Add( Card card )
         {
-            _cards.Add( card );
+            _cards.Insert( 0, card );
         }
 
         public void Add( IEnumerable<Card> cards )
         {
-            _cards.AddRange( cards );
+            _cards.InsertRange( 0, cards );
         }
 
         public Card TakeTop()
@@ -91,13 +93,15 @@ namespace Tabletop.Logic.Models
             }
             var card = _cards.First();
             _cards.RemoveAt( 0 );
+            card.Id = Guid.NewGuid();
+            card.Move( X, Y );
 
             return card;
         }
 
         public void Shuffle()
         {
-            _cards.OrderBy( i => _rnd.Next() );
+            _cards = _cards.OrderBy( i => _rnd.Next() ).ToList();
         }
 
         public string GetContent()

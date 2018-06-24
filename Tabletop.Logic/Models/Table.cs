@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Tabletop.Logic.Interfaces;
+using Tabletop.Logic.Models.Actions;
+using Tabletop.Logic.Models.Actions.Card;
+using Tabletop.Logic.Models.Actions.Deck;
 
 namespace Tabletop.Logic.Models
 {
     public class Table
     {
-        private List<Card> _cards;
-        private List<Deck> _decks;
+        private List<Card> _cards = new List<Card>();
+        private List<Deck> _decks = new List<Deck>();
         private const int _dropRadius = 50;
 
         public readonly int Height;
@@ -21,28 +24,67 @@ namespace Tabletop.Logic.Models
             Width = width;
         }
 
-        #region Cards
-        public void FlipCard( Guid id )
+        #region Table
+        public GetTableAction GetTable()
         {
-            var card = _cards.FirstOrDefault( i => i.Id == id );
+            var action = new GetTableAction( this )
+            {
+                Cards = _cards.Select( card => new TableCard( card ) ).ToList(),
+                Decks = _decks.Select( deck => new TableDeck( deck ) ).ToList()
+            };
+            return action;
+        }
+        #endregion
+
+        #region Cards
+        public IEnumerable<ITableAction> Dispatch( AddCardAction action )
+        {
+            var card = new Card( action.ContentTop, action.ContentBottom, action.H, action.W );
+            card.Move( action.X, action.Y );
+            _cards.Add( card );
+            action.Id = card.Id;
+            action.Content = card.GetContent();
+            action.ContentTop = action.ContentBottom = null;
+            return new List<ITableAction>
+            {
+                action
+            };
+        }
+        public IEnumerable<ITableAction> Dispatch( FlipCardAction action )
+        {
+            var card = _cards.FirstOrDefault( i => i.Id == action.Id );
             if( card == null )
             {
                 throw new ArgumentException( "Карта не найдена" );
             }
             card.Flip();
+            action.Content = card.GetContent();
+            return new List<ITableAction>
+            {
+                action
+            };
         }
-        public void GrabCard( Guid id )
+        public IEnumerable<ITableAction> Dispatch( CardUpAction action )
         {
-            var card = _cards.FirstOrDefault( i => i.Id == id );
+            var card = _cards.FirstOrDefault( i => i.Id == action.Id );
             if( card == null )
             {
                 throw new ArgumentException( "Карта не найдена" );
             }
             card.Grab();
+            return new List<ITableAction>
+            {
+                action
+            };
         }
-        public void DropCard( Guid id )
+        public IEnumerable<ITableAction> Dispatch( CardDownAction action )
         {
-            var card = _cards.FirstOrDefault( i => i.Id == id );
+            var result = new List<ITableAction>
+            {
+                action
+            };
+            
+            var card = _cards.FirstOrDefault( i => i.Id == action.Id );
             if( card == null )
             {
                 throw new ArgumentException( "Карта не найдена" );
@@ -67,96 +109,157 @@ namespace Tabletop.Logic.Models
                 .OrderBy( i => i.dist )
                 .Select( i => i.deck );
 
+            card.Drop();
+
             if( decks.Any() )
             {
                 var nearestDeck = decks.First();
-                nearestDeck.Add( card );
                 nearestDeck.Add( cards );
+
+                result.Add( new RemoveCardAction( card ) );
+                result.Add( new ChangeDeckAction( nearestDeck ) );
+                foreach( var c in cards )
+                {
+                    _cards.Remove( c );
+                }
             }
-            else if( cards.Any() )
+            else if( cards.Count() > 1 )
             {
-                _decks.Add( new Deck( cards ) );
+                var deck = new Deck( cards );
+                _decks.Add( deck );
+
+                result.Add( new AddDeckAction( deck ) );
+                foreach( var c in cards )
+                {
+                    _cards.Remove( c );
+                    result.Add( new RemoveCardAction( c ) );
+                }
             }
-            card.Drop();
+            return result;
         }
-        public void MoveCard( Guid id, int x, int y )
+        public IEnumerable<ITableAction> Dispatch( MoveCardAction action )
         {
-            var card = _cards.FirstOrDefault( i => i.Id == id );
+            var card = _cards.FirstOrDefault( i => i.Id == action.Id );
             if( card == null )
             {
                 throw new ArgumentException( "Карта не найдена" );
             }
-            (x, y) = FixCoords( x, y, card.Height, card.Width );
-            card.Move( x, y );
+            (action.X, action.Y) = FixCoords( action.X, action.Y, card.Height, card.Width );
+            card.Move( action.X, action.Y );
+            return new List<ITableAction>
+            {
+                action
+            };
         }
         #endregion
 
         #region Decks
-        public void FlipDeck( Guid id )
+        public IEnumerable<ITableAction> Dispatch( FlipDeckAction action )
         {
-            var deck = _decks.FirstOrDefault( i => i.Id == id );
+            var deck = _decks.FirstOrDefault( i => i.Id == action.Id );
             if( deck == null )
             {
                 throw new ArgumentException( "Колода не найдена" );
             }
             deck.Flip();
+            action.Content = deck.GetContent();
+            return new List<ITableAction>
+            {
+                action
+            };
         }
-        public void GrabDeck( Guid id )
+        public IEnumerable<ITableAction> Dispatch( DeckUpAction action )
         {
-            var deck = _decks.FirstOrDefault( i => i.Id == id );
+            var deck = _decks.FirstOrDefault( i => i.Id == action.Id );
             if( deck == null )
             {
                 throw new ArgumentException( "Колода не найдена" );
             }
             deck.Grab();
+            return new List<ITableAction>
+            {
+                action
+            };
         }
-        public void DropDeck( Guid id )
+        public IEnumerable<ITableAction> Dispatch( DeckDownAction action )
         {
-            var deck = _decks.FirstOrDefault( i => i.Id == id );
+            var deck = _decks.FirstOrDefault( i => i.Id == action.Id );
             if( deck == null )
             {
                 throw new ArgumentException( "Колода не найдена" );
             }
             deck.Drop();
+            return new List<ITableAction>
+            {
+                action
+            };
         }
-        public void MoveDeck( Guid id, int x, int y )
+        public IEnumerable<ITableAction> Dispatch( MoveDeckAction action )
         {
-            var deck = _decks.FirstOrDefault( i => i.Id == id );
+            var deck = _decks.FirstOrDefault( i => i.Id == action.Id );
             if( deck == null )
             {
                 throw new ArgumentException( "Колода не найдена" );
             }
-            (x, y) = FixCoords( x, y, deck.Height, deck.Width );
-            deck.Move( x, y );
+            (action.X, action.Y) = FixCoords( action.X, action.Y, deck.Height, deck.Width );
+            deck.Move( action.X, action.Y );
+            return new List<ITableAction>
+            {
+                action
+            };
         }
-        public void GetFromDeck( Guid id )
+        public IEnumerable<ITableAction> Dispatch( TakeTopDeckCardAction action )
         {
-            var deck = _decks.FirstOrDefault( i => i.Id == id );
+            var deck = _decks.FirstOrDefault( i => i.Id == action.Id );
             if( deck == null )
             {
                 throw new ArgumentException( "Колода не найдена" );
             }
+
+            var result = new List<ITableAction>();
+
             var card = deck.TakeTop();
-            if( deck.Length == 0 )
-            {
-                _decks.Remove( deck );
-            }
             _cards.Add( card );
+            result.Add( new AddCardAction( card ) );
+            result.Add( new CardUpAction( card ) );
+            if( deck.Length > 1 )
+            {
+                action.Content = deck.GetContent();
+                action.Length = deck.Length;
+                result.Add( action );
+            }
+            else
+            {
+                var lastCard = deck.TakeTop();
+                _cards.Add( lastCard );
+                _decks.Remove( deck );
+                result.Add( new AddCardAction( lastCard ) );
+                result.Add( new RemoveDeckAction( deck ) );
+            }
+
+            return result;
         }
-        public void ShuffleDeck( Guid id )
+        public IEnumerable<ITableAction> Dispatch( ShuffleDeckAction action )
         {
-            var deck = _decks.FirstOrDefault( i => i.Id == id );
+            var deck = _decks.FirstOrDefault( i => i.Id == action.Id );
             if( deck == null )
             {
                 throw new ArgumentException( "Колода не найдена" );
             }
             deck.Shuffle();
+            action.Content = deck.GetContent();
+            return new List<ITableAction>
+            {
+                action
+            };
         }
         #endregion
 
         private double GetDistance( IObject obj1, IObject obj2 )
         {
-            return Math.Sqrt( (obj1.X - obj2.X)^2 + (obj1.Y - obj2.Y) ^ 2 );
+            var dx = obj1.X - obj2.X;
+            var dy = obj1.Y - obj2.Y;
+            return Math.Sqrt( dx * dx + dy * dy );
         }
         private (int, int) FixCoords(int x, int y, int objHeigth, int objWidth)
         {

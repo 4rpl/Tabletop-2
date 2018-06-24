@@ -5,19 +5,21 @@ function cardsReducer(state = [], action) {
         case TableActions.FLIP_CARD: {
             return state.map((card, _) => {
                 return card.id === action.id
-                    ? Object.assign({}, card, {
-                        visible: !card.visible
-                    })
+                    ? {
+                        ...card,
+                        content: action.content
+                    }
                     : card;
             })
         }
         case TableActions.MOVE_CARD: {
             return state.map((card, _) => {
                 if (card.id === action.id) {
-                    return Object.assign({}, card, {
+                    return {
+                        ...card,
                         x: action.x,
                         y: action.y
-                    });
+                    };
                 } else {
                     return card;
                 }
@@ -25,18 +27,12 @@ function cardsReducer(state = [], action) {
         }
         case TableActions.CARD_UP: {
             return state.map((card, _) => {
-                if (card.z === action.z) {
+                if (card.id === action.id) {
                     return {
                         ...card,
                         active: true,
                         mx: action.mx,
-                        my: action.my,
-                        z: 100 + state.length
-                    };
-                } else if (card.z > action.z) {
-                    return {
-                        ...card,
-                        z: card.z - 1
+                        my: action.my
                     };
                 } else {
                     return card;
@@ -47,7 +43,7 @@ function cardsReducer(state = [], action) {
             return [
                 ...state,
                 {
-                    id: '1',
+                    id: action.id,
                     x: action.x,
                     y: action.y,
                     mx: action.mx,
@@ -56,9 +52,7 @@ function cardsReducer(state = [], action) {
                     h: action.h,
                     w: action.w,
                     active: action.active,
-                    visible: action.visible,
-                    contentTop: action.contentTop,
-                    contentBottom: action.contentBottom
+                    content: action.content
                 }
             ]
         }
@@ -73,6 +67,9 @@ function cardsReducer(state = [], action) {
                     return card;
                 }
             });
+        }
+        case TableActions.REMOVE_CARD: {
+            return state.filter(card => card.id !== action.id);
         }
         default: {
             return state;

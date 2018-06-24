@@ -21,7 +21,7 @@
         border: 1px solid #fb9;
     }
 
-    &:active {
+    &.grabbed {
         box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3);
     }
 
@@ -31,6 +31,99 @@
         width: 100%;
         vertical-align: middle;
     }
+}
+
+.deck {
+    outline: none;
+    border: 1px solid #999;
+    border-right: 3px solid #777;
+    border-bottom: 2px solid #999;
+    border-radius: 4px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    cursor: move;
+    width: 102px;
+    height: 142px;
+    background-color: #efefef;
+    transition: box-shadow 0.15s ease-out;
+
+    & * {
+        border-radius: inherit;
+        height: 100%;
+        width: 100%;
+    }
+
+    &:hover {
+        border: 1px solid #fb9;
+        border-right: 3px solid #d96;
+        border-bottom: 2px solid #fb9;
+    }
+
+    &:active {
+        box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3);
+    }
+}
+
+.deckCardsCounter {
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    top: -11px;
+    left: -11px;
+    color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(255, 255, 255, 0.8);
+    font-size: 21px;
+    width: initial;
+    height: initial;
+    padding: 0 6px;
+    width: no;
+    border-radius: 5px;
+    position: absolute;
+}
+
+/*.shuffleAnimaiton-enter {
+    position: absolute;
+    opacity: 0.01;
+
+    &.shuffleAnimaiton-enter-active {
+        opacity: 1;
+        transition: opacity 500ms ease-in;
+    }
+}
+
+.shuffleAnimaiton-leave {
+    position: absolute;
+    opacity: 1;
+
+    &.shuffleAnimaiton-leave-active {
+        opacity: 0.01;
+        transition: opacity 300ms ease-in;
+    }
+}*/
+
+.deckAnimaiton {
+    outline: none;
+    border: 1px solid #999;
+    border-radius: 4px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 102px;
+    height: 142px;
+    background-color: #efefef;
+
+    & * {
+        border-radius: inherit;
+        height: 100%;
+        width: 100%;
+    }
+}
+
+.deckAnimaitonLeft {
+    animation: Shuffle-animaiton 1 0.35s ease-in-out;
+}
+
+.deckAnimaitonRight {
+    animation: Shuffle-animaiton 1 0.45s ease-in-out;
 }
 
 .noselect * {

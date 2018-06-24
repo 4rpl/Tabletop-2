@@ -1,4 +1,6 @@
-﻿export default class ServerSyncService {
+﻿import { HubConnectionBuilder, LogLevel } from '@aspnet/signalr';
+
+export default class ServerSyncService {
 
     static instance = null;
 
@@ -10,41 +12,39 @@
         return this.instance;
     }
 
+    hubUrl = 'https://localhost:44344/game';
+    __hubConnection = null;
+    __connected = false;
+
+    onMessage = () => { }
+
     connect = () => {
-        this.__socket = new WebSocket('wss://localhost:44344/api/Table/RequestSession');
-        this.__socket.onopen = event => {
-            this.onOpen(event);
-        };
-        this.__socket.onclose = event => {
-            this.onClose(event);
-        };
-        this.__socket.onerror = event => {
-            this.onError(event);
-        };
-        this.__socket.onmessage = event => {
-            this.onMessage(event);
-        };
+        this.__hubConnection = new HubConnectionBuilder()
+            .withUrl(this.hubUrl)
+            .configureLogging(LogLevel.Information)
+            .build();
+
+        this.__hubConnection.on('PerformAction', action => {
+            this.onMessage(action)
+        });
+
+        this.__hubConnection.start().then(() => { this.__connected = true });
     }
 
-    onMessage = (event) => { };
-    onError = (event) => { };
-    onOpen = (event) => { };
-    onClose = (event) => { };
-
     sendAction = action => {
-        if (!this.__socket || this.__socket.readyState !== WebSocket.OPEN) {
+        if (!this.__hubConnection || !this.__connected) {
             console.error("ServerSyncService: socket is not connected");
             return;
         }
-        let payload = JSON.stringify(action);
-        this.__socket.send(payload);
+        //console.log('sending:', action);
+        this.__hubConnection.invoke(action.type, action);
     }
 
     closeConnection = () => {
-        if (!this.__socket || this.__socket.readyState !== WebSocket.OPEN) {
+        if (!this.__hubConnection || !this.__connected) {
             console.error("ServerSyncService: socket is not connected");
             return;
         }
-        this.__socket.close(1000, "Closing from client");
+        this.__hubConnection.close(1000, "Closing from client");
     }
 }

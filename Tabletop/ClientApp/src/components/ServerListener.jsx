@@ -1,5 +1,4 @@
-﻿import React from 'react';
-import { connect } from 'react-redux';
+﻿import { connect } from 'react-redux';
 import ServerSyncService from '../services/ServerSyncService';
 
 const mapStateToProps = state => {
@@ -11,9 +10,9 @@ const mapDispatchToProps = dispatch => {
 }
 
 const ServerListener = ({ state, dispatch }) => {
+
     let syncService = ServerSyncService.getInstance();
-    syncService.onMessage = (event) => {
-        let action = JSON.parse(event.data);
+    syncService.onMessage = action => {
         dispatch({
             ...action,
             enforce: true

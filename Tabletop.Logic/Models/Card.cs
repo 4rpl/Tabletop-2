@@ -70,7 +70,7 @@ namespace Tabletop.Logic.Models
         private readonly string _topContent;
         private readonly string _bottomContent;
 
-        public Guid Id { get; } = Guid.NewGuid();
+        public Guid Id { get; set; } = Guid.NewGuid();
         public readonly int Height;
         public readonly int Width;
 

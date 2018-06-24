@@ -1,11 +1,11 @@
 using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Tabletop.Hubs;
 
 namespace Tabletop
 {
@@ -22,6 +22,7 @@ namespace Tabletop
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddSignalR();
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
@@ -47,12 +48,10 @@ namespace Tabletop
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
 
-            var webSocketOptions = new WebSocketOptions()
+            app.UseSignalR( routes =>
             {
-                KeepAliveInterval = TimeSpan.FromSeconds( 120 ),
-                ReceiveBufferSize = 4 * 1024
-            };
-            app.UseWebSockets( webSocketOptions );
+                routes.MapHub<GameHub>( "/game" );
+            } );
 
             app.UseMvc(routes =>
             {
