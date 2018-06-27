@@ -3,23 +3,32 @@
   body {
     padding-top: 50px; } }
 
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  overflow: hidden;
+  background-color: #222; }
+
+.table {
+  background-color: #fff;
+  height: 100%;
+  width: 100%;
+  position: absolute; }
+
 .card {
   border: 1px solid #999;
   border-radius: 5px;
   position: absolute;
-  left: 0;
-  top: 0;
+  background-color: #999;
   cursor: move;
-  width: 91px;
-  height: 140px;
-  background-color: #efefef;
   transition: box-shadow 0.15s ease-out; }
   .card:hover {
     border: 1px solid #fb9; }
   .card.grabbed {
     box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3); }
   .card * {
-    border-radius: inherit;
+    border-radius: 5px;
     height: 100%;
     width: 100%;
     vertical-align: middle; }
@@ -29,17 +38,13 @@
   border: 1px solid #999;
   border-right: 3px solid #777;
   border-bottom: 2px solid #999;
-  border-radius: 4px;
+  border-radius: 5px;
+  background-color: #999;
   position: absolute;
-  left: 0;
-  top: 0;
   cursor: move;
-  width: 102px;
-  height: 142px;
-  background-color: #efefef;
   transition: box-shadow 0.15s ease-out; }
   .deck * {
-    border-radius: inherit;
+    border-radius: 5px;
     height: 100%;
     width: 100%; }
   .deck:hover {

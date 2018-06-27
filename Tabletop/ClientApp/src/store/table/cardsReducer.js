@@ -1,4 +1,7 @@
 ﻿import { TableActions } from './TableActions';
+import Config from '../../config';
+
+const initialZIndex = Config.zIndex.card;
 
 function cardsReducer(state = [], action) {
     switch (action.type) {
@@ -26,14 +29,21 @@ function cardsReducer(state = [], action) {
             })
         }
         case TableActions.CARD_UP: {
-            return state.map((card, _) => {
+            return state.map(card => {
+                const z = state.find(i => i.id === action.id).z;
                 if (card.id === action.id) {
                     return {
                         ...card,
                         active: true,
                         mx: action.mx,
-                        my: action.my
+                        my: action.my,
+                        z: initialZIndex + state.length
                     };
+                } else if (card.z > z) {
+                    return {
+                        ...card,
+                        z: card.z - 1
+                    }
                 } else {
                     return card;
                 }
@@ -48,7 +58,7 @@ function cardsReducer(state = [], action) {
                     y: action.y,
                     mx: action.mx,
                     my: action.my,
-                    z: 100 + state.length + 1,
+                    z: initialZIndex + state.length,
                     h: action.h,
                     w: action.w,
                     active: action.active,

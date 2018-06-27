@@ -2,7 +2,7 @@
 import { connect } from 'react-redux';
 import { flipDeck, moveDeck, deckUp, deckDown, shuffleDeck, takeTopDeckCard } from '../store/table/TableActions';
 import CallbackService from '../services/CallbackService';
-import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+//import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 const mapStateToProps = function (state) {
     return {
@@ -75,7 +75,7 @@ const Deck = function ({ id, x, y, mx, my, z, h, w, active, content, length, onF
         }
         return false;
     }
-    
+
     let contentImg = <img alt={content} src={process.env.PUBLIC_URL + content} />;
     //let animation = (
     //    <div>
@@ -96,16 +96,14 @@ const Deck = function ({ id, x, y, mx, my, z, h, w, active, content, length, onF
     //    </ReactCSSTransitionGroup>
     //);
     return (
-        <div>
-            <div style={{ top: y, left: x, width: w, height: h, zIndex: z }}
-                onMouseDown={MouseDown}
-                onKeyDown={OnKeyPress}
-                tabIndex="-1"
-                onContextMenu={OnContextMenu}
-                className="deck noselect">
-                <span className="deckCardsCounter">{length}</span>
-                {contentImg}
-            </div>
+        <div style={{ top: y, left: x, width: w, height: h, zIndex: z }}
+            onMouseDown={MouseDown}
+            onKeyDown={OnKeyPress}
+            tabIndex="-1"
+            onContextMenu={OnContextMenu}
+            className="deck noselect">
+            <span className="deckCardsCounter">{length}</span>
+            {contentImg}
         </div>
     );
 }

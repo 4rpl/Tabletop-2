@@ -220,8 +220,7 @@ namespace Tabletop.Logic.Models
 
             var card = deck.TakeTop();
             _cards.Add( card );
-            result.Add( new AddCardAction( card ) );
-            result.Add( new CardUpAction( card ) );
+            card.Grab();
             if( deck.Length > 1 )
             {
                 action.Content = deck.GetContent();
@@ -233,9 +232,14 @@ namespace Tabletop.Logic.Models
                 var lastCard = deck.TakeTop();
                 _cards.Add( lastCard );
                 _decks.Remove( deck );
-                result.Add( new AddCardAction( lastCard ) );
                 result.Add( new RemoveDeckAction( deck ) );
+                result.Add( new AddCardAction( lastCard ) );
             }
+            result.Add( new AddCardAction( card )
+            {
+                Mx = action.Mx,
+                My = action.My
+            } );
 
             return result;
         }

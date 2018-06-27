@@ -5,16 +5,29 @@
     }
 }
 
+$card-border-radius: 5px;
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    overflow: hidden;
+    background-color: #222;
+}
+
+.table {
+    background-color: #fff;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+}
+
 .card {
     border: 1px solid #999;
-    border-radius: 5px;
+    border-radius: $card-border-radius;
     position: absolute;
-    left: 0;
-    top: 0;
+    background-color: #999;
     cursor: move;
-    width: 91px;
-    height: 140px;
-    background-color: #efefef;
     transition: box-shadow 0.15s ease-out;
 
     &:hover {
@@ -26,7 +39,7 @@
     }
 
     & * {
-        border-radius: inherit;
+        border-radius: $card-border-radius;
         height: 100%;
         width: 100%;
         vertical-align: middle;
@@ -38,18 +51,14 @@
     border: 1px solid #999;
     border-right: 3px solid #777;
     border-bottom: 2px solid #999;
-    border-radius: 4px;
+    border-radius: $card-border-radius;
+    background-color: #999;
     position: absolute;
-    left: 0;
-    top: 0;
     cursor: move;
-    width: 102px;
-    height: 142px;
-    background-color: #efefef;
     transition: box-shadow 0.15s ease-out;
 
     & * {
-        border-radius: inherit;
+        border-radius: $card-border-radius;
         height: 100%;
         width: 100%;
     }

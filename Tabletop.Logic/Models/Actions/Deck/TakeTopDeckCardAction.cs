@@ -11,5 +11,7 @@ namespace Tabletop.Logic.Models.Actions.Deck
         public Guid Id { get; set; }
         public string Content { get; set; }
         public int Length { get; set; }
+        public int Mx { get; set; }
+        public int My { get; set; }
     }
 }

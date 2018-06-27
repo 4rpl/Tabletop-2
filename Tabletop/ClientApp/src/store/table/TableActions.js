@@ -1,5 +1,10 @@
 ﻿const GET_TABLE =           'GetTable';
 
+const TABLE_SCALE =         'TableScale';
+const TABLE_MOVE =          'TableMove';
+const TABLE_MOUSE_DOWN =    'TableMouseDown';
+const TABLE_MOUSE_UP =      'TableMouseUp';
+
 const FLIP_CARD =           'FlipCard';
 const MOVE_CARD =           'MoveCard';
 const CARD_UP =             'CardUp';
@@ -20,6 +25,11 @@ const REMOVE_DECK =         'RemoveDeck';
 export const TableActions = {
     GET_TABLE,
 
+    TABLE_SCALE,
+    TABLE_MOVE,
+    TABLE_MOUSE_DOWN,
+    TABLE_MOUSE_UP,
+
     FLIP_CARD,
     MOVE_CARD,
     CARD_UP,
@@ -36,6 +46,19 @@ export const TableActions = {
     SHUFFLE_DECK,
     REMOVE_DECK,
     TAKE_TOP_DECK_CARD
+}
+
+export function tableScale(scale) {
+    return { type: TABLE_SCALE, enforce: true, scale };
+}
+export function tableMove(x, y) {
+    return { type: TABLE_MOVE, enforce: true, x, y };
+}
+export function tableMouseUp() {
+    return { type: TABLE_MOUSE_UP, enforce: true };
+}
+export function tableMouseDown(mx, my) {
+    return { type: TABLE_MOUSE_DOWN, enforce: true, mx, my };
 }
 
 export function flipCard(id) {
