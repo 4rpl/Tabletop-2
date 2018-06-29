@@ -12,7 +12,7 @@ export default class ServerSyncService {
         return this.instance;
     }
 
-    hubUrl = 'https://localhost:44344/game';
+    hubUrl = '/game';
     __hubConnection = null;
     __connected = false;
 

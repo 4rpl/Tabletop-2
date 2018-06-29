@@ -6,7 +6,7 @@ using CardModel = Tabletop.Logic.Models.Card;
 
 namespace Tabletop.Logic.Models.Actions.Card
 {
-    public class AddCardAction : ITableAction
+    public class AddCardAction : ITableAction, IOwnershipAction
     {
         public AddCardAction() { }
 
@@ -34,5 +34,6 @@ namespace Tabletop.Logic.Models.Actions.Card
         public string Content { get; set; }
         public string ContentTop { get; set; }
         public string ContentBottom { get; set; }
+        public bool IsOwner { get; set; }
     }
 }

@@ -70,7 +70,18 @@ namespace Tabletop.Hubs
         {
             foreach( var action in actions )
             {
-                await Clients.All.SendAsync( "PerformAction", action );
+                if( action is IOwnershipAction )
+                {
+                    var oa = action as IOwnershipAction;
+                    oa.IsOwner = false;
+                    await Clients.Others.SendAsync( "PerformAction", oa );
+                    oa.IsOwner = true;
+                    await Clients.Caller.SendAsync( "PerformAction", oa );
+                }
+                else
+                {
+                    await Clients.All.SendAsync( "PerformAction", action );
+                }
             }
         }
     }

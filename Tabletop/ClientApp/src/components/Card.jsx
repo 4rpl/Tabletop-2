@@ -28,8 +28,8 @@ const mapDispatchToProps = function (dispatch) {
 class Card extends React.Component {
 
     componentDidMount() {
-        let { id, mx, my, active } = this.props;
-        if (active) {
+        let { id, mx, my, active, isOwner } = this.props;
+        if (active && isOwner) {
             this.applyCallbacks(id, mx, my);
         }
     }
@@ -42,9 +42,9 @@ class Card extends React.Component {
     callbackService = CallbackService.getInstance();
 
     MouseDown(e) {
-        let { id, x, y, z, onCardUp } = this.props;
+        let { id, x, y, z, active, onCardUp } = this.props;
         //console.log('Down', id);
-        if (e.button === 0) {
+        if (!active && e.button === 0) {
             onCardUp(id, x - e.clientX, y - e.clientY, z);
             this.applyCallbacks(id, x - e.clientX, y - e.clientY);
         }

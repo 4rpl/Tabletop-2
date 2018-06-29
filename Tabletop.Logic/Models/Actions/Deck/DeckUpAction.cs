@@ -5,12 +5,13 @@ using System.Threading.Tasks;
 
 namespace Tabletop.Logic.Models.Actions.Deck
 {
-    public class DeckUpAction : ITableAction
+    public class DeckUpAction : ITableAction, IOwnershipAction
     {
         public string Type { get; set; }
         public Guid Id { get; set; }
         public int Mx { get; set; }
         public int My { get; set; }
         public int Z { get; set; }
+        public bool IsOwner { get; set; }
     }
 }

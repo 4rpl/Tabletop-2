@@ -232,8 +232,8 @@ namespace Tabletop.Logic.Models
                 var lastCard = deck.TakeTop();
                 _cards.Add( lastCard );
                 _decks.Remove( deck );
-                result.Add( new RemoveDeckAction( deck ) );
                 result.Add( new AddCardAction( lastCard ) );
+                result.Add( new RemoveDeckAction( deck ) );
             }
             result.Add( new AddCardAction( card )
             {

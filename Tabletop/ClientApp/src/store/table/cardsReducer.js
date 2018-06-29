@@ -35,6 +35,7 @@ function cardsReducer(state = [], action) {
                     return {
                         ...card,
                         active: true,
+                        isOwner: action.isOwner,
                         mx: action.mx,
                         my: action.my,
                         z: initialZIndex + state.length
@@ -62,6 +63,7 @@ function cardsReducer(state = [], action) {
                     h: action.h,
                     w: action.w,
                     active: action.active,
+                    isOwner: action.isOwner,
                     content: action.content
                 }
             ]

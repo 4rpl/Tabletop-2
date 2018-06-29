@@ -81,6 +81,7 @@ const Table = ({ game, onAddCard, onTableScale, onTableMove, onTableMouseUp, onT
                 h={card.h}
                 w={card.w}
                 active={card.active}
+                isOwner={card.isOwner}
                 content={card.content}
                 visible={card.visible} />
         );
@@ -99,6 +100,7 @@ const Table = ({ game, onAddCard, onTableScale, onTableMove, onTableMouseUp, onT
                 h={deck.h}
                 w={deck.w}
                 active={deck.active}
+                isOwner={deck.isOwner}
                 length={deck.length}
                 content={deck.content} />
         )
@@ -109,7 +111,7 @@ const Table = ({ game, onAddCard, onTableScale, onTableMove, onTableMouseUp, onT
             style={{ top: table.y, left: table.x, transform: `scale(${table.scale})`, width: table.w, height: table.h }}
             onWheel={Wheel}
             onMouseDown={MouseDown}>
-            <button onClick={onAddCard}>Add Card</button>
+            <button onClick={onAddCard}>+</button>
             {decks}
             {cards}
         </div>

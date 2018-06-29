@@ -38,12 +38,14 @@ const Deck = function ({ id, x, y, mx, my, z, h, w, active, content, length, onF
 
     function MouseDown(e) {
         //console.log('Down');
-        if (e.shiftKey) {
-            takeTopDeckCard(id, x - e.clientX, y - e.clientY);
-        } else if (e.button === 0) {
-            onDeckUp(id, x - e.clientX, y - e.clientY, z);
-            callbackService.onMouseUp(id, MouseUp);
-            callbackService.onMouseMove(id, MouseMove.bind(null, x - e.clientX, y - e.clientY));
+        if (!active) {
+            if (e.shiftKey) {
+                takeTopDeckCard(id, x - e.clientX, y - e.clientY);
+            } else if (e.button === 0) {
+                onDeckUp(id, x - e.clientX, y - e.clientY, z);
+                callbackService.onMouseUp(id, MouseUp);
+                callbackService.onMouseMove(id, MouseMove.bind(null, x - e.clientX, y - e.clientY));
+            }
         }
         e.stopPropagation();
         return false;
