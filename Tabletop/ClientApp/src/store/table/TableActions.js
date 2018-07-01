@@ -1,5 +1,9 @@
 ﻿const GET_TABLE =           'GetTable';
 
+const ADD_USER =            'AddUser';
+const REMOVE_USER =         'RemoveUser';
+const MOVE_USER =           'MoveUser';
+
 const TABLE_SCALE =         'TableScale';
 const TABLE_MOVE =          'TableMove';
 const TABLE_MOUSE_DOWN =    'TableMouseDown';
@@ -25,6 +29,10 @@ const REMOVE_DECK =         'RemoveDeck';
 export const TableActions = {
     GET_TABLE,
 
+    ADD_USER,
+    REMOVE_USER,
+    MOVE_USER,
+
     TABLE_SCALE,
     TABLE_MOVE,
     TABLE_MOUSE_DOWN,
@@ -46,6 +54,10 @@ export const TableActions = {
     SHUFFLE_DECK,
     REMOVE_DECK,
     TAKE_TOP_DECK_CARD
+}
+
+export function moveUser(x, y) {
+    return { type: MOVE_USER, x, y };
 }
 
 export function tableScale(scale) {

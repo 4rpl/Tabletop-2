@@ -2,7 +2,8 @@
 import { connect } from 'react-redux';
 import Card from './Card';
 import Deck from './Deck';
-import { addCard, tableScale, tableMove, tableMouseUp, tableMouseDown } from '../store/table/TableActions';
+import Cursor from './Cursor';
+import { addCard, tableScale, tableMove, tableMouseUp, tableMouseDown, moveUser } from '../store/table/TableActions';
 import CallbackService from '../services/CallbackService';
 
 const mapDispatchToProps = function (dispatch) {
@@ -18,6 +19,9 @@ const mapDispatchToProps = function (dispatch) {
         },
         onTableMouseDown: function (mx, my) {
             dispatch(tableMouseDown(mx, my));
+        },
+        onCursorMove: function (x, y) {
+            dispatch(moveUser(x, y));
         },
         onAddCard: () => {
             dispatch(addCard(
@@ -35,31 +39,51 @@ const mapStateToProps = function (state) {
     };
 }
 
-const Table = ({ game, onAddCard, onTableScale, onTableMove, onTableMouseUp, onTableMouseDown }) => {
+class Table extends React.Component {
+    
+    componentDidMount() {
+        const callbackService = CallbackService.getInstance();
+        callbackService.onMouseMove('CURSOR', this.CursorMove.bind(this));
+    }
 
-    const table = game.table;
-    const callbackService = CallbackService.getInstance();
+    MouseDown(e) {
+        const { game, onTableMouseDown } = this.props;
+        const table = game.table;
+        const callbackService = CallbackService.getInstance();
 
-    function MouseDown(e) {
         onTableMouseDown(table.x - e.clientX, table.y - e.clientY);
-        callbackService.onMouseUp('TABLE', MouseUp);
-        callbackService.onMouseMove('TABLE', MouseMove.bind(null, table.x - e.clientX, table.y - e.clientY));
+        callbackService.onMouseUp('TABLE', this.MouseUp.bind(this));
+        callbackService.onMouseMove('TABLE', this.MouseMove.bind(this, table.x - e.clientX, table.y - e.clientY));
         return false;
     }
 
-    function MouseMove(mx, my, e) {
+    MouseMove(mx, my, e) {
+        const { onTableMove } = this.props;
+
         onTableMove(e.clientX + mx, e.clientY + my);
         return false;
     }
 
-    function MouseUp(e) {
+    MouseUp(e) {
+        const { onTableMouseUp } = this.props;
+        const callbackService = CallbackService.getInstance();
+
         callbackService.unsubscribeOnMouseUp('TABLE');
         callbackService.unsubscribeOnMouseMove('TABLE');
         onTableMouseUp();
         return false;
     }
 
-    function Wheel(e) {
+    CursorMove(e) {
+        const { onCursorMove, game } = this.props;
+        const table = game.table;
+        onCursorMove(e.clientX - table.x, e.clientY - table.y);
+        return false;
+    }
+
+    Wheel(e) {
+        const { onTableScale } = this.props;
+
         if (e.deltaY > 0) {
             onTableScale(-0.05);
         } else {
@@ -68,54 +92,70 @@ const Table = ({ game, onAddCard, onTableScale, onTableMove, onTableMouseUp, onT
         e.preventDefault();
     }
 
-    let cards = game.cards.map(card => {
+    render() {
+        const { game, onAddCard } = this.props;
+        const table = game.table;
+
+        const cards = game.cards.map(card => {
+            return (
+                <Card
+                    key={card.id}
+                    id={card.id}
+                    x={card.x}
+                    y={card.y}
+                    mx={card.mx}
+                    my={card.my}
+                    z={card.z}
+                    h={card.h}
+                    w={card.w}
+                    active={card.active}
+                    isOwner={card.isOwner}
+                    content={card.content}
+                    visible={card.visible} />
+            );
+        });
+
+        const decks = game.decks.map(deck => {
+            return (
+                <Deck
+                    key={deck.id}
+                    id={deck.id}
+                    x={deck.x}
+                    y={deck.y}
+                    mx={deck.mx}
+                    my={deck.my}
+                    z={deck.z}
+                    h={deck.h}
+                    w={deck.w}
+                    active={deck.active}
+                    isOwner={deck.isOwner}
+                    length={deck.length}
+                    content={deck.content} />
+            );
+        });
+
+        const users = game.users.map(user => {
+            return (
+                <Cursor
+                    key={user.id}
+                    name={user.name}
+                    x={user.x}
+                    y={user.y} />
+            );
+        });
+
         return (
-            <Card
-                key={card.id}
-                id={card.id}
-                x={card.x}
-                y={card.y}
-                mx={card.mx}
-                my={card.my}
-                z={card.z}
-                h={card.h}
-                w={card.w}
-                active={card.active}
-                isOwner={card.isOwner}
-                content={card.content}
-                visible={card.visible} />
+            <div className="table"
+                style={{ top: table.y, left: table.x, transform: `scale(${table.scale})`, width: table.w, height: table.h }}
+                onWheel={this.Wheel.bind(this)}
+                onMouseDown={this.MouseDown.bind(this)}>
+                <button onClick={onAddCard}>+</button>
+                {users}
+                {decks}
+                {cards}
+            </div>
         );
-    });
-
-    let decks = game.decks.map(deck => {
-        return (
-            <Deck
-                key={deck.id}
-                id={deck.id}
-                x={deck.x}
-                y={deck.y}
-                mx={deck.mx}
-                my={deck.my}
-                z={deck.z}
-                h={deck.h}
-                w={deck.w}
-                active={deck.active}
-                isOwner={deck.isOwner}
-                length={deck.length}
-                content={deck.content} />
-        )
-    });
-
-    return (
-        <div className="table"
-            style={{ top: table.y, left: table.x, transform: `scale(${table.scale})`, width: table.w, height: table.h }}
-            onWheel={Wheel}
-            onMouseDown={MouseDown}>
-            <button onClick={onAddCard}>+</button>
-            {decks}
-            {cards}
-        </div>
-    );
+    }
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Table);

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CardModel = Tabletop.Logic.Models.Card;
 using DeckModel = Tabletop.Logic.Models.Deck;
+using UserModel = Tabletop.Logic.Models.User;
 
 namespace Tabletop.Logic.Models.Actions
 {
@@ -19,10 +20,12 @@ namespace Tabletop.Logic.Models.Actions
         }
 
         public string Type { get; set; }
+        public Resiever Resiever { get; set; } = Resiever.Caller;
         public int H { get; set; }
         public int W { get; set; }
         public List<TableCard> Cards { get; set; }
         public List<TableDeck> Decks { get; set; }
+        public List<TableUser> Users { get; set; }
     }
 
     public class TableCard
@@ -73,5 +76,22 @@ namespace Tabletop.Logic.Models.Actions
         public bool Active { get; set; }
         public string Content { get; set; }
         public int Length { get; set; }
+    }
+
+    public class TableUser
+    {
+        public TableUser( UserModel user )
+        {
+            Id = user.Id;
+            Name = user.Name;
+            X = user.X;
+            Y = user.Y;
+
+        }
+
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public int X { get; set; }
+        public int Y { get; set; }
     }
 }

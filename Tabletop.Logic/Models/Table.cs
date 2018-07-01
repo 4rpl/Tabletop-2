@@ -6,6 +6,7 @@ using Tabletop.Logic.Interfaces;
 using Tabletop.Logic.Models.Actions;
 using Tabletop.Logic.Models.Actions.Card;
 using Tabletop.Logic.Models.Actions.Deck;
+using Tabletop.Logic.Models.Actions.User;
 
 namespace Tabletop.Logic.Models
 {
@@ -13,6 +14,7 @@ namespace Tabletop.Logic.Models
     {
         private List<Card> _cards = new List<Card>();
         private List<Deck> _decks = new List<Deck>();
+        private List<User> _users = new List<User>();
         private const int _dropRadius = 50;
 
         public readonly int Height;
@@ -30,9 +32,48 @@ namespace Tabletop.Logic.Models
             var action = new GetTableAction( this )
             {
                 Cards = _cards.Select( card => new TableCard( card ) ).ToList(),
-                Decks = _decks.Select( deck => new TableDeck( deck ) ).ToList()
+                Decks = _decks.Select( deck => new TableDeck( deck ) ).ToList(),
+                Users = _users.Select( user => new TableUser( user ) ).ToList()
             };
             return action;
+        }
+        #endregion
+
+        #region Users
+        public IEnumerable<ITableAction> Dispatch( AddUserAction action )
+        {
+            var user = new User( action.Id, action.Name, action.X, action.Y );
+            _users.Add( user );
+            return new List<ITableAction>
+            {
+                action
+            };
+        }
+        public IEnumerable<ITableAction> Dispatch( MoveUserAction action )
+        {
+            var user = _users.FirstOrDefault( i => i.Id == action.Id );
+            if( user == null )
+            {
+                throw new ArgumentException( "Пользователь не найден" );
+            }
+            user.Move( action.X, action.Y );
+            return new List<ITableAction>
+            {
+                action
+            };
+        }
+        public IEnumerable<ITableAction> Dispatch( RemoveUserAction action )
+        {
+            var user = _users.FirstOrDefault( i => i.Id == action.Id );
+            if( user == null )
+            {
+                throw new ArgumentException( "Пользователь не найден" );
+            }
+            _users.Remove( user );
+            return new List<ITableAction>
+            {
+                action
+            };
         }
         #endregion
 

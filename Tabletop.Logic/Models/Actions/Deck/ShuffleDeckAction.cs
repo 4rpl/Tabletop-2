@@ -8,6 +8,7 @@ namespace Tabletop.Logic.Models.Actions.Deck
     public class ShuffleDeckAction : ITableAction
     {
         public string Type { get; set; }
+        public Resiever Resiever { get; set; } = Resiever.All;
         public Guid Id { get; set; }
         public string Content { get; set; }
     }

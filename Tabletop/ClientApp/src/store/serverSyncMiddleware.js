@@ -1,4 +1,5 @@
 ﻿import ServerSyncService from '../services/ServerSyncService';
+import { TableActions } from './table/TableActions';
 
 export default function serverSyncMiddleware({ getState }) {
 
@@ -7,7 +8,12 @@ export default function serverSyncMiddleware({ getState }) {
             next(action);
         } else {
             let syncService = ServerSyncService.getInstance();
-            syncService.sendAction(action);
+            switch (action.type) {
+                default: {
+                    syncService.sendAction(action);
+                    break;
+                }
+            }
         }
     }
 }

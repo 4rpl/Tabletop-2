@@ -8,6 +8,7 @@ namespace Tabletop.Logic.Models.Actions.Deck
     public class DeckUpAction : ITableAction, IOwnershipAction
     {
         public string Type { get; set; }
+        public Resiever Resiever { get; set; } = Resiever.All;
         public Guid Id { get; set; }
         public int Mx { get; set; }
         public int My { get; set; }

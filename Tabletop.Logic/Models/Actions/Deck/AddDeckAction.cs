@@ -22,6 +22,7 @@ namespace Tabletop.Logic.Models.Actions.Deck
         }
 
         public string Type { get; set; }
+        public Resiever Resiever { get; set; } = Resiever.All;
         public Guid? Id { get; set; }
         public int X { get; set; }
         public int Y { get; set; }
