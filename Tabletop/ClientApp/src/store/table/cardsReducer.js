@@ -70,7 +70,7 @@ function cardsReducer(state = [], action) {
         }
         case TableActions.CARD_DOWN: {
             return state.map(card => {
-                if (card.Id === action.Id) {
+                if (card.id === action.id) {
                     return {
                         ...card,
                         active: false
@@ -82,6 +82,30 @@ function cardsReducer(state = [], action) {
         }
         case TableActions.REMOVE_CARD: {
             return state.filter(card => card.id !== action.id);
+        }
+        case TableActions.HIDE_CARD_CONTENT: {
+            return state.map(card => {
+                if (card.id === action.id) {
+                    return {
+                        ...card,
+                        content: 'Cards/placeholder.png'
+                    };
+                } else {
+                    return card;
+                }
+            });
+        }
+        case TableActions.SHOW_CARD_CONTENT: {
+            return state.map(card => {
+                if (card.id === action.id) {
+                    return {
+                        ...card,
+                        content: action.content
+                    };
+                } else {
+                    return card;
+                }
+            });
         }
         default: {
             return state;

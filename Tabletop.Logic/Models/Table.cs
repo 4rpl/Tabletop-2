@@ -6,6 +6,7 @@ using Tabletop.Logic.Interfaces;
 using Tabletop.Logic.Models.Actions;
 using Tabletop.Logic.Models.Actions.Card;
 using Tabletop.Logic.Models.Actions.Deck;
+using Tabletop.Logic.Models.Actions.Filter;
 using Tabletop.Logic.Models.Actions.User;
 
 namespace Tabletop.Logic.Models
@@ -15,6 +16,7 @@ namespace Tabletop.Logic.Models
         private List<Card> _cards = new List<Card>();
         private List<Deck> _decks = new List<Deck>();
         private List<User> _users = new List<User>();
+        private List<Filter> _filters = new List<Filter>();
         private const int _dropRadius = 50;
 
         public readonly int Height;
@@ -33,7 +35,8 @@ namespace Tabletop.Logic.Models
             {
                 Cards = _cards.Select( card => new TableCard( card ) ).ToList(),
                 Decks = _decks.Select( deck => new TableDeck( deck ) ).ToList(),
-                Users = _users.Select( user => new TableUser( user ) ).ToList()
+                Users = _users.Select( user => new TableUser( user ) ).ToList(),
+                Filters = _filters.Select( filter => new TableFilter( filter ) ).ToList(),
             };
             return action;
         }
@@ -70,6 +73,37 @@ namespace Tabletop.Logic.Models
                 throw new ArgumentException( "Пользователь не найден" );
             }
             _users.Remove( user );
+            return new List<ITableAction>
+            {
+                action
+            };
+        }
+        #endregion
+
+        #region Filters
+        public IEnumerable<ITableAction> Dispatch( AddFilterAction action )
+        {
+            var user = _users.FirstOrDefault( i => i.Id == action.OwnerId );
+            if( user == null )
+            {
+                throw new ArgumentException( "Пользователь не найден" );
+            }
+            var filter = new Filter( user, action.X, action.Y, action.H, action.W );
+            action.Id = filter.Id;
+            _filters.Add( filter );
+            return new List<ITableAction>
+            {
+                action
+            };
+        }
+        public IEnumerable<ITableAction> Dispatch( RemoveFilterAction action )
+        {
+            var filter = _filters.FirstOrDefault( i => i.Id == action.Id );
+            if( filter == null )
+            {
+                throw new ArgumentException( "Фильтр не найден" );
+            }
+            _filters.Remove( filter );
             return new List<ITableAction>
             {
                 action
@@ -180,17 +214,39 @@ namespace Tabletop.Logic.Models
         }
         public IEnumerable<ITableAction> Dispatch( MoveCardAction action )
         {
+            var result = new List<ITableAction>
+            {
+                action
+            };
             var card = _cards.FirstOrDefault( i => i.Id == action.Id );
             if( card == null )
             {
                 throw new ArgumentException( "Карта не найдена" );
             }
             (action.X, action.Y) = FixCoords( action.X, action.Y, card.Height, card.Width );
+
+            // пользователи, которые видели карту
+            var oldUsers = UsersWhoCanSee( card );
+
+            // пользователи, которые сейчас видят
             card.Move( action.X, action.Y );
-            return new List<ITableAction>
+            var newUsers = UsersWhoCanSee( card );
+
+            var showTo = oldUsers.Except( newUsers );
+            var hideFrom = newUsers.Except( oldUsers );
+
+            if( hideFrom.Any() )
             {
-                action
-            };
+                var resievers = _users.Except( hideFrom );
+                result.Add( new HideCardContentAction( card, resievers.Select( i => i.Id ) ) );
+            }
+            if( showTo.Any() )
+            {
+                var resievers = _users.Except( showTo );
+                result.Add( new ShowCardContentAction( card, resievers.Select( i => i.Id ) ) );
+            }
+
+            return result;
         }
         #endregion
 
@@ -243,11 +299,33 @@ namespace Tabletop.Logic.Models
                 throw new ArgumentException( "Колода не найдена" );
             }
             (action.X, action.Y) = FixCoords( action.X, action.Y, deck.Height, deck.Width );
-            deck.Move( action.X, action.Y );
-            return new List<ITableAction>
+            var result = new List<ITableAction>
             {
                 action
             };
+
+            // пользователи, которые видели колоду
+            var oldUsers = UsersWhoCanSee( deck );
+
+            // пользователи, которые сейчас видят
+            deck.Move( action.X, action.Y );
+            var newUsers = UsersWhoCanSee( deck );
+
+            var showTo = oldUsers.Except( newUsers );
+            var hideFrom = newUsers.Except( oldUsers );
+
+            if( hideFrom.Any() )
+            {
+                var resievers = _users.Except( hideFrom );
+                result.Add( new HideDeckContentAction( deck, resievers.Select( i => i.Id ) ) );
+            }
+            if( showTo.Any() )
+            {
+                var resievers = _users.Except( showTo );
+                result.Add( new ShowDeckContentAction( deck, resievers.Select( i => i.Id ) ) );
+            }
+
+            return result;
         }
         public IEnumerable<ITableAction> Dispatch( TakeTopDeckCardAction action )
         {
@@ -300,12 +378,39 @@ namespace Tabletop.Logic.Models
         }
         #endregion
 
+        #region private
+        /// <summary>
+        /// Кто из пользователей может видеть объект
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        private List<User> UsersWhoCanSee( IDraggable obj )
+        {
+            return _filters
+                .Where( i => i.IsFiltered( obj ) )
+                .Select( i => i.Owner )
+                .ToList();
+        }
+        /// <summary>
+        /// Расстояние между центрами объектов
+        /// </summary>
+        /// <param name="obj1"></param>
+        /// <param name="obj2"></param>
+        /// <returns></returns>
         private double GetDistance( IObject obj1, IObject obj2 )
         {
             var dx = obj1.X - obj2.X;
             var dy = obj1.Y - obj2.Y;
             return Math.Sqrt( dx * dx + dy * dy );
         }
+        /// <summary>
+        /// Для того, чтобы координаты не выходили за пределы стола
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="objHeigth"></param>
+        /// <param name="objWidth"></param>
+        /// <returns></returns>
         private (int, int) FixCoords(int x, int y, int objHeigth, int objWidth)
         {
             var maxX = Width - objWidth;
@@ -328,5 +433,6 @@ namespace Tabletop.Logic.Models
             }
             return (x, y);
         }
+        #endregion
     }
 }

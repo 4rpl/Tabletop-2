@@ -7,6 +7,7 @@ using Tabletop.Logic.Models;
 using Tabletop.Logic.Models.Actions;
 using Tabletop.Logic.Models.Actions.Card;
 using Tabletop.Logic.Models.Actions.Deck;
+using Tabletop.Logic.Models.Actions.Filter;
 using Tabletop.Logic.Models.Actions.User;
 
 namespace Tabletop.Hubs
@@ -46,6 +47,16 @@ namespace Tabletop.Hubs
         public async Task MoveUser( MoveUserAction action )
         {
             action.Id = Context.ConnectionId;
+            await PerformActions( _table.Dispatch( action ) );
+        }
+
+        public async Task AddFilter( AddFilterAction action )
+        {
+            action.OwnerId = Context.ConnectionId;
+            await PerformActions( _table.Dispatch( action ) );
+        }
+        public async Task RemoveFilter( RemoveFilterAction action )
+        {
             await PerformActions( _table.Dispatch( action ) );
         }
 
@@ -124,6 +135,11 @@ namespace Tabletop.Hubs
                         case Resiever.Others:
                             {
                                 await Clients.Others.SendAsync( "PerformAction", action );
+                                break;
+                            }
+                        case Resiever.Special:
+                            {
+                                await Clients.Clients( action.ResieverIds ).SendAsync( "PerformAction", action );
                                 break;
                             }
                     }

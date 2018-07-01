@@ -24,7 +24,8 @@ body {
   cursor: move;
   transition: box-shadow 0.15s ease-out; }
   .card:hover {
-    border: 1px solid #fb9; }
+    border: 1px solid #fb9;
+    background-color: #fb9; }
   .card.grabbed {
     box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3); }
   .card * {
@@ -50,7 +51,8 @@ body {
   .deck:hover {
     border: 1px solid #fb9;
     border-right: 3px solid #d96;
-    border-bottom: 2px solid #fb9; }
+    border-bottom: 2px solid #fb9;
+    background-color: #fb9; }
   .deck:active {
     box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3); }
 
@@ -108,28 +110,7 @@ body {
 .deckAnimaitonRight {
   animation: Shuffle-animaiton 1 0.45s ease-in-out; }
 
-.cursor {
-  -webkit-touch-callout: none;
-  /* iOS Safari */
-  -webkit-user-select: none;
-  /* Safari */
-  -khtml-user-select: none;
-  /* Konqueror HTML */
-  -moz-user-select: none;
-  /* Firefox */
-  -ms-user-select: none;
-  /* Internet Explorer/Edge */
-  user-select: none;
-  /* Non-prefixed version, currently */
-  pointer-events: none;
-  z-index: 150000;
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  border-radius: 10px;
-  background-color: red; }
-
-.noselect * {
+.noselect-content, .cursor, .filter, .noselect * {
   -webkit-touch-callout: none;
   /* iOS Safari */
   -webkit-user-select: none;
@@ -143,4 +124,18 @@ body {
   user-select: none;
   /* Non-prefixed version, currently */
   pointer-events: none; }
+
+.cursor {
+  z-index: 150000;
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 10px;
+  background-color: red; }
+
+.filter {
+  z-index: 20000;
+  position: absolute;
+  border: 3px solid #ff8080;
+  background-color: rgba(255, 128, 128, 0.3); }
 

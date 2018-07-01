@@ -3,7 +3,8 @@ import { connect } from 'react-redux';
 import Card from './Card';
 import Deck from './Deck';
 import Cursor from './Cursor';
-import { addCard, tableScale, tableMove, tableMouseUp, tableMouseDown, moveUser } from '../store/table/TableActions';
+import Filter from './Filter';
+import { addCard, tableScale, tableMove, tableMouseUp, tableMouseDown, moveUser, addFilter } from '../store/table/TableActions';
 import CallbackService from '../services/CallbackService';
 
 const mapDispatchToProps = function (dispatch) {
@@ -22,6 +23,9 @@ const mapDispatchToProps = function (dispatch) {
         },
         onCursorMove: function (x, y) {
             dispatch(moveUser(x, y));
+        },
+        onAddFilter: (x, y, h, w) => {
+            dispatch(addFilter(x, y, h, w));
         },
         onAddCard: () => {
             dispatch(addCard(
@@ -44,6 +48,7 @@ class Table extends React.Component {
     componentDidMount() {
         const callbackService = CallbackService.getInstance();
         callbackService.onMouseMove('CURSOR', this.CursorMove.bind(this));
+        console.log(this.props.onAddFilter);
     }
 
     MouseDown(e) {
@@ -144,6 +149,17 @@ class Table extends React.Component {
             );
         });
 
+        const filters = game.filters.map(filter => {
+            return (
+                <Filter
+                    key={filter.id}
+                    x={filter.x}
+                    y={filter.y}
+                    h={filter.h}
+                    w={filter.w} />
+            );
+        })
+
         return (
             <div className="table"
                 style={{ top: table.y, left: table.x, transform: `scale(${table.scale})`, width: table.w, height: table.h }}
@@ -153,6 +169,7 @@ class Table extends React.Component {
                 {users}
                 {decks}
                 {cards}
+                {filters}
             </div>
         );
     }

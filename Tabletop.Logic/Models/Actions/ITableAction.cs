@@ -10,7 +10,8 @@ namespace Tabletop.Logic.Models.Actions
     {
         Caller,
         Others,
-        All
+        All,
+        Special
     }
 
     public interface ITableAction
@@ -18,5 +19,7 @@ namespace Tabletop.Logic.Models.Actions
         string Type { get; set; }
         [JsonIgnore]
         Resiever Resiever { get; set; }
+        [JsonIgnore]
+        List<string> ResieverIds { get; set; }
     }
 }

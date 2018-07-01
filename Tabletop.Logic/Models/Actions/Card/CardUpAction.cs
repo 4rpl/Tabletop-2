@@ -19,6 +19,7 @@ namespace Tabletop.Logic.Models.Actions.Card
 
         public string Type { get; set; }
         public Resiever Resiever { get; set; } = Resiever.All;
+        public List<string> ResieverIds { get; set; }
         public Guid Id { get; set; }
         public int Mx { get; set; }
         public int My { get; set; }

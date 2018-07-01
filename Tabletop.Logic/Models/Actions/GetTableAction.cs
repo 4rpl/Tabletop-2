@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CardModel = Tabletop.Logic.Models.Card;
 using DeckModel = Tabletop.Logic.Models.Deck;
 using UserModel = Tabletop.Logic.Models.User;
+using FilterModel = Tabletop.Logic.Models.Filter;
 
 namespace Tabletop.Logic.Models.Actions
 {
@@ -21,11 +22,13 @@ namespace Tabletop.Logic.Models.Actions
 
         public string Type { get; set; }
         public Resiever Resiever { get; set; } = Resiever.Caller;
+        public List<string> ResieverIds { get; set; }
         public int H { get; set; }
         public int W { get; set; }
         public List<TableCard> Cards { get; set; }
         public List<TableDeck> Decks { get; set; }
         public List<TableUser> Users { get; set; }
+        public List<TableFilter> Filters { get; set; }
     }
 
     public class TableCard
@@ -93,5 +96,23 @@ namespace Tabletop.Logic.Models.Actions
         public string Name { get; set; }
         public int X { get; set; }
         public int Y { get; set; }
+    }
+
+    public class TableFilter
+    {
+        public TableFilter( FilterModel filter )
+        {
+            Id = filter.Id;
+            X = filter.X;
+            Y = filter.Y;
+            H = filter.H;
+            W = filter.W;
+        }
+
+        public Guid Id { get; protected set; }
+        public int X { get; set; }
+        public int Y { get; set; }
+        public int H { get; protected set; }
+        public int W { get; protected set; }
     }
 }

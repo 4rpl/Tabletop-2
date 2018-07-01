@@ -6,21 +6,20 @@ using DeckModel = Tabletop.Logic.Models.Deck;
 
 namespace Tabletop.Logic.Models.Actions.Deck
 {
-    public class ChangeDeckAction : ITableAction
+    public class ShowDeckContentAction : ITableAction
     {
-        public ChangeDeckAction( DeckModel deck )
+        public ShowDeckContentAction( DeckModel deck, IEnumerable<string> resievers )
         {
-            Type = "ChangeDeck";
+            Type = "ShowDeckContent";
             Id = deck.Id;
             Content = deck.GetContent();
-            Length = deck.Length;
+            ResieverIds = resievers.ToList();
         }
 
         public string Type { get; set; }
-        public Resiever Resiever { get; set; } = Resiever.All;
+        public Resiever Resiever { get; set; } = Resiever.Special;
         public List<string> ResieverIds { get; set; }
-        public Guid? Id { get; set; }
+        public Guid Id { get; set; }
         public string Content { get; set; }
-        public int Length { get; set; }
     }
 }

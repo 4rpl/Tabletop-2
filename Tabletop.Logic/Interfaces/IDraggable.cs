@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Tabletop.Logic.Interfaces
 {
-    interface IDraggable : IObject
+    public interface IDraggable : IObject
     {
         /// <summary>
         /// Взять
@@ -24,5 +24,10 @@ namespace Tabletop.Logic.Interfaces
         /// </summary>
         /// <returns></returns>
         bool IsGrabbed();
+        /// <summary>
+        /// Центр объекта
+        /// </summary>
+        /// <returns></returns>
+        (int, int) GetCenter();
     }
 }

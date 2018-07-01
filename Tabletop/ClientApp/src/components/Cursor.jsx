@@ -11,7 +11,7 @@ const mapDispatchToProps = function (dispatch) {
     return {};
 }
 
-const Cursor = function ({ id, x, y, name }) {
+const Cursor = function ({ x, y, name }) {
     return (
         <div
             style={{ top: y, left: x }}

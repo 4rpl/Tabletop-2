@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
-namespace Tabletop.Logic.Models.Actions.Card
+namespace Tabletop.Logic.Models.Actions.Filter
 {
-    public class CardDownAction : ITableAction
+    public class AddFilterAction : ITableAction
     {
         public string Type { get; set; }
         public Resiever Resiever { get; set; } = Resiever.All;
@@ -13,5 +14,9 @@ namespace Tabletop.Logic.Models.Actions.Card
         public Guid Id { get; set; }
         public int X { get; set; }
         public int Y { get; set; }
+        public int H { get; set; }
+        public int W { get; set; }
+        [JsonIgnore]
+        public string OwnerId { get; set; }
     }
 }

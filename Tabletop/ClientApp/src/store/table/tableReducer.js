@@ -1,6 +1,7 @@
 ﻿import cardsReducer from './cardsReducer';
 import decksReducer from './decksReducer';
 import usersReducer from './usersReducer';
+import filtersReducer from './filtersReducer';
 import { TableActions } from './TableActions';
 
 const _minScale = 0.4;
@@ -23,6 +24,15 @@ function tableReducer(state = {}, action) {
                         name: user.name,
                         x: user.x,
                         y: user.y
+                    };
+                }),
+                filters: action.filters.map(filter => {
+                    return {
+                        id: filter.id,
+                        x: filter.x,
+                        y: filter.y,
+                        h: filter.h,
+                        w: filter.w
                     };
                 }),
                 cards: action.cards.map(card => {
@@ -113,6 +123,7 @@ function tableReducer(state = {}, action) {
                     h: 1600
                 },
                 users: usersReducer(state.users, action),
+                filters: filtersReducer(state.filters, action),
                 cards: cardsReducer(state.cards, action),
                 decks: decksReducer(state.decks, action)
             };

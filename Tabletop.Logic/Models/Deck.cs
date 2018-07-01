@@ -115,5 +115,10 @@ namespace Tabletop.Logic.Models
                 return _cards.First().GetContent();
             }
         }
+
+        public (int, int) GetCenter()
+        {
+            return (X + Width / 2, Y + Height / 2);
+        }
     }
 }

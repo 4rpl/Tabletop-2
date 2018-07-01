@@ -85,5 +85,10 @@ namespace Tabletop.Logic.Models
                 return _bottomContent;
             }
         }
+
+        public (int, int) GetCenter()
+        {
+            return (X + Width / 2, Y + Height / 2);
+        }
     }
 }

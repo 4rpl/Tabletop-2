@@ -4,6 +4,9 @@ const ADD_USER =            'AddUser';
 const REMOVE_USER =         'RemoveUser';
 const MOVE_USER =           'MoveUser';
 
+const ADD_FILTER =          'AddFilter';
+const REMOVE_FILTER =       'RemoveFilter';
+
 const TABLE_SCALE =         'TableScale';
 const TABLE_MOVE =          'TableMove';
 const TABLE_MOUSE_DOWN =    'TableMouseDown';
@@ -15,6 +18,8 @@ const CARD_UP =             'CardUp';
 const CARD_DOWN =           'CardDown';
 const ADD_CARD =            'AddCard';
 const REMOVE_CARD =         'RemoveCard';
+const HIDE_CARD_CONTENT =   'HideCardContent';
+const SHOW_CARD_CONTENT =   'ShowCardContent';
 
 const ADD_DECK =            'AddDeck';
 const CHANGE_DECK =         'ChangeDeck';
@@ -25,6 +30,8 @@ const DECK_DOWN =           'DeckDown';
 const SHUFFLE_DECK =        'ShuffleDeck';
 const TAKE_TOP_DECK_CARD =  'TakeTopDeckCard';
 const REMOVE_DECK =         'RemoveDeck';
+const HIDE_DECK_CONTENT =   'HideDeckContent';
+const SHOW_DECK_CONTENT =   'ShowDeckContent';
 
 export const TableActions = {
     GET_TABLE,
@@ -32,6 +39,9 @@ export const TableActions = {
     ADD_USER,
     REMOVE_USER,
     MOVE_USER,
+
+    ADD_FILTER,
+    REMOVE_FILTER,
 
     TABLE_SCALE,
     TABLE_MOVE,
@@ -44,6 +54,8 @@ export const TableActions = {
     CARD_DOWN,
     ADD_CARD,
     REMOVE_CARD,
+    HIDE_CARD_CONTENT,
+    SHOW_CARD_CONTENT,
 
     ADD_DECK,
     CHANGE_DECK,
@@ -53,11 +65,20 @@ export const TableActions = {
     DECK_DOWN,
     SHUFFLE_DECK,
     REMOVE_DECK,
+    HIDE_DECK_CONTENT,
+    SHOW_DECK_CONTENT,
     TAKE_TOP_DECK_CARD
 }
 
 export function moveUser(x, y) {
     return { type: MOVE_USER, x, y };
+}
+
+export function addFilter(x, y, h, w) {
+    return { type: ADD_FILTER, x, y, h, w };
+}
+export function removeFilter(id) {
+    return { type: REMOVE_FILTER, id };
 }
 
 export function tableScale(scale) {

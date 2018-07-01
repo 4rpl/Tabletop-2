@@ -6,16 +6,17 @@ using DeckModel = Tabletop.Logic.Models.Deck;
 
 namespace Tabletop.Logic.Models.Actions.Deck
 {
-    public class RemoveDeckAction : ITableAction
+    public class HideDeckContentAction : ITableAction
     {
-        public RemoveDeckAction( DeckModel deck )
+        public HideDeckContentAction( DeckModel deck, IEnumerable<string> resievers )
         {
-            Type = "RemoveDeck";
+            Type = "HideDeckContent";
             Id = deck.Id;
+            ResieverIds = resievers.ToList();
         }
 
         public string Type { get; set; }
-        public Resiever Resiever { get; set; } = Resiever.All;
+        public Resiever Resiever { get; set; } = Resiever.Special;
         public List<string> ResieverIds { get; set; }
         public Guid Id { get; set; }
     }

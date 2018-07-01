@@ -72,7 +72,7 @@ function cardsReducer(state = [], action) {
         }
         case TableActions.DECK_DOWN: {
             return state.map(function (deck) {
-                if (deck.Id === action.Id) {
+                if (deck.id === action.id) {
                     return {
                         ...deck,
                         active: false
@@ -118,6 +118,30 @@ function cardsReducer(state = [], action) {
                         length: action.length,
                         content: action.content
                     }
+                } else {
+                    return deck;
+                }
+            });
+        }
+        case TableActions.HIDE_DECK_CONTENT: {
+            return state.map(deck => {
+                if (deck.id === action.id) {
+                    return {
+                        ...deck,
+                        content: 'Cards/placeholder.png'
+                    };
+                } else {
+                    return deck;
+                }
+            });
+        }
+        case TableActions.SHOW_DECK_CONTENT: {
+            return state.map(deck => {
+                if (deck.id === action.id) {
+                    return {
+                        ...deck,
+                        content: action.content
+                    };
                 } else {
                     return deck;
                 }

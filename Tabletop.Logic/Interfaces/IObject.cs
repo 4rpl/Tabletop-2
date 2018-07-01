@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Tabletop.Logic.Interfaces
 {
-    interface IObject
+    public interface IObject
     {
         int X { get; }
         int Y { get; }

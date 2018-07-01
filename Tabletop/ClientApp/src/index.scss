@@ -32,6 +32,7 @@ body {
 
     &:hover {
         border: 1px solid #fb9;
+        background-color: #fb9;
     }
 
     &.grabbed {
@@ -67,6 +68,7 @@ body {
         border: 1px solid #fb9;
         border-right: 3px solid #d96;
         border-bottom: 2px solid #fb9;
+        background-color: #fb9;
     }
 
     &:active {
@@ -135,7 +137,7 @@ body {
     animation: Shuffle-animaiton 1 0.45s ease-in-out;
 }
 
-.cursor {
+.noselect-content {
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
     -khtml-user-select: none; /* Konqueror HTML */
@@ -143,6 +145,10 @@ body {
     -ms-user-select: none; /* Internet Explorer/Edge */
     user-select: none; /* Non-prefixed version, currently */
     pointer-events: none;
+}
+
+.cursor {
+    @extend .noselect-content;
 
     z-index: 150000;
     position: absolute;
@@ -152,12 +158,15 @@ body {
     background-color: red;
 }
 
+.filter {
+    @extend .noselect-content;
+
+    z-index: 20000;
+    position: absolute;
+    border: 3px solid rgb(255, 128, 128);
+    background-color: rgba(255, 128, 128 ,0.3);
+}
+
 .noselect * {
-    -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-    -khtml-user-select: none; /* Konqueror HTML */
-    -moz-user-select: none; /* Firefox */
-    -ms-user-select: none; /* Internet Explorer/Edge */
-    user-select: none; /* Non-prefixed version, currently */
-    pointer-events: none;
+    @extend .noselect-content;
 }

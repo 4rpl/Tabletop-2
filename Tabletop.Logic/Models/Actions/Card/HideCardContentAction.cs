@@ -6,17 +6,18 @@ using CardModel = Tabletop.Logic.Models.Card;
 
 namespace Tabletop.Logic.Models.Actions.Card
 {
-    public class RemoveCardAction : ITableAction
+    public class HideCardContentAction : ITableAction
     {
-        public RemoveCardAction( CardModel card )
+        public HideCardContentAction( CardModel card, IEnumerable<string> resievers )
         {
-            Type = "RemoveCard";
+            Type = "HideCardContent";
             Id = card.Id;
+            ResieverIds = resievers.ToList();
         }
 
         public string Type { get; set; }
-        public Resiever Resiever { get; set; } = Resiever.All;
+        public Resiever Resiever { get; set; } = Resiever.Special;
         public List<string> ResieverIds { get; set; }
-        public Guid? Id { get; set; }
+        public Guid Id { get; set; }
     }
 }
