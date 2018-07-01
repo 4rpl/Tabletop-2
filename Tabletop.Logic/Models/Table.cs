@@ -114,16 +114,23 @@ namespace Tabletop.Logic.Models
         #region Cards
         public IEnumerable<ITableAction> Dispatch( AddCardAction action )
         {
+            var result = new List<ITableAction>
+            {
+                action
+            };
             var card = new Card( action.ContentTop, action.ContentBottom, action.H, action.W );
             card.Move( action.X, action.Y );
             _cards.Add( card );
             action.Id = card.Id;
+            var users = UsersWhoCanSee( card );
+            action.ResieverIds = users.Select( i => i.Id ).ToList();
             action.Content = card.GetContent();
             action.ContentTop = action.ContentBottom = null;
-            return new List<ITableAction>
+            if( users.Count() < _users.Count() )
             {
-                action
-            };
+                result.Add( new AddCardAction( card, _users.Except( users ).Select( i => i.Id ).ToList(), true ) );
+            }
+            return result;
         }
         public IEnumerable<ITableAction> Dispatch( FlipCardAction action )
         {
@@ -132,25 +139,43 @@ namespace Tabletop.Logic.Models
             {
                 throw new ArgumentException( "Карта не найдена" );
             }
-            card.Flip();
-            action.Content = card.GetContent();
-            return new List<ITableAction>
+            var result = new List<ITableAction>
             {
                 action
             };
+            card.Flip();
+            action.Content = card.GetContent();
+
+            var users = UsersWhoCanSee( card );
+            action.ResieverIds = users.Select( i => i.Id ).ToList();
+
+            if( users.Count() < _users.Count() )
+            {
+                result.Add( new FlipCardAction( card, _users.Except( users ).Select( i => i.Id ).ToList(), true ) );
+            }
+
+            return result;
         }
         public IEnumerable<ITableAction> Dispatch( CardUpAction action )
         {
+            var result = new List<ITableAction>
+            {
+                action
+            };
             var card = _cards.FirstOrDefault( i => i.Id == action.Id );
             if( card == null )
             {
                 throw new ArgumentException( "Карта не найдена" );
             }
-            card.Grab();
-            return new List<ITableAction>
+            action.IsOwner = true;
+            action.ResieverIds = new List<string> { action.OwnerId };
+            var users = _users.Where( i => i.Id != action.OwnerId );
+            if( users.Count() < _users.Count() )
             {
-                action
-            };
+                result.Add( new CardUpAction( card, _users.Except( users ).Select( i => i.Id ).ToList(), false ) );
+            }
+            card.Grab();
+            return result;
         }
         public IEnumerable<ITableAction> Dispatch( CardDownAction action )
         {
@@ -191,8 +216,14 @@ namespace Tabletop.Logic.Models
                 var nearestDeck = decks.First();
                 nearestDeck.Add( cards );
 
+                var users = UsersWhoCanSee( nearestDeck );
+
                 result.Add( new RemoveCardAction( card ) );
-                result.Add( new ChangeDeckAction( nearestDeck ) );
+                result.Add( new ChangeDeckAction( nearestDeck, users.Select( i => i.Id ).ToList(), false ) );
+                if( users.Count() < _users.Count() )
+                {
+                    result.Add( new ChangeDeckAction( nearestDeck, _users.Except( users ).Select( i => i.Id ).ToList(), true ) );
+                }
                 foreach( var c in cards )
                 {
                     _cards.Remove( c );
@@ -203,7 +234,13 @@ namespace Tabletop.Logic.Models
                 var deck = new Deck( cards );
                 _decks.Add( deck );
 
-                result.Add( new AddDeckAction( deck ) );
+                var users = UsersWhoCanSee( deck );
+                result.Add( new AddDeckAction( deck, users.Select( i => i.Id ).ToList(), false ) );
+                if( users.Count() < _users.Count() )
+                {
+                    result.Add( new AddDeckAction( deck, _users.Except( users ).Select( i => i.Id ).ToList(), true ) );
+                }
+
                 foreach( var c in cards )
                 {
                     _cards.Remove( c );
@@ -227,23 +264,20 @@ namespace Tabletop.Logic.Models
 
             // пользователи, которые видели карту
             var oldUsers = UsersWhoCanSee( card );
-
             // пользователи, которые сейчас видят
             card.Move( action.X, action.Y );
             var newUsers = UsersWhoCanSee( card );
 
-            var showTo = oldUsers.Except( newUsers );
-            var hideFrom = newUsers.Except( oldUsers );
+            var hideFrom = oldUsers.Except( newUsers );
+            var showTo = newUsers.Except( oldUsers );
 
             if( hideFrom.Any() )
             {
-                var resievers = _users.Except( hideFrom );
-                result.Add( new HideCardContentAction( card, resievers.Select( i => i.Id ) ) );
+                result.Add( new HideCardContentAction( card, hideFrom.Select( i => i.Id ) ) );
             }
             if( showTo.Any() )
             {
-                var resievers = _users.Except( showTo );
-                result.Add( new ShowCardContentAction( card, resievers.Select( i => i.Id ) ) );
+                result.Add( new ShowCardContentAction( card, showTo.Select( i => i.Id ) ) );
             }
 
             return result;
@@ -258,12 +292,23 @@ namespace Tabletop.Logic.Models
             {
                 throw new ArgumentException( "Колода не найдена" );
             }
-            deck.Flip();
-            action.Content = deck.GetContent();
-            return new List<ITableAction>
+            var result = new List<ITableAction>
             {
                 action
             };
+
+            deck.Flip();
+            action.Content = deck.GetContent();
+            
+            var users = UsersWhoCanSee( deck );
+            action.ResieverIds = users.Select( i => i.Id ).ToList();
+
+            if( users.Count() < _users.Count() )
+            {
+                result.Add( new FlipDeckAction( deck, _users.Except( users ).Select( i => i.Id ).ToList(), true ) );
+            }
+
+            return result;
         }
         public IEnumerable<ITableAction> Dispatch( DeckUpAction action )
         {
@@ -272,11 +317,16 @@ namespace Tabletop.Logic.Models
             {
                 throw new ArgumentException( "Колода не найдена" );
             }
-            deck.Grab();
-            return new List<ITableAction>
+            action.IsOwner = true;
+            action.ResieverIds = new List<string> { action.OwnerId };
+            var users = _users.Where( i => i.Id != action.OwnerId ).Select( i => i.Id ).ToList();
+            var result = new List<ITableAction>
             {
-                action
+                action,
+                new DeckUpAction( deck, users, false )
             };
+            deck.Grab();
+            return result;
         }
         public IEnumerable<ITableAction> Dispatch( DeckDownAction action )
         {
@@ -311,18 +361,16 @@ namespace Tabletop.Logic.Models
             deck.Move( action.X, action.Y );
             var newUsers = UsersWhoCanSee( deck );
 
-            var showTo = oldUsers.Except( newUsers );
-            var hideFrom = newUsers.Except( oldUsers );
+            var hideFrom = oldUsers.Except( newUsers );
+            var showTo = newUsers.Except( oldUsers );
 
             if( hideFrom.Any() )
             {
-                var resievers = _users.Except( hideFrom );
-                result.Add( new HideDeckContentAction( deck, resievers.Select( i => i.Id ) ) );
+                result.Add( new HideDeckContentAction( deck, hideFrom.Select( i => i.Id ) ) );
             }
             if( showTo.Any() )
             {
-                var resievers = _users.Except( showTo );
-                result.Add( new ShowDeckContentAction( deck, resievers.Select( i => i.Id ) ) );
+                result.Add( new ShowDeckContentAction( deck, showTo.Select( i => i.Id ) ) );
             }
 
             return result;
@@ -340,6 +388,7 @@ namespace Tabletop.Logic.Models
             var card = deck.TakeTop();
             _cards.Add( card );
             card.Grab();
+            var users = UsersWhoCanSee( deck );
             if( deck.Length > 1 )
             {
                 action.Content = deck.GetContent();
@@ -351,14 +400,28 @@ namespace Tabletop.Logic.Models
                 var lastCard = deck.TakeTop();
                 _cards.Add( lastCard );
                 _decks.Remove( deck );
-                result.Add( new AddCardAction( lastCard ) );
+                result.Add( new AddCardAction( lastCard, users.Select( i => i.Id ).ToList(), false ) );
+                if( users.Count() < _users.Count() )
+                {
+                    result.Add( new AddCardAction( lastCard, _users.Except( users ).Select( i => i.Id ).ToList(), true ) );
+                }
                 result.Add( new RemoveDeckAction( deck ) );
             }
-            result.Add( new AddCardAction( card )
+            result.Add( new AddCardAction( card, users.Select( i => i.Id ).ToList(), false )
             {
                 Mx = action.Mx,
-                My = action.My
+                My = action.My,
+                IsOwner = true
             } );
+            if( users.Count() < _users.Count() )
+            {
+                result.Add( new AddCardAction( card, _users.Except( users ).Select( i => i.Id ).ToList(), true )
+                {
+                    Mx = action.Mx,
+                    My = action.My,
+                    IsOwner = true
+                } );
+            }
 
             return result;
         }
@@ -386,9 +449,8 @@ namespace Tabletop.Logic.Models
         /// <returns></returns>
         private List<User> UsersWhoCanSee( IDraggable obj )
         {
-            return _filters
-                .Where( i => i.IsFiltered( obj ) )
-                .Select( i => i.Owner )
+            return _users
+                .Where( i => _filters.All( j => !j.IsFiltered( obj ) || j.Owner == i ) )
                 .ToList();
         }
         /// <summary>

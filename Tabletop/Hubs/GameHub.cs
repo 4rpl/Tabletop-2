@@ -91,6 +91,7 @@ namespace Tabletop.Hubs
         }
         public async Task DeckUp( DeckUpAction action )
         {
+            action.OwnerId = Context.ConnectionId;
             await PerformActions( _table.Dispatch( action ) );
         }
         public async Task DeckDown( DeckDownAction action )
@@ -110,39 +111,28 @@ namespace Tabletop.Hubs
         {
             foreach( var action in actions )
             {
-                if( action is IOwnershipAction )
+                switch( action.Resiever )
                 {
-                    var oa = action as IOwnershipAction;
-                    oa.IsOwner = false;
-                    await Clients.Others.SendAsync( "PerformAction", oa );
-                    oa.IsOwner = true;
-                    await Clients.Caller.SendAsync( "PerformAction", oa );
-                }
-                else
-                {
-                    switch( action.Resiever )
-                    {
-                        case Resiever.All:
-                            {
-                                await Clients.All.SendAsync( "PerformAction", action );
-                                break;
-                            }
-                        case Resiever.Caller:
-                            {
-                                await Clients.Caller.SendAsync( "PerformAction", action );
-                                break;
-                            }
-                        case Resiever.Others:
-                            {
-                                await Clients.Others.SendAsync( "PerformAction", action );
-                                break;
-                            }
-                        case Resiever.Special:
-                            {
-                                await Clients.Clients( action.ResieverIds ).SendAsync( "PerformAction", action );
-                                break;
-                            }
-                    }
+                    case Resiever.All:
+                        {
+                            await Clients.All.SendAsync( "PerformAction", action );
+                            break;
+                        }
+                    case Resiever.Caller:
+                        {
+                            await Clients.Caller.SendAsync( "PerformAction", action );
+                            break;
+                        }
+                    case Resiever.Others:
+                        {
+                            await Clients.Others.SendAsync( "PerformAction", action );
+                            break;
+                        }
+                    case Resiever.Special:
+                        {
+                            await Clients.Clients( action.ResieverIds ).SendAsync( "PerformAction", action );
+                            break;
+                        }
                 }
             }
         }

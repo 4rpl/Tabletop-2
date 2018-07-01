@@ -8,21 +8,22 @@ namespace Tabletop.Logic.Models.Actions.Deck
 {
     public class AddDeckAction : ITableAction
     {
-        public AddDeckAction( DeckModel deck )
+        public AddDeckAction( DeckModel deck, List<string> resievers, bool isHidden )
         {
             Type = "AddDeck";
             Active = deck.IsGrabbed();
-            Content = deck.GetContent();
+            Content = isHidden ? null : deck.GetContent();
             H = deck.Height;
             Id = deck.Id;
             W = deck.Width;
             X = deck.X;
             Y = deck.Y;
             Length = deck.Length;
+            ResieverIds = resievers;
         }
 
         public string Type { get; set; }
-        public Resiever Resiever { get; set; } = Resiever.All;
+        public Resiever Resiever { get; set; } = Resiever.Special;
         public List<string> ResieverIds { get; set; }
         public Guid? Id { get; set; }
         public int X { get; set; }

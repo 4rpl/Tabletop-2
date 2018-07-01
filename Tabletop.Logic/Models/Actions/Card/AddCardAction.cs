@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using CardModel = Tabletop.Logic.Models.Card;
 
 namespace Tabletop.Logic.Models.Actions.Card
@@ -10,20 +11,21 @@ namespace Tabletop.Logic.Models.Actions.Card
     {
         public AddCardAction() { }
 
-        public AddCardAction( CardModel card )
+        public AddCardAction( CardModel card, List<string> resievers, bool isHidden )
         {
             Type = "AddCard";
             Active = card.IsGrabbed();
-            Content = card.GetContent();
+            Content = isHidden ? null : card.GetContent();
             H = card.Height;
             Id = card.Id;
             W = card.Width;
             X = card.X;
             Y = card.Y;
+            ResieverIds = resievers;
         }
 
         public string Type { get; set; }
-        public Resiever Resiever { get; set; } = Resiever.All;
+        public Resiever Resiever { get; set; } = Resiever.Special;
         public List<string> ResieverIds { get; set; }
         public Guid? Id { get; set; }
         public int X { get; set; }

@@ -88,7 +88,7 @@ function cardsReducer(state = [], action) {
                 if (card.id === action.id) {
                     return {
                         ...card,
-                        content: 'Cards/placeholder.png'
+                        content: null
                     };
                 } else {
                     return card;

@@ -77,8 +77,7 @@ const Deck = function ({ id, x, y, mx, my, z, h, w, active, content, length, onF
         }
         return false;
     }
-
-    let contentImg = <img alt={content} src={process.env.PUBLIC_URL + content} />;
+    
     //let animation = (
     //    <div>
     //        <div style={{ top: y, left: x, width: w, height: h, zIndex: z - 1, visibility: 'visible' }} className="deckAnimaiton deckAnimaitonLeft noselect">
@@ -97,6 +96,12 @@ const Deck = function ({ id, x, y, mx, my, z, h, w, active, content, length, onF
     //        <h1>123</h1>
     //    </ReactCSSTransitionGroup>
     //);
+
+    let cardContent;
+    if (content) {
+        cardContent = <img alt={content} src={process.env.PUBLIC_URL + content} />;
+    }
+
     return (
         <div style={{ top: y, left: x, width: w, height: h, zIndex: z }}
             onMouseDown={MouseDown}
@@ -105,7 +110,7 @@ const Deck = function ({ id, x, y, mx, my, z, h, w, active, content, length, onF
             onContextMenu={OnContextMenu}
             className="deck noselect">
             <span className="deckCardsCounter">{length}</span>
-            {contentImg}
+            {cardContent}
         </div>
     );
 }

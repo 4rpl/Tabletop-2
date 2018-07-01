@@ -80,13 +80,18 @@ class Card extends React.Component {
     render() {
         let { x, y, z, h, w, active, content } = this.props;
 
+        let cardContent;
+        if (content) {
+            cardContent = <img alt={content} src={process.env.PUBLIC_URL + content} />;
+        }
+
         return (
             <div
                 style={{ top: y, left: x, width: w, height: h, zIndex: z }}
                 onMouseDown={this.MouseDown.bind(this)}
                 onContextMenu={this.OnContextMenu.bind(this)}
                 className={'card noselect ' + (active ? 'grabbed' : '')}>
-                <img alt={content} src={process.env.PUBLIC_URL + content} />
+                {cardContent}
             </div>
         );
     }
