@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Tabletop.Logic.Models;
 
 namespace Tabletop.Logic.Interfaces
 {
@@ -10,7 +11,7 @@ namespace Tabletop.Logic.Interfaces
         /// <summary>
         /// Взять
         /// </summary>
-        void Grab();
+        void Grab( User owner );
         /// <summary>
         /// Подвигать
         /// </summary>
@@ -23,11 +24,16 @@ namespace Tabletop.Logic.Interfaces
         /// Перетаскивается ли кем-то
         /// </summary>
         /// <returns></returns>
-        bool IsGrabbed();
+        bool IsGrabbed { get; }
         /// <summary>
-        /// Центр объекта
+        /// Взявший
         /// </summary>
-        /// <returns></returns>
-        (int, int) GetCenter();
+        User Owner { get; }
+        /// <summary>
+        /// Z-координата
+        /// </summary>
+        int Z { get; }
+        int Mx { get; }
+        int My { get; }
     }
 }

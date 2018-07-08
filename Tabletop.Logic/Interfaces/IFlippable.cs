@@ -7,5 +7,7 @@ namespace Tabletop.Logic.Interfaces
     interface IFlippable
     {
         void Flip();
+
+        string GetContent();
     }
 }

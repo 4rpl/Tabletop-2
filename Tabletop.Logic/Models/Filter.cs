@@ -15,6 +15,7 @@ namespace Tabletop.Logic.Models
             Y = y;
             H = h;
             W = w;
+            Radius = Convert.ToInt32( h * h + w * w );
             Owner = owner;
         }
 
@@ -25,6 +26,8 @@ namespace Tabletop.Logic.Models
         public int Y { get; protected set; } = 0;
 
         public int Z { get; protected set; } = 0;
+
+        public double Alpha { get; protected set; } = 0;
 
         public void Move( int x, int y )
         {
@@ -42,10 +45,11 @@ namespace Tabletop.Logic.Models
 
         public int W { get; protected set; }
 
+        public int Radius { get; protected set; }
+
         public bool IsFiltered( IDraggable obj )
         {
-            var (x, y) = obj.GetCenter();
-            return X <= x && X + W >= x && Y <= y && Y + H >= y;
+            return X <= obj.X && X + W >= obj.X && Y <= obj.Y && Y + H >= obj.Y;
         }
     }
 }

@@ -111,6 +111,15 @@ function tableReducer(state = {}, action) {
                 }
             };
         }
+        case TableActions.TABLE_ROTATE: {
+            return {
+                ...state,
+                table: {
+                    ...state.table,
+                    alpha: action.alpha
+                }
+            };
+        }
         default: {
             return {
                 table: state.table || {
@@ -119,8 +128,9 @@ function tableReducer(state = {}, action) {
                     mx: 0,
                     my: 0,
                     scale: 1,
-                    w: 3000,
-                    h: 1600
+                    w: 1500,
+                    h: 1000,
+                    alpha: Math.PI * .25
                 },
                 users: usersReducer(state.users, action),
                 filters: filtersReducer(state.filters, action),

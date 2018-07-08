@@ -14,7 +14,7 @@ namespace Tabletop.Logic.Models.Actions.Card
         public AddCardAction( CardModel card, List<string> resievers, bool isHidden )
         {
             Type = "AddCard";
-            Active = card.IsGrabbed();
+            Active = card.IsGrabbed;
             Content = isHidden ? null : card.GetContent();
             H = card.Height;
             Id = card.Id;

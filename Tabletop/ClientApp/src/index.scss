@@ -1,38 +1,41 @@
-﻿@media (max-width: 767px) {
-    /* On small screens, the nav menu spans the full width of the screen. Leave a space for it. */
-    body {
-        padding-top: 50px;
-    }
-}
-
-$card-border-radius: 5px;
+﻿$card-border-radius: 5px;
 
 body {
     margin: 0;
     padding: 0;
-    font-family: sans-serif;
+    font-family: Consolas;
     overflow: hidden;
     background-color: #222;
 }
 
+.main-menu {
+    padding: 45px;
+    background-color: #ccc;
+
+    & input {
+        &[type=text] {
+            font-size: 20px;
+        }
+    }
+}
+
 .table {
     background-color: #fff;
-    height: 100%;
-    width: 100%;
     position: absolute;
+    transition: transform ease-in-out .1s;
+    margin: 0;
 }
 
 .card {
     border: 1px solid #999;
-    border-radius: $card-border-radius;
+    border-radius: $card-border-radius + 1px;
     position: absolute;
-    background-color: #999;
+    background-color: #dedede;
     cursor: move;
     transition: box-shadow 0.15s ease-out;
 
     &:hover {
         border: 1px solid #fb9;
-        background-color: #fb9;
     }
 
     &.grabbed {
@@ -41,9 +44,24 @@ body {
 
     & * {
         border-radius: $card-border-radius;
+        object-fit: cover;
         height: 100%;
         width: 100%;
-        vertical-align: middle;
+    }
+}
+
+.table-logo {
+    animation: Table-logo-spin infinite 20s linear;
+    height: 80px;
+}
+
+@keyframes Table-logo-spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
     }
 }
 
@@ -149,7 +167,6 @@ body {
 
 .cursor {
     @extend .noselect-content;
-
     z-index: 150000;
     position: absolute;
     width: 10px;
@@ -161,9 +178,8 @@ body {
 .filter {
     @extend .noselect-content;
 
-    z-index: 20000;
+    z-index: 200000;
     position: absolute;
-    border: 3px solid rgb(255, 128, 128);
     background-color: rgba(255, 128, 128 ,0.3);
 }
 

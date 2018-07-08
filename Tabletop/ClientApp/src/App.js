@@ -1,12 +1,13 @@
 ﻿import React from 'react';
 import { Route } from 'react-router';
-import Layout from './components/Layout';
 import Table from './components/Table';
-import ServerListener from './components/ServerListener';
+import MainMenu from './components/MainMenu';
+import Editor from './components/Editor';
 
 export default () => (
-    <Layout>
-        <ServerListener />
-        <Route exact path='/' component={Table} />
-    </Layout>
+    <div>
+        <Route exact path='/' component={MainMenu} />
+        <Route exact path='/table/:id' component={Table} />
+        <Route exact path='/editor' component={Editor} />
+    </div>
 );

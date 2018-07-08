@@ -9,6 +9,7 @@ namespace Tabletop.Logic.Interfaces
     {
         int X { get; }
         int Y { get; }
-        int Z { get; }
+        double Alpha { get; }
+        int Radius { get; }
     }
 }

@@ -23,22 +23,43 @@ namespace Tabletop.Logic.Models
             Height = height;
             Width = width;
             _cards = cards.ToList();
-            X = (int)Math.Round( cards.Average( i => i.X ) );
-            Y = (int)Math.Round( cards.Average( i => i.Y ) );
+            X = Convert.ToInt32( cards.Average( i => i.X ) );
+            Y = Convert.ToInt32( cards.Average( i => i.Y ) );
+            _hd2 = Height / 2;
+            _wd2 = Width / 2;
+            Radius = Convert.ToInt32( Math.Sqrt( Height * Height + Width * Width ) );
         }
+
+        private List<Card> _cards;
+        private readonly Random _rnd = new Random();
+
+        public Guid Id { get; } = Guid.NewGuid();
+
+        public readonly int Height;
+
+        public readonly int Width;
+
+        private readonly int _hd2;
+        private readonly int _wd2;
 
         #region impl
         private bool _isGrabbed;
 
-        public int X { get; protected set; } = 0;
-
-        public int Y { get; protected set; } = 0;
-
-        public int Z { get; protected set; } = 0;
+        public int X { get; protected set; }
+        public int Y { get; protected set; }
+        public int Z { get; protected set; }
+        public double Alpha { get; protected set; }
+        public int Mx { get; protected set; }
+        public int My { get; protected set; }
 
         public void Drop()
         {
+            if( _isGrabbed )
+            {
+                throw new MethodAccessException( $"Колода не была взята. Id: {Id}" );
+            }
             _isGrabbed = false;
+            Owner = null;
         }
 
         public void Flip()
@@ -50,28 +71,41 @@ namespace Tabletop.Logic.Models
             }
         }
 
-        public void Grab()
+        public void Grab( User owner )
         {
+            if( _isGrabbed )
+            {
+                throw new MethodAccessException( $"Колода уже была взята. Id: {Id}, UserId: {owner.Id}, OwnerId: {Owner.Id}" );
+            }
+            Owner = owner;
+            Alpha = owner.Alpha;
             _isGrabbed = true;
         }
 
-        public bool IsGrabbed() => _isGrabbed;
+        public User Owner { get; protected set; }
+
+        public bool IsGrabbed => _isGrabbed;
 
         public void Move( int x, int y )
         {
             X = x;
             Y = y;
         }
+
+        public string GetContent()
+        {
+            if( _cards.Count == 0 )
+            {
+                throw new ArgumentException( "Колода пуста" );
+            }
+            else
+            {
+                return _cards.First().GetContent();
+            }
+        }
+
+        public int Radius { get; protected set; }
         #endregion
-
-        private List<Card> _cards;
-        private readonly Random _rnd = new Random();
-
-        public Guid Id { get; } = Guid.NewGuid();
-
-        public readonly int Height;
-
-        public readonly int Width;
 
         public int Length { get => _cards.Count; }
 
@@ -102,23 +136,6 @@ namespace Tabletop.Logic.Models
         public void Shuffle()
         {
             _cards = _cards.OrderBy( i => _rnd.Next() ).ToList();
-        }
-
-        public string GetContent()
-        {
-            if( _cards.Count == 0 )
-            {
-                throw new ArgumentException( "Колода пуста" );
-            }
-            else
-            {
-                return _cards.First().GetContent();
-            }
-        }
-
-        public (int, int) GetCenter()
-        {
-            return (X + Width / 2, Y + Height / 2);
         }
     }
 }

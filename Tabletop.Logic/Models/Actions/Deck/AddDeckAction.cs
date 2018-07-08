@@ -11,7 +11,7 @@ namespace Tabletop.Logic.Models.Actions.Deck
         public AddDeckAction( DeckModel deck, List<string> resievers, bool isHidden )
         {
             Type = "AddDeck";
-            Active = deck.IsGrabbed();
+            Active = deck.IsGrabbed;
             Content = isHidden ? null : deck.GetContent();
             H = deck.Height;
             Id = deck.Id;

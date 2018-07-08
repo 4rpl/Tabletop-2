@@ -22,7 +22,9 @@ namespace Tabletop.Logic.Models
 
         public int Y { get; protected set; } = 0;
 
-        public int Z { get; protected set; } = 0;
+        public int Radius { get; } = 0;
+
+        public double Alpha { get; protected set; } = 0;
 
         public void Move( int x, int y )
         {
@@ -35,5 +37,7 @@ namespace Tabletop.Logic.Models
         public string Id { get; protected set; }
 
         public string Name { get; protected set; }
+
+        public string Color { get; protected set; }
     }
 }

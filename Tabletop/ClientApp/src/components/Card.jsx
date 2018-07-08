@@ -42,11 +42,13 @@ class Card extends React.Component {
     callbackService = CallbackService.getInstance();
 
     MouseDown(e) {
-        let { id, x, y, z, active, onCardUp } = this.props;
+        let { id, x, y, z, active, onCardUp, parentAlpha } = this.props;
         //console.log('Down', id);
         if (!active && e.button === 0) {
+            let px = Math.cos(parentAlpha) * e.clientX + Math.sin(parentAlpha) * e.clientY;
+            let py = Math.cos(parentAlpha) * e.clientY - Math.sin(parentAlpha) * e.clientX;
             onCardUp(id, x - e.clientX, y - e.clientY, z);
-            this.applyCallbacks(id, x - e.clientX, y - e.clientY);
+            this.applyCallbacks(id, x - px, y - py);
         }
         e.stopPropagation();
         return false;
@@ -60,9 +62,11 @@ class Card extends React.Component {
     }
 
     MouseMove(mx, my, e) {
-        let { id, onMoveCard } = this.props;
+        let { id, onMoveCard, parentAlpha } = this.props;
         //console.log('Move', id);
-        onMoveCard(id, e.clientX + mx, e.clientY + my);
+        let px = Math.cos(parentAlpha) * e.clientX + Math.sin(parentAlpha) * e.clientY;
+        let py = Math.cos(parentAlpha) * e.clientY - Math.sin(parentAlpha) * e.clientX;
+        onMoveCard(id, px + mx, py + my);
         return false;
     }
 
@@ -75,14 +79,14 @@ class Card extends React.Component {
         return false;
     }
 
-
-
     render() {
         let { x, y, z, h, w, active, content } = this.props;
 
         let cardContent;
         if (content) {
-            cardContent = <img alt={content} src={process.env.PUBLIC_URL + content} />;
+            cardContent = <img alt="" src={process.env.PUBLIC_URL + content} />;
+        } else {
+            cardContent = <img alt="" src={process.env.PUBLIC_URL + 'Cards/logo.svg'} className="table-logo" />
         }
 
         return (
@@ -90,7 +94,7 @@ class Card extends React.Component {
                 style={{ top: y, left: x, width: w, height: h, zIndex: z }}
                 onMouseDown={this.MouseDown.bind(this)}
                 onContextMenu={this.OnContextMenu.bind(this)}
-                className={'card noselect ' + (active ? 'grabbed' : '')}>
+                className={'card noselect' + (active ? ' grabbed' : '')}>
                 {cardContent}
             </div>
         );

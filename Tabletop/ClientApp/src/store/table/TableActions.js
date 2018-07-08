@@ -11,6 +11,7 @@ const TABLE_SCALE =         'TableScale';
 const TABLE_MOVE =          'TableMove';
 const TABLE_MOUSE_DOWN =    'TableMouseDown';
 const TABLE_MOUSE_UP =      'TableMouseUp';
+const TABLE_ROTATE =        'TableRotate';
 
 const FLIP_CARD =           'FlipCard';
 const MOVE_CARD =           'MoveCard';
@@ -47,6 +48,7 @@ export const TableActions = {
     TABLE_MOVE,
     TABLE_MOUSE_DOWN,
     TABLE_MOUSE_UP,
+    TABLE_ROTATE,
 
     FLIP_CARD,
     MOVE_CARD,
@@ -92,6 +94,9 @@ export function tableMouseUp() {
 }
 export function tableMouseDown(mx, my) {
     return { type: TABLE_MOUSE_DOWN, enforce: true, mx, my };
+}
+export function tableRotate(alpha) {
+    return { type: TABLE_ROTATE, enforce: true, alpha };
 }
 
 export function flipCard(id) {

@@ -100,6 +100,8 @@ const Deck = function ({ id, x, y, mx, my, z, h, w, active, content, length, onF
     let cardContent;
     if (content) {
         cardContent = <img alt={content} src={process.env.PUBLIC_URL + content} />;
+    } else {
+        cardContent = <img alt="" src={process.env.PUBLIC_URL + 'Cards/logo.svg'} className="table-logo" />
     }
 
     return (

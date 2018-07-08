@@ -70,6 +70,7 @@ namespace Tabletop.Hubs
         }
         public async Task CardUp( CardUpAction action )
         {
+            action.OwnerId = Context.ConnectionId;
             await PerformActions( _table.Dispatch( action ) );
         }
         public async Task CardDown( CardDownAction action )

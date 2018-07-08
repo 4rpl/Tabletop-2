@@ -7,6 +7,8 @@ using Tabletop.Logic.Models.Actions;
 using Tabletop.Logic.Models.Actions.Card;
 using Tabletop.Logic.Models.Actions.Deck;
 using Tabletop.Logic.Models.Actions.Filter;
+using Tabletop.Logic.Models.Actions.In.Card;
+using Tabletop.Logic.Models.Actions.Out.Card;
 using Tabletop.Logic.Models.Actions.User;
 
 namespace Tabletop.Logic.Models
@@ -118,8 +120,7 @@ namespace Tabletop.Logic.Models
             {
                 action
             };
-            var card = new Card( action.ContentTop, action.ContentBottom, action.H, action.W );
-            card.Move( action.X, action.Y );
+            var card = new Card( action.ContentTop, action.ContentBottom, action.X, action.Y, 0, action.H, action.W );
             _cards.Add( card );
             action.Id = card.Id;
             var users = UsersWhoCanSee( card );
@@ -174,7 +175,7 @@ namespace Tabletop.Logic.Models
             {
                 result.Add( new CardUpAction( card, _users.Except( users ).Select( i => i.Id ).ToList(), false ) );
             }
-            card.Grab();
+            card.Grab( null );
             return result;
         }
         public IEnumerable<ITableAction> Dispatch( CardDownAction action )
@@ -284,6 +285,66 @@ namespace Tabletop.Logic.Models
         }
         #endregion
 
+        public IEnumerable<ITableAction> Dispatch( InAddCardAction action, string userId )
+        {
+            var user = _users.FirstOrDefault( i => i.Id == userId );
+            if( user == null )
+            {
+                throw new ArgumentException( "Пользователь не найден" );
+            }
+            var card = new Card( action.ContentTop, action.ContentBottom, action.X, action.Y, user.Alpha, action.H, action.W );
+            _cards.Add( card );
+
+            var canSee = UserIdsWhoCanSee( card );
+            var canNotSee = _users.Select( i => i.Id ).Except( canSee ).ToList();
+            var result = new List<ITableAction>
+            {
+                new OutAddCardAction( card, canSee, true ),
+                new OutAddCardAction( card, canNotSee, false )
+            };
+            return result;
+        }
+        public IEnumerable<ITableAction> Dispatch( InFlipCardAction action )
+        {
+            var card = _cards.FirstOrDefault( i => i.Id == action.Id );
+            if( card == null )
+            {
+                throw new ArgumentException( "Карта не найдена" );
+            }
+            card.Flip();
+
+            var canSee = UserIdsWhoCanSee( card );
+            var canNotSee = _users.Select( i => i.Id ).Except( canSee ).ToList();
+            var result = new List<ITableAction>
+            {
+                new OutFlipCardAction( card, canSee, true ),
+                new OutFlipCardAction( card, canSee, false )
+            };
+            return result;
+        }
+        public IEnumerable<ITableAction> Dispatch( InCardUpAction action, string userId )
+        {
+            var user = _users.FirstOrDefault( i => i.Id == userId );
+            if( user == null )
+            {
+                throw new ArgumentException( "Пользователь не найден" );
+            }
+            var card = _cards.FirstOrDefault( i => i.Id == action.Id && !i.IsGrabbed );
+            if( card == null )
+            {
+                throw new ArgumentException( "Карта не найдена" );
+            }
+            card.Grab( user );
+
+            var others = _users.Where( i => i.Id != userId ).Select( i => i.Id ).ToList();
+            var result = new List<ITableAction>
+            {
+                new OutGrabCardAction( card, userId ),
+                new OutUpCardAction( card, others )
+            };
+            return result;
+        }
+
         #region Decks
         public IEnumerable<ITableAction> Dispatch( FlipDeckAction action )
         {
@@ -325,7 +386,7 @@ namespace Tabletop.Logic.Models
                 action,
                 new DeckUpAction( deck, users, false )
             };
-            deck.Grab();
+            deck.Grab( null );
             return result;
         }
         public IEnumerable<ITableAction> Dispatch( DeckDownAction action )
@@ -387,7 +448,7 @@ namespace Tabletop.Logic.Models
 
             var card = deck.TakeTop();
             _cards.Add( card );
-            card.Grab();
+            card.Grab( null );
             var users = UsersWhoCanSee( deck );
             if( deck.Length > 1 )
             {
@@ -452,6 +513,10 @@ namespace Tabletop.Logic.Models
             return _users
                 .Where( i => _filters.All( j => !j.IsFiltered( obj ) || j.Owner == i ) )
                 .ToList();
+        }
+        private List<string> UserIdsWhoCanSee( IDraggable obj )
+        {
+            return UsersWhoCanSee( obj ).Select( i => i.Id ).ToList();
         }
         /// <summary>
         /// Расстояние между центрами объектов

@@ -4,8 +4,9 @@ import Card from './Card';
 import Deck from './Deck';
 import Cursor from './Cursor';
 import Filter from './Filter';
-import { addCard, tableScale, tableMove, tableMouseUp, tableMouseDown, moveUser, addFilter } from '../store/table/TableActions';
+import { addCard, tableScale, tableMove, tableMouseUp, tableMouseDown, moveUser, addFilter, tableRotate } from '../store/table/TableActions';
 import CallbackService from '../services/CallbackService';
+import ServerListener from './ServerListener';
 
 const mapDispatchToProps = function (dispatch) {
     return {
@@ -27,11 +28,16 @@ const mapDispatchToProps = function (dispatch) {
         onAddFilter: (x, y, h, w) => {
             dispatch(addFilter(x, y, h, w));
         },
+        onRotate: alpha => {
+            dispatch(tableRotate(alpha));
+        },
         onAddCard: () => {
+            let rnd = Math.floor(Math.random() * 20 + 1);
+
             dispatch(addCard(
-                null, 0, 0, 0, 0, 142, 102, false, false,
-                'Cards/1.png',
-                'Cards/2.png'
+                null, 0, 0, 0, 0, 140, 92, false, false,
+                `Cards/${rnd}.gif`,
+                'Cards/0.jpg'
             ));
         }
     }
@@ -49,6 +55,7 @@ class Table extends React.Component {
         const callbackService = CallbackService.getInstance();
         callbackService.onMouseMove('CURSOR', this.CursorMove.bind(this));
         console.log(this.props.onAddFilter);
+        console.log(this.props.onRotate);
     }
 
     MouseDown(e) {
@@ -82,7 +89,20 @@ class Table extends React.Component {
     CursorMove(e) {
         const { onCursorMove, game } = this.props;
         const table = game.table;
-        onCursorMove(e.clientX - table.x, e.clientY - table.y);
+
+        // TODO: optimize
+        const tox = table.w / 2 + table.x;
+        const toy = table.h / 2 + table.y;
+        const box = Math.cos(table.alpha) * table.w / 2 - Math.sin(table.alpha) * table.h / 2;
+        const boy = Math.cos(table.alpha) * table.h / 2 + Math.sin(table.alpha) * table.w / 2;
+        const tbx = tox - box;
+        const tby = toy - boy;
+        const bcx = e.clientX - tbx;
+        const bcy = e.clientY - tby;
+        const cx = Math.cos(table.alpha) * bcx + Math.sin(table.alpha) * bcy;
+        const cy = Math.cos(table.alpha) * bcy - Math.sin(table.alpha) * bcx;
+        
+        onCursorMove(cx, cy);
         return false;
     }
 
@@ -98,7 +118,7 @@ class Table extends React.Component {
     }
 
     render() {
-        const { game, onAddCard } = this.props;
+        const { game, onAddCard, onRotate } = this.props;
         const table = game.table;
 
         const cards = game.cards.map(card => {
@@ -113,6 +133,7 @@ class Table extends React.Component {
                     z={card.z}
                     h={card.h}
                     w={card.w}
+                    parentAlpha={table.alpha}
                     active={card.active}
                     isOwner={card.isOwner}
                     content={card.content}
@@ -162,7 +183,15 @@ class Table extends React.Component {
 
         return (
             <div className="table"
-                style={{ top: table.y, left: table.x, transform: `scale(${table.scale})`, width: table.w, height: table.h }}
+                style={{
+                    top: table.y,
+                    left: table.x,
+                    transform: `scale(${table.scale}) rotate(${table.alpha}rad)`,
+                    width: table.w,
+                    maxWidth: table.w,
+                    height: table.h,
+                    maxHeight: table.h
+                }}
                 onWheel={this.Wheel.bind(this)}
                 onMouseDown={this.MouseDown.bind(this)}>
                 <button onClick={onAddCard}>+</button>
@@ -170,6 +199,7 @@ class Table extends React.Component {
                 {decks}
                 {cards}
                 {filters}
+                <ServerListener />
             </div>
         );
     }

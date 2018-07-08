@@ -35,7 +35,7 @@ namespace Tabletop.Logic.Models.Actions
     {
         public TableCard( CardModel card )
         {
-            Active = card.IsGrabbed();
+            Active = card.IsGrabbed;
             Content = card.GetContent();
             H = card.Height;
             Id = card.Id;
@@ -59,7 +59,7 @@ namespace Tabletop.Logic.Models.Actions
     {
         public TableDeck( DeckModel deck )
         {
-            Active = deck.IsGrabbed();
+            Active = deck.IsGrabbed;
             Content = deck.GetContent();
             H = deck.Height;
             Id = deck.Id;
