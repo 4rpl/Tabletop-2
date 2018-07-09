@@ -49,13 +49,13 @@ namespace Tabletop.Logic.Models
         public int Z { get; protected set; }
         public int Mx { get; protected set; }
         public int My { get; protected set; }
-        public double Alpha { get; protected set; }
+        public double Alpha { get; set; }
 
         public CardSideEnum Side => _side;
 
         public void Drop()
         {
-            if( _isGrabbed )
+            if( !_isGrabbed )
             {
                 throw new MethodAccessException( $"Колода не была взята. Id: {Id}" );
             }
@@ -82,7 +82,7 @@ namespace Tabletop.Logic.Models
                 throw new MethodAccessException( $"Карта уже была взята. Id: {Id}, UserId: {owner.Id}, OwnerId: {Owner.Id}" );
             }
             Owner = owner;
-            Alpha = owner.Alpha;
+            //Alpha = owner.Alpha;
             _isGrabbed = true;
         }
 

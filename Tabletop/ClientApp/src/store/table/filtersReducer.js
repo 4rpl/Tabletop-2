@@ -2,6 +2,17 @@
 
 function usersReducer(state = [], action) {
     switch (action.type) {
+        case TableActions.GET_TABLE: {
+            return action.filters.map(filter => {
+                return {
+                    id: filter.id,
+                    x: filter.x,
+                    y: filter.y,
+                    h: filter.h,
+                    w: filter.w
+                };
+            });
+        }
         case TableActions.ADD_FILTER: {
             return [
                 ...state,

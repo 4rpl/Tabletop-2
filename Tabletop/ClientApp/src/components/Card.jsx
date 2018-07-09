@@ -16,8 +16,8 @@ const mapDispatchToProps = function (dispatch) {
         onMoveCard: (id, x, y) => {
             dispatch(moveCard(id, x, y));
         },
-        onCardUp: (id, mx, my, z) => {
-            dispatch(cardUp(id, mx, my, z));
+        onCardUp: (id, alpha, mx, my, z) => {
+            dispatch(cardUp(id, alpha, mx, my, z));
         },
         onCardDown: (id, x, y) => {
             dispatch(cardDown(id, x, y));
@@ -47,7 +47,7 @@ class Card extends React.Component {
         if (!active && e.button === 0) {
             let px = Math.cos(parentAlpha) * e.clientX + Math.sin(parentAlpha) * e.clientY;
             let py = Math.cos(parentAlpha) * e.clientY - Math.sin(parentAlpha) * e.clientX;
-            onCardUp(id, x - e.clientX, y - e.clientY, z);
+            onCardUp(id, parentAlpha, x - e.clientX, y - e.clientY, z);
             this.applyCallbacks(id, x - px, y - py);
         }
         e.stopPropagation();
@@ -80,7 +80,7 @@ class Card extends React.Component {
     }
 
     render() {
-        let { x, y, z, h, w, active, content } = this.props;
+        let { x, y, z, h, w, active, alpha, content } = this.props;
 
         let cardContent;
         if (content) {
@@ -88,10 +88,9 @@ class Card extends React.Component {
         } else {
             cardContent = <img alt="" src={process.env.PUBLIC_URL + 'Cards/logo.svg'} className="table-logo" />
         }
-
         return (
             <div
-                style={{ top: y, left: x, width: w, height: h, zIndex: z }}
+                style={{ top: y, left: x, width: w, height: h, zIndex: z, transform: `rotate(-${alpha}rad)` }}
                 onMouseDown={this.MouseDown.bind(this)}
                 onContextMenu={this.OnContextMenu.bind(this)}
                 className={'card noselect' + (active ? ' grabbed' : '')}>

@@ -13,8 +13,8 @@ const mapDispatchToProps = function (dispatch) {
         onTableScale: function (scale) {
             dispatch(tableScale(scale));
         },
-        onTableMove: function (x, y) {
-            dispatch(tableMove(x, y));
+        onTableMove: function (ax, ay, vx, vy, x, y) {
+            dispatch(tableMove(ax, ay, vx, vy, x, y));
         },
         onTableMouseUp: function () {
             dispatch(tableMouseUp());
@@ -45,9 +45,19 @@ const mapDispatchToProps = function (dispatch) {
 
 const mapStateToProps = function (state) {
     return {
-        game: state.game
+        table: state.game.table,
+        decks: state.game.decks,
+        cards: state.game.cards,
+        filters: state.game.filters,
+        users: state.game.users,
+        camera: state.game.camera,
     };
 }
+
+const _maxVelocity = 30;
+const _moveAcceleration = 3;
+const _moveTickMs = 20;
+const tableRotateStep = Math.PI / 8;
 
 class Table extends React.Component {
     
@@ -55,17 +65,104 @@ class Table extends React.Component {
         const callbackService = CallbackService.getInstance();
         callbackService.onMouseMove('CURSOR', this.CursorMove.bind(this));
         console.log(this.props.onAddFilter);
-        console.log(this.props.onRotate);
+        document.onkeydown = this.keyPress.bind(this);
+        document.onkeyup = this.keyPress.bind(this);
+
+        setInterval(this.updateCamera.bind(this), _moveTickMs);
+    }
+
+    updateCamera() {
+        const { camera, onTableMove, table } = this.props;
+        if (camera.ax || camera.ay || camera.vx || camera.vy) {
+            let vx = camera.vx + camera.ax;
+            let vy = camera.vy + camera.ay;
+            let x = camera.vx + camera.x;
+            let y = camera.vy + camera.y;
+            if (camera.ax === 0 && camera.vx !== 0) {
+                vx -= Math.sign(vx) * _moveAcceleration;
+            }
+            if (camera.ay === 0 && camera.vy !== 0) {
+                vy -= Math.sign(vy) * _moveAcceleration;
+            }
+            if (x > table.w / 2) {
+                x = table.w / 2;
+            } else if (x < -table.w / 2) {
+                x = -table.w / 2;
+            }
+            if (y > table.h / 2) {
+                y = table.h / 2;
+            } else if (y < -table.h / 2) {
+                y = -table.h / 2;
+            }
+            if (vx > _maxVelocity) {
+                vx = _maxVelocity;
+            } else if (vx < -_maxVelocity) {
+                vx = -_maxVelocity;
+            }
+            onTableMove(camera.ax, camera.ay, vx, vy, x, y);
+        }
+    }
+
+    rotate(angle) {
+        const { camera, onRotate } = this.props;
+        const alpha = camera.alpha + angle;
+        onRotate(alpha);
+    }
+    
+    keyPress(e) {
+        const { onTableMove } = this.props;
+        const { ax, ay, vx, vy, x, y } = this.props.camera;
+        switch (e.key) {
+            case 'q': {
+                this.rotate(-tableRotateStep);
+                break;
+            }
+            case 'e': {
+                this.rotate(tableRotateStep);
+                break;
+            }
+            case 'w': {
+                if (e.type === 'keydown') {
+                    onTableMove(ax, _moveAcceleration, vx, (vy > 0 ? vy : 0), x, y);
+                } else if (e.type === 'keyup' && ay > 0) {
+                    onTableMove(ax, 0, vx, vy, x, y);
+                }
+                break;
+            }
+            case 'a': {
+                if (e.type === 'keydown') {
+                    onTableMove(_moveAcceleration, ay, (vx > 0 ? vx : 0), vy, x, y);
+                } else if (e.type === 'keyup' && ax > 0) {
+                    onTableMove(0, ay, vx, vy, x, y);
+                }
+                break;
+            }
+            case 's': {
+                if (e.type === 'keydown') {
+                    onTableMove(ax, -_moveAcceleration, vx, (vy < 0 ? vy : 0), x, y);
+                } else if (e.type === 'keyup' && ay < 0) {
+                    onTableMove(ax, 0, vx, vy, x, y);
+                }
+                break;
+            }
+            case 'd': {
+                if (e.type === 'keydown') {
+                    onTableMove(-_moveAcceleration, ay, (vy < 0 ? vy : 0), vy, x, y);
+                } else if (e.type === 'keyup' && ax < 0) {
+                    onTableMove(0, ay, vx, vy, x, y);
+                }
+                break;
+            }
+        }
     }
 
     MouseDown(e) {
-        const { game, onTableMouseDown } = this.props;
-        const table = game.table;
+        const { camera, onTableMouseDown } = this.props;
         const callbackService = CallbackService.getInstance();
 
-        onTableMouseDown(table.x - e.clientX, table.y - e.clientY);
+        onTableMouseDown(camera.x - e.clientX, camera.y - e.clientY);
         callbackService.onMouseUp('TABLE', this.MouseUp.bind(this));
-        callbackService.onMouseMove('TABLE', this.MouseMove.bind(this, table.x - e.clientX, table.y - e.clientY));
+        callbackService.onMouseMove('TABLE', this.MouseMove.bind(this, camera.x - e.clientX, camera.y - e.clientY));
         return false;
     }
 
@@ -87,20 +184,19 @@ class Table extends React.Component {
     }
 
     CursorMove(e) {
-        const { onCursorMove, game } = this.props;
-        const table = game.table;
+        const { onCursorMove, table, camera } = this.props;
 
         // TODO: optimize
         const tox = table.w / 2 + table.x;
         const toy = table.h / 2 + table.y;
-        const box = Math.cos(table.alpha) * table.w / 2 - Math.sin(table.alpha) * table.h / 2;
-        const boy = Math.cos(table.alpha) * table.h / 2 + Math.sin(table.alpha) * table.w / 2;
+        const box = Math.cos(camera.alpha) * table.w / 2 - Math.sin(camera.alpha) * table.h / 2;
+        const boy = Math.cos(camera.alpha) * table.h / 2 + Math.sin(camera.alpha) * table.w / 2;
         const tbx = tox - box;
         const tby = toy - boy;
         const bcx = e.clientX - tbx;
         const bcy = e.clientY - tby;
-        const cx = Math.cos(table.alpha) * bcx + Math.sin(table.alpha) * bcy;
-        const cy = Math.cos(table.alpha) * bcy - Math.sin(table.alpha) * bcx;
+        const cx = Math.cos(camera.alpha) * bcx + Math.sin(camera.alpha) * bcy;
+        const cy = Math.cos(camera.alpha) * bcy - Math.sin(camera.alpha) * bcx;
         
         onCursorMove(cx, cy);
         return false;
@@ -118,10 +214,8 @@ class Table extends React.Component {
     }
 
     render() {
-        const { game, onAddCard, onRotate } = this.props;
-        const table = game.table;
-
-        const cards = game.cards.map(card => {
+        const { camera, table, cards, decks, users, filters, onAddCard } = this.props;
+        const cardViews = cards.map(card => {
             return (
                 <Card
                     key={card.id}
@@ -133,7 +227,8 @@ class Table extends React.Component {
                     z={card.z}
                     h={card.h}
                     w={card.w}
-                    parentAlpha={table.alpha}
+                    alpha={card.alpha}
+                    parentAlpha={camera.alpha}
                     active={card.active}
                     isOwner={card.isOwner}
                     content={card.content}
@@ -141,7 +236,7 @@ class Table extends React.Component {
             );
         });
 
-        const decks = game.decks.map(deck => {
+        const deckViews = decks.map(deck => {
             return (
                 <Deck
                     key={deck.id}
@@ -160,7 +255,7 @@ class Table extends React.Component {
             );
         });
 
-        const users = game.users.map(user => {
+        const userViews = users.map(user => {
             return (
                 <Cursor
                     key={user.id}
@@ -170,7 +265,7 @@ class Table extends React.Component {
             );
         });
 
-        const filters = game.filters.map(filter => {
+        const filterViews = filters.map(filter => {
             return (
                 <Filter
                     key={filter.id}
@@ -184,21 +279,20 @@ class Table extends React.Component {
         return (
             <div className="table"
                 style={{
-                    top: table.y,
-                    left: table.x,
-                    transform: `scale(${table.scale}) rotate(${table.alpha}rad)`,
+                    top: camera.y,
+                    left: camera.x,
+                    transform: `scale(${camera.scale}) rotate(${camera.alpha}rad)`,
                     width: table.w,
                     maxWidth: table.w,
                     height: table.h,
                     maxHeight: table.h
                 }}
-                onWheel={this.Wheel.bind(this)}
-                onMouseDown={this.MouseDown.bind(this)}>
+                onWheel={this.Wheel.bind(this)}>
                 <button onClick={onAddCard}>+</button>
-                {users}
-                {decks}
-                {cards}
-                {filters}
+                {userViews}
+                {deckViews}
+                {cardViews}
+                {filterViews}
                 <ServerListener />
             </div>
         );

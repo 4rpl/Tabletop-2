@@ -170,12 +170,13 @@ namespace Tabletop.Logic.Models
             }
             action.IsOwner = true;
             action.ResieverIds = new List<string> { action.OwnerId };
-            var users = _users.Where( i => i.Id != action.OwnerId );
+            var users = _users.Where( i => action.ResieverIds.Contains( i.Id ) );
+            card.Grab( null );
+            card.Alpha = action.Alpha;
             if( users.Count() < _users.Count() )
             {
                 result.Add( new CardUpAction( card, _users.Except( users ).Select( i => i.Id ).ToList(), false ) );
             }
-            card.Grab( null );
             return result;
         }
         public IEnumerable<ITableAction> Dispatch( CardDownAction action )

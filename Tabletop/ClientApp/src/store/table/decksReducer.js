@@ -5,6 +5,23 @@ const initialZIndex = Config.zIndex.deck;
 
 function cardsReducer(state = [], action) {
     switch (action.type) {
+        case TableActions.GET_TABLE: {
+            return action.decks.map(deck => {
+                return {
+                    id: deck.id,
+                    x: deck.x,
+                    y: deck.y,
+                    z: deck.z,
+                    mx: deck.mx,
+                    my: deck.my,
+                    h: deck.h,
+                    w: deck.w,
+                    active: deck.active,
+                    content: deck.content,
+                    length: deck.length,
+                };
+            });
+        }
         case TableActions.ADD_DECK: {
             return [
                 ...state,

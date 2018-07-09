@@ -86,8 +86,8 @@ export function removeFilter(id) {
 export function tableScale(scale) {
     return { type: TABLE_SCALE, enforce: true, scale };
 }
-export function tableMove(x, y) {
-    return { type: TABLE_MOVE, enforce: true, x, y };
+export function tableMove(ax, ay, vx, vy, x, y) {
+    return { type: TABLE_MOVE, enforce: true, ax, ay, vx, vy, x, y };
 }
 export function tableMouseUp() {
     return { type: TABLE_MOUSE_UP, enforce: true };
@@ -105,8 +105,8 @@ export function flipCard(id) {
 export function moveCard(id, x, y) {
     return { type: MOVE_CARD, id, x, y };
 }
-export function cardUp(id, mx, my, z) {
-    return { type: CARD_UP, id, mx, my, z };
+export function cardUp(id, alpha, mx, my, z) {
+    return { type: CARD_UP, id, alpha, mx, my, z };
 }
 export function cardDown(id, x, y) {
     return { type: CARD_DOWN, id, x, y };

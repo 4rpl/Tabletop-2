@@ -18,9 +18,11 @@ namespace Tabletop.Logic.Models.Actions.Card
             Z = card.Z;
             ResieverIds = resievers;
             IsOwner = isOwner;
+            Alpha = card.Alpha;
         }
 
         public string Type { get; set; }
+        public double Alpha { get; set; }
         public Resiever Resiever { get; set; } = Resiever.Special;
         public List<string> ResieverIds { get; set; }
         public Guid Id { get; set; }

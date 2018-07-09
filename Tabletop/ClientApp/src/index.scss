@@ -22,7 +22,9 @@ body {
 .table {
     background-color: #fff;
     position: absolute;
-    transition: transform ease-in-out .1s;
+    transition:
+        top linear .02s,
+        left linear .02s;
     margin: 0;
 }
 
@@ -32,7 +34,9 @@ body {
     position: absolute;
     background-color: #dedede;
     cursor: move;
-    transition: box-shadow 0.15s ease-out;
+    transition:
+        box-shadow .1s ease-in-out,
+        transform .1s ease-in-out;
 
     &:hover {
         border: 1px solid #fb9;

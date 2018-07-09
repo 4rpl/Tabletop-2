@@ -5,6 +5,22 @@ const initialZIndex = Config.zIndex.card;
 
 function cardsReducer(state = [], action) {
     switch (action.type) {
+        case TableActions.GET_TABLE: {
+            return action.cards.map(card => {
+                return {
+                    id: card.id,
+                    x: card.x,
+                    y: card.y,
+                    z: card.z,
+                    mx: card.mx,
+                    my: card.my,
+                    h: card.h,
+                    w: card.w,
+                    active: card.active,
+                    content: card.content
+                };
+            });
+        }
         case TableActions.FLIP_CARD: {
             return state.map((card, _) => {
                 return card.id === action.id
@@ -38,6 +54,7 @@ function cardsReducer(state = [], action) {
                         isOwner: action.isOwner,
                         mx: action.mx,
                         my: action.my,
+                        alpha: action.alpha,
                         z: initialZIndex + state.length
                     };
                 } else if (card.z > z) {

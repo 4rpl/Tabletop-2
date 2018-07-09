@@ -2,6 +2,16 @@
 
 function usersReducer(state = [], action) {
     switch (action.type) {
+        case TableActions.GET_TABLE: {
+            return action.users.map(user => {
+                return {
+                    id: user.id,
+                    name: user.name,
+                    x: user.x,
+                    y: user.y
+                };
+            });
+        }
         case TableActions.ADD_USER: {
             return [
                 ...state,
