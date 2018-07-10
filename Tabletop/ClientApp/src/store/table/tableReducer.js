@@ -12,7 +12,7 @@ function tableReducer(state = {}, action) {
     switch (action.type) {
         case TableActions.GET_TABLE: {
             return {
-                table: state.table || {
+                table: {
                     w: action.w,
                     h: action.h
                 },
@@ -25,10 +25,7 @@ function tableReducer(state = {}, action) {
         }
         default: {
             return {
-                table: state.table || {
-                    w: 1500,
-                    h: 1000,
-                },
+                table: state.table || {},
                 camera: cameraReducer(state.camera, action),
                 users: usersReducer(state.users, action),
                 filters: filtersReducer(state.filters, action),

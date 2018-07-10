@@ -14,7 +14,7 @@ namespace Tabletop.Hubs
 {
     public class GameHub : Hub
     {
-        private static Table _table = new Table( 3000, 3000 );
+        private static Table _table = new Table( 1000, 1000 );
 
         public override async Task OnConnectedAsync()
         {

@@ -47,7 +47,9 @@ function cameraReducer(state = {}, action) {
         case TableActions.TABLE_ROTATE: {
             return {
                 ...state,
-                alpha: action.alpha
+                alpha: action.alpha,
+                x: action.x,
+                y: action.y,
             };
         }
         case TableActions.CURSOR_MOVE: {

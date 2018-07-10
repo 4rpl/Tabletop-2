@@ -33,7 +33,7 @@ const SHUFFLE_DECK =        'ShuffleDeck';
 const TAKE_TOP_DECK_CARD =  'TakeTopDeckCard';
 const REMOVE_DECK =         'RemoveDeck';
 const HIDE_DECK_CONTENT =   'HideDeckContent';
-const SHOW_DECK_CONTENT = 'ShowDeckContent';
+const SHOW_DECK_CONTENT =   'ShowDeckContent';
 
 export const TableActionAccessTypes = {
     // Приватное действие. Не отсылается на сервер, пропускается в редьюсер
@@ -96,27 +96,30 @@ export function tableScale(scale) {
 export function tableMove(ax, ay, vx, vy, x, y) {
     return { type: TABLE_MOVE, access: TableActionAccessTypes.private, ax, ay, vx, vy, x, y };
 }
-export function tableRotate(alpha) {
-    return { type: TABLE_ROTATE, access: TableActionAccessTypes.private, alpha };
+export function tableRotate(alpha, x, y) {
+    return { type: TABLE_ROTATE, access: TableActionAccessTypes.private, alpha, x, y };
 }
-export function cursorMove(x, y) {
-    return { type: CURSOR_MOVE, access: TableActionAccessTypes.notification, x, y }
+export function moveCursor(x, y) {
+    return { type: CURSOR_MOVE, access: TableActionAccessTypes.private, x, y }
+}
+export function moveUser(x, y) {
+    return { type: MOVE_USER, access: TableActionAccessTypes.notification, x, y }
 }
 
 export function flipCard(id) {
-    return { type: FLIP_CARD, id };
+    return { type: FLIP_CARD, access: TableActionAccessTypes.verificationRequired, id };
 }
 export function moveCard(id, x, y) {
-    return { type: MOVE_CARD, id, x, y };
+    return { type: MOVE_CARD, access: TableActionAccessTypes.notification, id, x, y };
 }
 export function cardUp(id, alpha, mx, my, z) {
-    return { type: CARD_UP, id, alpha, mx, my, z };
+    return { type: CARD_UP, access: TableActionAccessTypes.verificationRequired, id, alpha, mx, my, z };
 }
 export function cardDown(id, x, y) {
-    return { type: CARD_DOWN, id, x, y };
+    return { type: CARD_DOWN, access: TableActionAccessTypes.verificationRequired, id, x, y };
 }
 export function addCard(id, x, y, mx, my, h, w, visible, active, contentTop, contentBottom) {
-    return { type: ADD_CARD, id, x, y, mx, my, h, w, visible, active, contentTop, contentBottom };
+    return { type: ADD_CARD, access: TableActionAccessTypes.verificationRequired, id, x, y, mx, my, h, w, visible, active, contentTop, contentBottom };
 }
 
 export function flipDeck(id) {

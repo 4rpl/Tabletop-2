@@ -4,7 +4,7 @@ import Card from './Card';
 import Deck from './Deck';
 import Cursor from './Cursor';
 import Filter from './Filter';
-import { addCard, tableScale, tableMove, addFilter, tableRotate, cursorMove } from '../store/table/TableActions';
+import { addCard, tableScale, tableMove, addFilter, tableRotate, moveCursor, moveUser } from '../store/table/TableActions';
 import CallbackService from '../services/CallbackService';
 import ServerListener from './ServerListener';
 
@@ -19,11 +19,12 @@ const mapDispatchToProps = function (dispatch) {
         onAddFilter: (x, y, h, w) => {
             dispatch(addFilter(x, y, h, w));
         },
-        onRotate: alpha => {
-            dispatch(tableRotate(alpha));
+        onRotate: (alpha, x, y) => {
+            dispatch(tableRotate(alpha, x, y));
         },
         onCursorMove: function (x, y) {
-            dispatch(cursorMove(x, y));
+            dispatch(moveCursor(x, y));
+            //dispatch(moveUser(x, y));
         },
         onAddCard: () => {
             let rnd = Math.floor(Math.random() * 20 + 1);
@@ -48,10 +49,10 @@ const mapStateToProps = function (state) {
     };
 }
 
-const _maxVelocity = 30;
-const _moveAcceleration = 3;
+const _maxVelocity = 40;
+const _moveAcceleration = 4;
 const _moveTickMs = 20;
-const tableRotateStep = Math.PI / 8;
+const tableRotateStep = Math.PI / 2;
 
 class Table extends React.Component {
     
@@ -61,7 +62,7 @@ class Table extends React.Component {
         console.log(this.props.onAddFilter);
         document.onkeydown = this.keyPress.bind(this);
         document.onkeyup = this.keyPress.bind(this);
-        //document.onmousemove = this.updateCursor.bind(this);
+        document.onmousemove = this.updateCursor.bind(this);
 
         setInterval(this.updateCamera.bind(this), _moveTickMs);
     }
@@ -95,29 +96,42 @@ class Table extends React.Component {
             if (camera.ay === 0 && camera.vy !== 0) {
                 vy -= Math.sign(vy) * _moveAcceleration;
             }
-            if (x > table.w / 2) {
-                x = table.w / 2;
-            } else if (x < -table.w / 2) {
-                x = -table.w / 2;
-            }
-            if (y > table.h / 2) {
-                y = table.h / 2;
-            } else if (y < -table.h / 2) {
-                y = -table.h / 2;
-            }
+            //if (x > window.screen.width / 2) {
+            //    x = window.screen.width / 2;
+            //} else if (x < -table.w / 2) {
+            //    x = -table.w / 2;
+            //}
+            //if (y > table.h / 2) {
+            //    y = table.h / 2;
+            //} else if (y < -table.h / 2) {
+            //    y = -table.h / 2;
+            //}
             if (vx > _maxVelocity) {
                 vx = _maxVelocity;
             } else if (vx < -_maxVelocity) {
                 vx = -_maxVelocity;
+            }
+            if (vy > _maxVelocity) {
+                vy = _maxVelocity;
+            } else if (vy < -_maxVelocity) {
+                vy = -_maxVelocity;
             }
             onTableMove(camera.ax, camera.ay, vx, vy, x, y);
         }
     }
 
     rotate(angle) {
-        const { camera, onRotate } = this.props;
+        const { camera, onRotate, table } = this.props;
+        const screenCenterX = window.screen.width / 2;
+        const screenCenterY = window.screen.height / 2;
+        const rotCenterX = screenCenterX - camera.x - table.w / 2;
+        const rotCenterY = screenCenterY - camera.y - table.h / 2;
+        console.log('center', rotCenterX, rotCenterY);
+        const x = (Math.cos(-angle) * rotCenterX - Math.sin(-angle) * rotCenterY) * camera.scale;
+        const y = (Math.cos(-angle) * rotCenterY + Math.sin(-angle) * rotCenterX) * camera.scale;
+        console.log('new center:', x, y);
         const alpha = camera.alpha + angle;
-        onRotate(alpha);
+        onRotate(alpha, x, y);
     }
     
     keyPress(e) {
@@ -125,11 +139,15 @@ class Table extends React.Component {
         const { ax, ay, vx, vy, x, y } = this.props.camera;
         switch (e.key) {
             case 'q': {
-                this.rotate(-tableRotateStep);
+                if (e.type === 'keydown') {
+                    this.rotate(-tableRotateStep);
+                }
                 break;
             }
             case 'e': {
-                this.rotate(tableRotateStep);
+                if (e.type === 'keydown') {
+                    this.rotate(tableRotateStep);
+                }
                 break;
             }
             case 'w': {
