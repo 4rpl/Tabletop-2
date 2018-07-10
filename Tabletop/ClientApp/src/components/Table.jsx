@@ -4,7 +4,7 @@ import Card from './Card';
 import Deck from './Deck';
 import Cursor from './Cursor';
 import Filter from './Filter';
-import { addCard, tableScale, tableMove, tableMouseUp, tableMouseDown, moveUser, addFilter, tableRotate } from '../store/table/TableActions';
+import { addCard, tableScale, tableMove, tableMouseUp, tableMouseDown, moveUser, addFilter, tableRotate, cursorMove } from '../store/table/TableActions';
 import CallbackService from '../services/CallbackService';
 import ServerListener from './ServerListener';
 
@@ -30,6 +30,9 @@ const mapDispatchToProps = function (dispatch) {
         },
         onRotate: alpha => {
             dispatch(tableRotate(alpha));
+        },
+        onCursorMove: function (x, y) {
+            dispatch(cursorMove(x, y));
         },
         onAddCard: () => {
             let rnd = Math.floor(Math.random() * 20 + 1);
@@ -63,12 +66,30 @@ class Table extends React.Component {
     
     componentDidMount() {
         const callbackService = CallbackService.getInstance();
-        callbackService.onMouseMove('CURSOR', this.CursorMove.bind(this));
+        //callbackService.onMouseMove('CURSOR', this.CursorMove.bind(this));
         console.log(this.props.onAddFilter);
         document.onkeydown = this.keyPress.bind(this);
         document.onkeyup = this.keyPress.bind(this);
+        document.onmousemove = this.updateCursor.bind(this);
 
         setInterval(this.updateCamera.bind(this), _moveTickMs);
+    }
+
+    updateCursor(e) {
+        const { onCursorMove, table, camera } = this.props;
+
+        const tox = table.w / 2 + camera.x;
+        const toy = table.h / 2 + camera.y;
+        const box = Math.cos(camera.alpha) * table.w / 2 - Math.sin(camera.alpha) * table.h / 2;
+        const boy = Math.cos(camera.alpha) * table.h / 2 + Math.sin(camera.alpha) * table.w / 2;
+        const tbx = (tox - box) / camera.scale;
+        const tby = (toy - boy) / camera.scale;
+        const bcx = e.clientX - tbx;
+        const bcy = e.clientY - tby;
+        const cx = Math.cos(camera.alpha) * bcx + Math.sin(camera.alpha) * bcy;
+        const cy = Math.cos(camera.alpha) * bcy - Math.sin(camera.alpha) * bcx;
+        console.log(cx, cy);
+        onCursorMove(cx, cy);
     }
 
     updateCamera() {
@@ -184,20 +205,8 @@ class Table extends React.Component {
     }
 
     CursorMove(e) {
-        const { onCursorMove, table, camera } = this.props;
-
-        // TODO: optimize
-        const tox = table.w / 2 + table.x;
-        const toy = table.h / 2 + table.y;
-        const box = Math.cos(camera.alpha) * table.w / 2 - Math.sin(camera.alpha) * table.h / 2;
-        const boy = Math.cos(camera.alpha) * table.h / 2 + Math.sin(camera.alpha) * table.w / 2;
-        const tbx = tox - box;
-        const tby = toy - boy;
-        const bcx = e.clientX - tbx;
-        const bcy = e.clientY - tby;
-        const cx = Math.cos(camera.alpha) * bcx + Math.sin(camera.alpha) * bcy;
-        const cy = Math.cos(camera.alpha) * bcy - Math.sin(camera.alpha) * bcx;
-        
+        const { onCursorMove } = this.props;
+        const { cx, cy } = this.props.camera;
         onCursorMove(cx, cy);
         return false;
     }
