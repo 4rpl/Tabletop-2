@@ -4,7 +4,7 @@ import Card from './Card';
 import Deck from './Deck';
 import Cursor from './Cursor';
 import Filter from './Filter';
-import { addCard, tableScale, tableMove, tableMouseUp, tableMouseDown, moveUser, addFilter, tableRotate, cursorMove } from '../store/table/TableActions';
+import { addCard, tableScale, tableMove, addFilter, tableRotate, cursorMove } from '../store/table/TableActions';
 import CallbackService from '../services/CallbackService';
 import ServerListener from './ServerListener';
 
@@ -15,15 +15,6 @@ const mapDispatchToProps = function (dispatch) {
         },
         onTableMove: function (ax, ay, vx, vy, x, y) {
             dispatch(tableMove(ax, ay, vx, vy, x, y));
-        },
-        onTableMouseUp: function () {
-            dispatch(tableMouseUp());
-        },
-        onTableMouseDown: function (mx, my) {
-            dispatch(tableMouseDown(mx, my));
-        },
-        onCursorMove: function (x, y) {
-            dispatch(moveUser(x, y));
         },
         onAddFilter: (x, y, h, w) => {
             dispatch(addFilter(x, y, h, w));
@@ -70,7 +61,7 @@ class Table extends React.Component {
         console.log(this.props.onAddFilter);
         document.onkeydown = this.keyPress.bind(this);
         document.onkeyup = this.keyPress.bind(this);
-        document.onmousemove = this.updateCursor.bind(this);
+        //document.onmousemove = this.updateCursor.bind(this);
 
         setInterval(this.updateCamera.bind(this), _moveTickMs);
     }
@@ -80,16 +71,15 @@ class Table extends React.Component {
 
         const tox = table.w / 2 + camera.x;
         const toy = table.h / 2 + camera.y;
-        const box = Math.cos(camera.alpha) * table.w / 2 - Math.sin(camera.alpha) * table.h / 2;
-        const boy = Math.cos(camera.alpha) * table.h / 2 + Math.sin(camera.alpha) * table.w / 2;
-        const tbx = (tox - box) / camera.scale;
-        const tby = (toy - boy) / camera.scale;
+        const box = (Math.cos(camera.alpha) * table.w / 2 - Math.sin(camera.alpha) * table.h / 2) * camera.scale;
+        const boy = (Math.cos(camera.alpha) * table.h / 2 + Math.sin(camera.alpha) * table.w / 2) * camera.scale;
+        const tbx = tox - box;
+        const tby = toy - boy;
         const bcx = e.clientX - tbx;
         const bcy = e.clientY - tby;
-        const cx = Math.cos(camera.alpha) * bcx + Math.sin(camera.alpha) * bcy;
-        const cy = Math.cos(camera.alpha) * bcy - Math.sin(camera.alpha) * bcx;
-        console.log(cx, cy);
-        onCursorMove(cx, cy);
+        const cx = (Math.cos(camera.alpha) * bcx + Math.sin(camera.alpha) * bcy) / camera.scale;
+        const cy = (Math.cos(camera.alpha) * bcy - Math.sin(camera.alpha) * bcx) / camera.scale;
+        onCursorMove(Math.round(cx), Math.round(cy));
     }
 
     updateCamera() {
@@ -168,7 +158,7 @@ class Table extends React.Component {
             }
             case 'd': {
                 if (e.type === 'keydown') {
-                    onTableMove(-_moveAcceleration, ay, (vy < 0 ? vy : 0), vy, x, y);
+                    onTableMove(-_moveAcceleration, ay, (vx < 0 ? vx : 0), vy, x, y);
                 } else if (e.type === 'keyup' && ax < 0) {
                     onTableMove(0, ay, vx, vy, x, y);
                 }
@@ -176,34 +166,7 @@ class Table extends React.Component {
             }
         }
     }
-
-    MouseDown(e) {
-        const { camera, onTableMouseDown } = this.props;
-        const callbackService = CallbackService.getInstance();
-
-        onTableMouseDown(camera.x - e.clientX, camera.y - e.clientY);
-        callbackService.onMouseUp('TABLE', this.MouseUp.bind(this));
-        callbackService.onMouseMove('TABLE', this.MouseMove.bind(this, camera.x - e.clientX, camera.y - e.clientY));
-        return false;
-    }
-
-    MouseMove(mx, my, e) {
-        const { onTableMove } = this.props;
-
-        onTableMove(e.clientX + mx, e.clientY + my);
-        return false;
-    }
-
-    MouseUp(e) {
-        const { onTableMouseUp } = this.props;
-        const callbackService = CallbackService.getInstance();
-
-        callbackService.unsubscribeOnMouseUp('TABLE');
-        callbackService.unsubscribeOnMouseMove('TABLE');
-        onTableMouseUp();
-        return false;
-    }
-
+    
     CursorMove(e) {
         const { onCursorMove } = this.props;
         const { cx, cy } = this.props.camera;

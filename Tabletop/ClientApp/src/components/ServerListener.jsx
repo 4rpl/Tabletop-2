@@ -1,5 +1,6 @@
 ﻿import { connect } from 'react-redux';
 import ServerSyncService from '../services/ServerSyncService';
+import { TableActionAccessTypes } from '../store/table/TableActions';
 
 const mapStateToProps = state => {
     return { state };
@@ -15,7 +16,7 @@ const ServerListener = ({ state, dispatch }) => {
     syncService.onMessage = action => {
         dispatch({
             ...action,
-            enforce: true
+            access: TableActionAccessTypes.private
         });
     };
 

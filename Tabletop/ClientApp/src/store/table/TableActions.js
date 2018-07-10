@@ -33,7 +33,16 @@ const SHUFFLE_DECK =        'ShuffleDeck';
 const TAKE_TOP_DECK_CARD =  'TakeTopDeckCard';
 const REMOVE_DECK =         'RemoveDeck';
 const HIDE_DECK_CONTENT =   'HideDeckContent';
-const SHOW_DECK_CONTENT =   'ShowDeckContent';
+const SHOW_DECK_CONTENT = 'ShowDeckContent';
+
+export const TableActionAccessTypes = {
+    // Приватное действие. Не отсылается на сервер, пропускается в редьюсер
+    private: 'private',
+    // Уведомление. Отсылается на сервер, пропускается в редьюсер. Ответа не ожидаем
+    notification: 'notification',
+    // Действие, требующее подтверждения. Отсылается на сервер, не пропускается в редьюсер
+    verificationRequired: 'verificationRequired',
+}
 
 export const TableActions = {
     GET_TABLE,
@@ -74,10 +83,6 @@ export const TableActions = {
     TAKE_TOP_DECK_CARD
 }
 
-export function moveUser(x, y) {
-    return { type: MOVE_USER, x, y };
-}
-
 export function addFilter(x, y, h, w) {
     return { type: ADD_FILTER, x, y, h, w };
 }
@@ -86,22 +91,16 @@ export function removeFilter(id) {
 }
 
 export function tableScale(scale) {
-    return { type: TABLE_SCALE, enforce: true, scale };
+    return { type: TABLE_SCALE, access: TableActionAccessTypes.private, scale };
 }
 export function tableMove(ax, ay, vx, vy, x, y) {
-    return { type: TABLE_MOVE, enforce: true, ax, ay, vx, vy, x, y };
-}
-export function tableMouseUp() {
-    return { type: TABLE_MOUSE_UP, enforce: true };
-}
-export function tableMouseDown(mx, my) {
-    return { type: TABLE_MOUSE_DOWN, enforce: true, mx, my };
+    return { type: TABLE_MOVE, access: TableActionAccessTypes.private, ax, ay, vx, vy, x, y };
 }
 export function tableRotate(alpha) {
-    return { type: TABLE_ROTATE, enforce: true, alpha };
+    return { type: TABLE_ROTATE, access: TableActionAccessTypes.private, alpha };
 }
 export function cursorMove(x, y) {
-    return { type: CURSOR_MOVE, enforce: true, x, y }
+    return { type: CURSOR_MOVE, access: TableActionAccessTypes.notification, x, y }
 }
 
 export function flipCard(id) {
