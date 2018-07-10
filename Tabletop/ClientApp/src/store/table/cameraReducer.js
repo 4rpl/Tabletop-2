@@ -15,6 +15,8 @@ function cameraReducer(state = {}, action) {
                 vy: 0,
                 ax: 0,
                 ay: 0,
+                mx: 0,
+                my: 0,
             };
         }
         case TableActions.TABLE_SCALE: {
@@ -44,6 +46,13 @@ function cameraReducer(state = {}, action) {
             return {
                 ...state,
                 alpha: action.alpha
+            };
+        }
+        case TableActions.CURSOR_MOVE: {
+            return {
+                ...state,
+                mx: action.x,
+                my: action.y,
             };
         }
         default: {
