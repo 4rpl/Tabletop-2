@@ -29,14 +29,11 @@ class Card extends React.Component {
 
     componentDidMount() {
         let { id, mx, my, active, isOwner } = this.props;
+        this.mouseDown = this.mouseDown.bind(this);
+        this.onContextMenu = this.onContextMenu.bind(this);
         if (active && isOwner) {
-            this.callbackService.onMouseUp(id, this.MouseUp.bind(this));
+            this.callbackService.onMouseUp(id, this.mouseUp.bind(this));
         }
-    }
-
-    applyCallbacks(id, mx, my) {
-        this.callbackService.onMouseUp(id, this.MouseUp.bind(this));
-        this.callbackService.onMouseMove(id, this.MouseMove.bind(this, mx, my));
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -48,25 +45,25 @@ class Card extends React.Component {
 
     callbackService = CallbackService.getInstance();
 
-    MouseDown(e) {
+    mouseDown(e) {
         let { id, x, y, z, active, onCardUp, mouse } = this.props;
         //console.log('Down', id);
         if (!active && e.button === 0) {
             onCardUp(id, mouse.alpha % Math.PI, x - mouse.x, y - mouse.y, z);
-            this.callbackService.onMouseUp(id, this.MouseUp.bind(this));
+            this.callbackService.onMouseUp(id, this.mouseUp.bind(this));
         }
         e.stopPropagation();
         return false;
     }
 
-    OnContextMenu(e) {
+    onContextMenu(e) {
         let { id, onFlipCard } = this.props;
         e.preventDefault();
         onFlipCard(id);
         return false;
     }
     
-    MouseUp(e) {
+    mouseUp(e) {
         let { id, x, y, onCardDown } = this.props;
         //console.log('Up', id);
         onCardDown(id, x, y);
@@ -87,8 +84,8 @@ class Card extends React.Component {
         return (
             <div
                 style={{ top: y, left: x, width: w, height: h, zIndex: z, transform: `rotate(${-alpha}rad)` }}
-                onMouseDown={this.MouseDown.bind(this)}
-                onContextMenu={this.OnContextMenu.bind(this)}
+                onMouseDown={this.mouseDown}
+                onContextMenu={this.onContextMenu}
                 className={'card noselect' + (active ? ' grabbed' : '')}>
                 {cardContent}
             </div>

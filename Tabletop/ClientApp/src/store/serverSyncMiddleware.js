@@ -8,7 +8,7 @@ export default function serverSyncMiddleware({ getState }) {
 
         const access = action.access;
         // Передавать лишние данные не нужно
-        action.access = undefined;
+        delete action.access;
 
         if (action.type === '@@router/LOCATION_CHANGE') {
             next(action);

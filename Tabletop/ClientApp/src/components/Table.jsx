@@ -66,6 +66,8 @@ class Table extends React.Component {
         document.onkeydown = this.keyPress.bind(this);
         document.onkeyup = this.keyPress.bind(this);
         document.onmousemove = this.updateCursor.bind(this);
+        this.wheel = this.wheel.bind(this);
+        preload();
 
         setInterval(this.updateCamera.bind(this), _moveTickMs);
     }
@@ -198,15 +200,8 @@ class Table extends React.Component {
 
         return c;
     }
-    
-    CursorMove(e) {
-        const { onCursorMove } = this.props;
-        const { cx, cy } = this.props.camera;
-        onCursorMove(cx, cy);
-        return false;
-    }
 
-    Wheel(e) {
+    wheel(e) {
         const { onTableScale } = this.props;
 
         if (e.deltaY > 0) {
@@ -215,6 +210,13 @@ class Table extends React.Component {
             onTableScale(0.05);
         }
         e.preventDefault();
+    }
+
+    preload() {
+        for (let i = 0; i < 20; ++i) {
+            window['img_' + i] = new Image();
+            window['img_' + i].src = `Cards/${i}.jpg`;
+        }
     }
 
     render() {
@@ -296,7 +298,7 @@ class Table extends React.Component {
                     height: table.h,
                     maxHeight: table.h
                 }}
-                onWheel={this.Wheel.bind(this)}>
+                onWheel={this.wheel}>
                 <button onClick={onAddCard}>+</button>
                 {userViews}
                 {deckViews}
