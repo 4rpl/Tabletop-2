@@ -11,7 +11,7 @@ namespace Tabletop.Logic.Interfaces
         /// <summary>
         /// Взять
         /// </summary>
-        void Grab( User owner );
+        void Grab( User owner, int mx, int my, double alpha );
         /// <summary>
         /// Подвигать
         /// </summary>

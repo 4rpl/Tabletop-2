@@ -8,6 +8,8 @@ using Tabletop.Logic.Models.Actions;
 using Tabletop.Logic.Models.Actions.Card;
 using Tabletop.Logic.Models.Actions.Deck;
 using Tabletop.Logic.Models.Actions.Filter;
+using Tabletop.Logic.Models.Actions.In.Card;
+using Tabletop.Logic.Models.Actions.In.User;
 using Tabletop.Logic.Models.Actions.User;
 
 namespace Tabletop.Hubs
@@ -19,7 +21,6 @@ namespace Tabletop.Hubs
         public override async Task OnConnectedAsync()
         {
             var result = new List<ITableAction>();
-            result.Add( _table.GetTable() );
             result.AddRange( _table.Dispatch( new AddUserAction
             {
                 Id = Context.ConnectionId,
@@ -28,16 +29,16 @@ namespace Tabletop.Hubs
                 X = 0,
                 Y = 0
             } ) );
+            result.Add( _table.GetTable( Context.ConnectionId ) );
             await PerformActions( result );
 
             await base.OnConnectedAsync();
         }
         public override async Task OnDisconnectedAsync( Exception exception )
         {
-            var action = new RemoveUserAction
+            var action = new InRemoveUserAction
             {
-                Id = Context.ConnectionId,
-                Type = "RemoveUser"
+                Id = Context.ConnectionId
             };
             await PerformActions( _table.Dispatch( action ) );
 
@@ -60,26 +61,25 @@ namespace Tabletop.Hubs
             await PerformActions( _table.Dispatch( action ) );
         }
 
-        public async Task FlipCard( FlipCardAction action )
+        public async Task FlipCard( InFlipCardAction action )
         {
             await PerformActions( _table.Dispatch( action ) );
         }
-        public async Task MoveCard( MoveCardAction action )
+        public async Task MoveCard( InMoveCardAction action )
         {
-            await PerformActions( _table.Dispatch( action ) );
+            await PerformActions( _table.Dispatch( action, Context.ConnectionId ) );
         }
-        public async Task CardUp( CardUpAction action )
+        public async Task CardUp( InCardUpAction action )
         {
-            action.OwnerId = Context.ConnectionId;
-            await PerformActions( _table.Dispatch( action ) );
+            await PerformActions( _table.Dispatch( action, Context.ConnectionId ) );
         }
-        public async Task CardDown( CardDownAction action )
+        public async Task DropCard( InDropCardAction action )
         {
-            await PerformActions( _table.Dispatch( action ) );
+            await PerformActions( _table.Dispatch( action, Context.ConnectionId ) );
         }
-        public async Task AddCard( AddCardAction action )
+        public async Task AddCard( InAddCardAction action )
         {
-            await PerformActions( _table.Dispatch( action ) );
+            await PerformActions( _table.Dispatch( action, Context.ConnectionId ) );
         }
 
         public async Task FlipDeck( FlipDeckAction action )

@@ -164,6 +164,21 @@ function cardsReducer(state = [], action) {
                 }
             });
         }
+        case TableActions.REMOVE_USER: {
+            if (!action.deckToDrop) {
+                return state;
+            }
+            return state.map(deck => {
+                if (deck.id === action.id) {
+                    return {
+                        ...deck,
+                        active: false
+                    };
+                } else {
+                    return deck;
+                }
+            });
+        }
         default: {
             return state;
         }

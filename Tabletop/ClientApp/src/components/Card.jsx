@@ -30,7 +30,7 @@ class Card extends React.Component {
     componentDidMount() {
         let { id, mx, my, active, isOwner } = this.props;
         if (active && isOwner) {
-            this.applyCallbacks(id, mx, my);
+            this.callbackService.onMouseUp(id, this.MouseUp.bind(this));
         }
     }
 
@@ -39,16 +39,21 @@ class Card extends React.Component {
         this.callbackService.onMouseMove(id, this.MouseMove.bind(this, mx, my));
     }
 
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        let { id, mx, my, active, isOwner, mouse, onMoveCard } = this.props;
+        if (active && isOwner && (mouse.x !== prevProps.mouse.x || mouse.y !== prevProps.mouse.y)) {
+            onMoveCard(id, mx + mouse.x, my + mouse.y);
+        }
+    }
+
     callbackService = CallbackService.getInstance();
 
     MouseDown(e) {
-        let { id, x, y, z, active, onCardUp, parentAlpha } = this.props;
+        let { id, x, y, z, active, onCardUp, mouse } = this.props;
         //console.log('Down', id);
         if (!active && e.button === 0) {
-            let px = Math.cos(parentAlpha) * e.clientX + Math.sin(parentAlpha) * e.clientY;
-            let py = Math.cos(parentAlpha) * e.clientY - Math.sin(parentAlpha) * e.clientX;
-            onCardUp(id, parentAlpha, x - e.clientX, y - e.clientY, z);
-            this.applyCallbacks(id, x - px, y - py);
+            onCardUp(id, mouse.alpha % Math.PI, x - mouse.x, y - mouse.y, z);
+            this.callbackService.onMouseUp(id, this.MouseUp.bind(this));
         }
         e.stopPropagation();
         return false;
@@ -60,16 +65,7 @@ class Card extends React.Component {
         onFlipCard(id);
         return false;
     }
-
-    MouseMove(mx, my, e) {
-        let { id, onMoveCard, parentAlpha } = this.props;
-        //console.log('Move', id);
-        let px = Math.cos(parentAlpha) * e.clientX + Math.sin(parentAlpha) * e.clientY;
-        let py = Math.cos(parentAlpha) * e.clientY - Math.sin(parentAlpha) * e.clientX;
-        onMoveCard(id, px + mx, py + my);
-        return false;
-    }
-
+    
     MouseUp(e) {
         let { id, x, y, onCardDown } = this.props;
         //console.log('Up', id);
@@ -90,7 +86,7 @@ class Card extends React.Component {
         }
         return (
             <div
-                style={{ top: y, left: x, width: w, height: h, zIndex: z, transform: `rotate(-${alpha}rad)` }}
+                style={{ top: y, left: x, width: w, height: h, zIndex: z, transform: `rotate(${-alpha}rad)` }}
                 onMouseDown={this.MouseDown.bind(this)}
                 onContextMenu={this.OnContextMenu.bind(this)}
                 className={'card noselect' + (active ? ' grabbed' : '')}>

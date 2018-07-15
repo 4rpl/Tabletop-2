@@ -1,5 +1,5 @@
 ﻿import ServerSyncService from '../services/ServerSyncService';
-import { TableActions, TableActionAccessTypes } from './table/TableActions';
+import { TableActionAccessTypes } from './table/TableActions';
 
 export default function serverSyncMiddleware({ getState }) {
 
@@ -9,6 +9,11 @@ export default function serverSyncMiddleware({ getState }) {
         const access = action.access;
         // Передавать лишние данные не нужно
         action.access = undefined;
+
+        if (action.type === '@@router/LOCATION_CHANGE') {
+            next(action);
+            return;
+        }
 
         switch (access) {
             case TableActionAccessTypes.private: {
@@ -25,7 +30,8 @@ export default function serverSyncMiddleware({ getState }) {
                 break;
             }
             default: {
-                console.error('Неизвестный тип доступа:', access);
+                console.error(`Неизвестный тип доступа: ${access} (${action.type})`);
+                next(action);
                 break;
             }
         }

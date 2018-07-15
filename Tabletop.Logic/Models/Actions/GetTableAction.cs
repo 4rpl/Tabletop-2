@@ -33,9 +33,10 @@ namespace Tabletop.Logic.Models.Actions
 
     public class TableCard
     {
-        public TableCard( CardModel card )
+        public TableCard( CardModel card, UserModel user )
         {
             Active = card.IsGrabbed;
+            IsOwner = card.Owner == user;
             Content = card.GetContent();
             H = card.Height;
             Id = card.Id;
@@ -52,14 +53,16 @@ namespace Tabletop.Logic.Models.Actions
         public int H { get; set; }
         public int W { get; set; }
         public bool Active { get; set; }
+        public bool IsOwner { get; set; }
         public string Content { get; set; }
     }
 
     public class TableDeck
     {
-        public TableDeck( DeckModel deck )
+        public TableDeck( DeckModel deck, UserModel user )
         {
             Active = deck.IsGrabbed;
+            IsOwner = deck.Owner == user;
             Content = deck.GetContent();
             H = deck.Height;
             Id = deck.Id;
@@ -77,6 +80,7 @@ namespace Tabletop.Logic.Models.Actions
         public int H { get; set; }
         public int W { get; set; }
         public bool Active { get; set; }
+        public bool IsOwner { get; set; }
         public string Content { get; set; }
         public int Length { get; set; }
     }

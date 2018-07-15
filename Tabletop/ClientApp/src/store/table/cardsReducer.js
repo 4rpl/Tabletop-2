@@ -12,8 +12,9 @@ function cardsReducer(state = [], action) {
                     x: card.x,
                     y: card.y,
                     z: card.z,
-                    mx: card.mx,
-                    my: card.my,
+                    mx: card.mx || -15,
+                    my: card.my || -15,
+                    isOwner: action.isOwner,
                     h: card.h,
                     w: card.w,
                     active: card.active,
@@ -51,7 +52,29 @@ function cardsReducer(state = [], action) {
                     return {
                         ...card,
                         active: true,
-                        isOwner: action.isOwner,
+                        mx: action.mx,
+                        my: action.my,
+                        alpha: action.alpha,
+                        z: initialZIndex + state.length
+                    };
+                } else if (card.z > z) {
+                    return {
+                        ...card,
+                        z: card.z - 1
+                    }
+                } else {
+                    return card;
+                }
+            });
+        }
+        case TableActions.CARD_GRAB: {
+            return state.map(card => {
+                const z = state.find(i => i.id === action.id).z;
+                if (card.id === action.id) {
+                    return {
+                        ...card,
+                        active: true,
+                        isOwner: true,
                         mx: action.mx,
                         my: action.my,
                         alpha: action.alpha,
@@ -79,13 +102,13 @@ function cardsReducer(state = [], action) {
                     z: initialZIndex + state.length,
                     h: action.h,
                     w: action.w,
-                    active: action.active,
+                    active: false,
                     isOwner: action.isOwner,
                     content: action.content
                 }
             ]
         }
-        case TableActions.CARD_DOWN: {
+        case TableActions.CARD_DROP: {
             return state.map(card => {
                 if (card.id === action.id) {
                     return {
@@ -118,6 +141,21 @@ function cardsReducer(state = [], action) {
                     return {
                         ...card,
                         content: action.content
+                    };
+                } else {
+                    return card;
+                }
+            });
+        }
+        case TableActions.REMOVE_USER: {
+            if (!action.cardToDrop) {
+                return state;
+            }
+            return state.map(card => {
+                if (card.id === action.cardToDrop) {
+                    return {
+                        ...card,
+                        active: false
                     };
                 } else {
                     return card;

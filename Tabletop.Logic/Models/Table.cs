@@ -8,7 +8,9 @@ using Tabletop.Logic.Models.Actions.Card;
 using Tabletop.Logic.Models.Actions.Deck;
 using Tabletop.Logic.Models.Actions.Filter;
 using Tabletop.Logic.Models.Actions.In.Card;
+using Tabletop.Logic.Models.Actions.In.User;
 using Tabletop.Logic.Models.Actions.Out.Card;
+using Tabletop.Logic.Models.Actions.Out.User;
 using Tabletop.Logic.Models.Actions.User;
 
 namespace Tabletop.Logic.Models
@@ -31,13 +33,19 @@ namespace Tabletop.Logic.Models
         }
 
         #region Table
-        public GetTableAction GetTable()
+        public GetTableAction GetTable( string userId )
         {
+            var user = _users.FirstOrDefault( i => i.Id == userId );
+            if( user == null )
+            {
+                throw new ArgumentException( "Пользователь не найден" );
+            }
+
             var action = new GetTableAction( this )
             {
-                Cards = _cards.Select( card => new TableCard( card ) ).ToList(),
-                Decks = _decks.Select( deck => new TableDeck( deck ) ).ToList(),
-                Users = _users.Select( user => new TableUser( user ) ).ToList(),
+                Cards = _cards.Select( card => new TableCard( card, user ) ).ToList(),
+                Decks = _decks.Select( deck => new TableDeck( deck, user ) ).ToList(),
+                Users = _users.Select( u => new TableUser( u ) ).ToList(),
                 Filters = _filters.Select( filter => new TableFilter( filter ) ).ToList(),
             };
             return action;
@@ -67,7 +75,7 @@ namespace Tabletop.Logic.Models
                 action
             };
         }
-        public IEnumerable<ITableAction> Dispatch( RemoveUserAction action )
+        public IEnumerable<ITableAction> Dispatch( InRemoveUserAction action )
         {
             var user = _users.FirstOrDefault( i => i.Id == action.Id );
             if( user == null )
@@ -75,9 +83,14 @@ namespace Tabletop.Logic.Models
                 throw new ArgumentException( "Пользователь не найден" );
             }
             _users.Remove( user );
+            var deckToDrop = _decks.FirstOrDefault( i => i.Owner == user );
+            var cardToDrop = _cards.FirstOrDefault( i => i.Owner == user );
+            deckToDrop?.Drop();
+            cardToDrop?.Drop();
+            var resievers = _users.Select( i => i.Id ).ToList();
             return new List<ITableAction>
             {
-                action
+                new OutRemoveUserAction( action.Id, cardToDrop?.Id, deckToDrop?.Id, resievers )
             };
         }
         #endregion
@@ -171,7 +184,7 @@ namespace Tabletop.Logic.Models
             action.IsOwner = true;
             action.ResieverIds = new List<string> { action.OwnerId };
             var users = _users.Where( i => action.ResieverIds.Contains( i.Id ) );
-            card.Grab( null );
+            card.Grab( null, 0, 0, 0 );
             card.Alpha = action.Alpha;
             if( users.Count() < _users.Count() )
             {
@@ -319,9 +332,9 @@ namespace Tabletop.Logic.Models
             var result = new List<ITableAction>
             {
                 new OutFlipCardAction( card, canSee, true ),
-                new OutFlipCardAction( card, canSee, false )
+                new OutFlipCardAction( card, canNotSee, false )
             };
-            return result;
+            return result.Where( i => i.ResieverIds.Any() );
         }
         public IEnumerable<ITableAction> Dispatch( InCardUpAction action, string userId )
         {
@@ -335,7 +348,7 @@ namespace Tabletop.Logic.Models
             {
                 throw new ArgumentException( "Карта не найдена" );
             }
-            card.Grab( user );
+            card.Grab( user, action.Mx, action.My, action.Alpha );
 
             var others = _users.Where( i => i.Id != userId ).Select( i => i.Id ).ToList();
             var result = new List<ITableAction>
@@ -344,6 +357,111 @@ namespace Tabletop.Logic.Models
                 new OutUpCardAction( card, others )
             };
             return result;
+        }
+        public IEnumerable<ITableAction> Dispatch( InDropCardAction action, string userId )
+        {
+            var card = _cards.Where( i => i.IsGrabbed && i.Owner.Id == userId ).FirstOrDefault();
+            if( card == null )
+            {
+                throw new ArgumentException( "Карта не найдена" );
+            }
+
+            (action.X, action.Y) = FixCoords( action.X, action.Y, card.Height, card.Width );
+            card.Move( action.X, action.Y );
+            card.Drop();
+
+            var cards = _cards
+                .Select( i => new
+                {
+                    dist = GetDistance( card, i ),
+                    card = i
+                } )
+                .Where( i => i.dist <= _dropRadius )
+                .OrderBy( i => i.dist )
+                .Select( i => i.card );
+            var decks = _decks
+                .Select( i => new
+                {
+                    dist = GetDistance( card, i ),
+                    deck = i
+                } )
+                .Where( i => i.dist <= _dropRadius )
+                .OrderBy( i => i.dist )
+                .Select( i => i.deck );
+
+            if( decks.Any() )
+            {
+                var nearestDeck = decks.First();
+                nearestDeck.Add( card );
+
+                var showTo = UsersWhoCanSee( nearestDeck );
+                var showToIds = showTo.Select( i => i.Id ).ToList();
+                var hideFromIds = _users.Except( showTo ).Select( i => i.Id ).ToList();
+                return new List<ITableAction>
+                {
+                    new OutPutCardInDeckAction( nearestDeck, showToIds, true ),
+                    new OutPutCardInDeckAction( nearestDeck, hideFromIds, false )
+                };
+            }
+            else if( cards.Count() > 1 )
+            {
+                var deck = new Deck( cards );
+                _decks.Add( deck );
+
+                var showTo = UsersWhoCanSee( deck );
+                var showToIds = showTo.Select( i => i.Id ).ToList();
+                var hideFromIds = _users.Except( showTo ).Select( i => i.Id ).ToList();
+                return new List<ITableAction>
+                {
+                    new OutCreateDeckAction( cards, deck, showToIds, true ),
+                    new OutCreateDeckAction( cards, deck, hideFromIds, false )
+                };
+            }
+
+            return new List<ITableAction>
+            {
+                new OutDropCardAction( card, _users.Select( i => i.Id ).ToList() )
+            };
+        }
+        public IEnumerable<ITableAction> Dispatch( InMoveCardAction action, string userId )
+        {
+            var card = _cards.FirstOrDefault( i => i.Id == action.Id );
+            if( card == null )
+            {
+                throw new ArgumentException( "Карта не найдена" );
+            }
+            (action.X, action.Y) = FixCoords( action.X, action.Y, card.Height, card.Width );
+            var oldShownTo = UsersWhoCanSee( card );
+            card.Move( action.X, action.Y );
+            var newShownTo = UsersWhoCanSee( card );
+
+            var showToIds = newShownTo.Except( oldShownTo ).Select( i => i.Id ).ToList();
+            var hideFromIds = oldShownTo.Except( newShownTo ).Select( i => i.Id ).ToList();
+            var notChanged = _users
+                .Where( u => !showToIds.Contains( u.Id ) && !hideFromIds.Contains( u.Id ) && u.Id != userId )
+                .Select( u => u.Id )
+                .ToList();
+
+            var result = new List<ITableAction>();
+            if( showToIds.Contains( userId ) )
+            {
+                result.Add( new OutChangeCardContent( card, new List<string> { userId }, true ) );
+                result.Add( new OutMoveCardAndChangeContentAction( card, showToIds.Except( new[] { userId } ).ToList(), true ) );
+                result.Add( new OutMoveCardAndChangeContentAction( card, hideFromIds, false ) );
+            }
+            else if( hideFromIds.Contains( userId ) )
+            {
+                result.Add( new OutChangeCardContent( card, new List<string> { userId }, false ) );
+                result.Add( new OutMoveCardAndChangeContentAction( card, showToIds, true ) );
+                result.Add( new OutMoveCardAndChangeContentAction( card, hideFromIds.Except( new[] { userId } ).ToList(), false ) );
+            }
+            else
+            {
+                result.Add( new OutMoveCardAndChangeContentAction( card, showToIds, true ) );
+                result.Add( new OutMoveCardAndChangeContentAction( card, hideFromIds, false ) );
+            }
+            result.Add( new OutMoveCardAction( card, notChanged ) );
+            return result.Where( i => i.ResieverIds.Any() );
         }
 
         #region Decks
@@ -387,7 +505,7 @@ namespace Tabletop.Logic.Models
                 action,
                 new DeckUpAction( deck, users, false )
             };
-            deck.Grab( null );
+            deck.Grab( null, 0, 0, 0 );
             return result;
         }
         public IEnumerable<ITableAction> Dispatch( DeckDownAction action )
@@ -449,7 +567,7 @@ namespace Tabletop.Logic.Models
 
             var card = deck.TakeTop();
             _cards.Add( card );
-            card.Grab( null );
+            card.Grab( null, 0, 0, 0 );
             var users = UsersWhoCanSee( deck );
             if( deck.Length > 1 )
             {

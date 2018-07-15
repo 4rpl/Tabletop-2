@@ -75,14 +75,16 @@ namespace Tabletop.Logic.Models
             }
         }
 
-        public void Grab( User owner )
+        public void Grab( User owner, int mx, int my, double alpha )
         {
             if( _isGrabbed )
             {
                 throw new MethodAccessException( $"Карта уже была взята. Id: {Id}, UserId: {owner.Id}, OwnerId: {Owner.Id}" );
             }
             Owner = owner;
-            //Alpha = owner.Alpha;
+            Alpha = alpha;
+            Mx = mx;
+            My = my;
             _isGrabbed = true;
         }
 

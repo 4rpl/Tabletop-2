@@ -71,7 +71,7 @@ namespace Tabletop.Logic.Models
             }
         }
 
-        public void Grab( User owner )
+        public void Grab( User owner, int mx, int my, double alpha )
         {
             if( _isGrabbed )
             {

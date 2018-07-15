@@ -1,7 +1,5 @@
 ﻿import React from 'react';
 import { connect } from 'react-redux';
-import Table from './Table';
-import { Route } from 'react-router';
 
 const mapStateToProps = function (state) {
     return {
@@ -27,6 +25,16 @@ const MainMenu = () => {
 
     return (
         <div className="main-menu">
+            <nav>
+                <div className="nav-wrapper">
+                    <a href="#" className="brand-logo">Logo</a>
+                    <ul id="nav-mobile" className="right hide-on-med-and-down">
+                        <li><a href="sass.html">Sass</a></li>
+                        <li><a href="badges.html">Components</a></li>
+                        <li><a href="collapsible.html">JavaScript</a></li>
+                    </ul>
+                </div>
+            </nav>
             <h1>Стол v.2</h1>
             <input type="text" placeholder="Имя" />
             <h2>

@@ -1,5 +1,6 @@
 ﻿import React from 'react';
 import { connect } from 'react-redux';
+import Victor from 'victor';
 import Card from './Card';
 import Deck from './Deck';
 import Cursor from './Cursor';
@@ -24,14 +25,16 @@ const mapDispatchToProps = function (dispatch) {
         },
         onCursorMove: function (x, y) {
             dispatch(moveCursor(x, y));
-            //dispatch(moveUser(x, y));
+        },
+        onUserMove: function (x, y) {
+            dispatch(moveUser(x, y));
         },
         onAddCard: () => {
             let rnd = Math.floor(Math.random() * 20 + 1);
 
             dispatch(addCard(
                 null, 0, 0, 0, 0, 140, 92, false, false,
-                `Cards/${rnd}.gif`,
+                `Cards/${rnd}.jpg`,
                 'Cards/0.jpg'
             ));
         }
@@ -52,7 +55,7 @@ const mapStateToProps = function (state) {
 const _maxVelocity = 40;
 const _moveAcceleration = 4;
 const _moveTickMs = 20;
-const tableRotateStep = Math.PI / 2;
+const tableRotateStep = Math.PI / 4;
 
 class Table extends React.Component {
     
@@ -68,19 +71,14 @@ class Table extends React.Component {
     }
 
     updateCursor(e) {
-        const { onCursorMove, table, camera } = this.props;
-
-        const tox = table.w / 2 + camera.x;
-        const toy = table.h / 2 + camera.y;
-        const box = (Math.cos(camera.alpha) * table.w / 2 - Math.sin(camera.alpha) * table.h / 2) * camera.scale;
-        const boy = (Math.cos(camera.alpha) * table.h / 2 + Math.sin(camera.alpha) * table.w / 2) * camera.scale;
-        const tbx = tox - box;
-        const tby = toy - boy;
-        const bcx = e.clientX - tbx;
-        const bcy = e.clientY - tby;
-        const cx = (Math.cos(camera.alpha) * bcx + Math.sin(camera.alpha) * bcy) / camera.scale;
-        const cy = (Math.cos(camera.alpha) * bcy - Math.sin(camera.alpha) * bcx) / camera.scale;
-        onCursorMove(Math.round(cx), Math.round(cy));
+        const { onCursorMove, onUserMove, cards } = this.props;
+        const { x, y } = this.project(e.clientX, e.clientY);
+        const mx = Math.round(x);
+        const my = Math.round(y);
+        onCursorMove(mx, my);
+        if (cards.filter(i => i.active && i.isOwner).length === 0) {
+            onUserMove(mx, my);
+        }
     }
 
     updateCamera() {
@@ -122,16 +120,15 @@ class Table extends React.Component {
 
     rotate(angle) {
         const { camera, onRotate, table } = this.props;
-        const screenCenterX = window.screen.width / 2;
-        const screenCenterY = window.screen.height / 2;
-        const rotCenterX = screenCenterX - camera.x - table.w / 2;
-        const rotCenterY = screenCenterY - camera.y - table.h / 2;
-        console.log('center', rotCenterX, rotCenterY);
-        const x = (Math.cos(-angle) * rotCenterX - Math.sin(-angle) * rotCenterY) * camera.scale;
-        const y = (Math.cos(-angle) * rotCenterY + Math.sin(-angle) * rotCenterX) * camera.scale;
-        console.log('new center:', x, y);
+        const { x, y } = this.project(window.screen.width / 2, window.screen.height / 2);
+        //const screenCenterX = window.screen.width / 2;
+        //const screenCenterY = window.screen.height / 2;
+        //const rotCenterX = screenCenterX - camera.x - table.w / 2;
+        //const rotCenterY = screenCenterY - camera.y - table.h / 2;
+        //const x = (Math.cos(-angle) * rotCenterX - Math.sin(-angle) * rotCenterY) * camera.scale;
+        //const y = (Math.cos(-angle) * rotCenterY + Math.sin(-angle) * rotCenterX) * camera.scale;
         const alpha = camera.alpha + angle;
-        onRotate(alpha, x, y);
+        onRotate(alpha, camera.x, camera.y);
     }
     
     keyPress(e) {
@@ -184,6 +181,23 @@ class Table extends React.Component {
             }
         }
     }
+
+    project(x, y) {
+        const { table, camera } = this.props;
+
+        const bo = new Victor(table.w / 2, table.h / 2)
+            .rotate(camera.alpha)
+            .multiply({ x: camera.scale, y: camera.scale });
+        const to = new Victor(camera.x, camera.y)
+            .add({ x: table.w / 2, y: table.h / 2 })
+            .subtract(bo);
+        const c = new Victor(x, y)
+            .subtract(to)
+            .rotate(-camera.alpha)
+            .divide({ x: camera.scale, y: camera.scale });
+
+        return c;
+    }
     
     CursorMove(e) {
         const { onCursorMove } = this.props;
@@ -205,6 +219,11 @@ class Table extends React.Component {
 
     render() {
         const { camera, table, cards, decks, users, filters, onAddCard } = this.props;
+        const mouse = {
+            x: camera.mx,
+            y: camera.my,
+            alpha: camera.alpha,
+        }
         const cardViews = cards.map(card => {
             return (
                 <Card
@@ -218,7 +237,7 @@ class Table extends React.Component {
                     h={card.h}
                     w={card.w}
                     alpha={card.alpha}
-                    parentAlpha={camera.alpha}
+                    mouse={mouse}
                     active={card.active}
                     isOwner={card.isOwner}
                     content={card.content}

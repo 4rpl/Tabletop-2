@@ -17,11 +17,12 @@ const CURSOR_MOVE =         'CursorMove';
 const FLIP_CARD =           'FlipCard';
 const MOVE_CARD =           'MoveCard';
 const CARD_UP =             'CardUp';
-const CARD_DOWN =           'CardDown';
+const CARD_DROP =           'DropCard';
 const ADD_CARD =            'AddCard';
 const REMOVE_CARD =         'RemoveCard';
 const HIDE_CARD_CONTENT =   'HideCardContent';
 const SHOW_CARD_CONTENT =   'ShowCardContent';
+const CARD_GRAB =           'GrabCard';
 
 const ADD_DECK =            'AddDeck';
 const CHANGE_DECK =         'ChangeDeck';
@@ -64,7 +65,8 @@ export const TableActions = {
     FLIP_CARD,
     MOVE_CARD,
     CARD_UP,
-    CARD_DOWN,
+    CARD_GRAB,
+    CARD_DROP,
     ADD_CARD,
     REMOVE_CARD,
     HIDE_CARD_CONTENT,
@@ -116,7 +118,7 @@ export function cardUp(id, alpha, mx, my, z) {
     return { type: CARD_UP, access: TableActionAccessTypes.verificationRequired, id, alpha, mx, my, z };
 }
 export function cardDown(id, x, y) {
-    return { type: CARD_DOWN, access: TableActionAccessTypes.verificationRequired, id, x, y };
+    return { type: CARD_DROP, access: TableActionAccessTypes.verificationRequired, id, x, y };
 }
 export function addCard(id, x, y, mx, my, h, w, visible, active, contentTop, contentBottom) {
     return { type: ADD_CARD, access: TableActionAccessTypes.verificationRequired, id, x, y, mx, my, h, w, visible, active, contentTop, contentBottom };
