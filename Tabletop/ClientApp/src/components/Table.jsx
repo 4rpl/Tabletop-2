@@ -67,7 +67,7 @@ class Table extends React.Component {
         document.onkeyup = this.keyPress.bind(this);
         document.onmousemove = this.updateCursor.bind(this);
         this.wheel = this.wheel.bind(this);
-        preload();
+        this.preload();
 
         setInterval(this.updateCamera.bind(this), _moveTickMs);
     }
