@@ -23,18 +23,23 @@ const REMOVE_CARD =         'RemoveCard';
 const HIDE_CARD_CONTENT =   'HideCardContent';
 const SHOW_CARD_CONTENT =   'ShowCardContent';
 const CARD_GRAB =           'GrabCard';
+const CARD_PUT_IN_DECK =    'PutCardInDeck';
 
+const CREATE_DECK =         'CreateDeck';
 const ADD_DECK =            'AddDeck';
 const CHANGE_DECK =         'ChangeDeck';
 const FLIP_DECK =           'FlipDeck';
 const MOVE_DECK =           'MoveDeck';
 const DECK_UP =             'DeckUp';
 const DECK_DOWN =           'DeckDown';
+const DECK_DROP =           'DropDeck';
 const SHUFFLE_DECK =        'ShuffleDeck';
 const TAKE_TOP_DECK_CARD =  'TakeTopDeckCard';
 const REMOVE_DECK =         'RemoveDeck';
 const HIDE_DECK_CONTENT =   'HideDeckContent';
 const SHOW_DECK_CONTENT =   'ShowDeckContent';
+const DECK_GRAB =           'GrabDeck';
+const DECK_MERGE =          'MergeDecks';
 
 export const TableActionAccessTypes = {
     // Приватное действие. Не отсылается на сервер, пропускается в редьюсер
@@ -72,17 +77,22 @@ export const TableActions = {
     HIDE_CARD_CONTENT,
     SHOW_CARD_CONTENT,
 
+    CREATE_DECK,
     ADD_DECK,
     CHANGE_DECK,
     FLIP_DECK,
     MOVE_DECK,
     DECK_UP,
+    DECK_GRAB,
     DECK_DOWN,
+    DECK_DROP,
     SHUFFLE_DECK,
     REMOVE_DECK,
     HIDE_DECK_CONTENT,
     SHOW_DECK_CONTENT,
-    TAKE_TOP_DECK_CARD
+    TAKE_TOP_DECK_CARD,
+    CARD_PUT_IN_DECK,
+    DECK_MERGE,
 }
 
 export function addFilter(x, y, h, w) {
@@ -125,20 +135,20 @@ export function addCard(id, x, y, mx, my, h, w, visible, active, contentTop, con
 }
 
 export function flipDeck(id) {
-    return { type: FLIP_DECK, id };
+    return { type: FLIP_DECK, access: TableActionAccessTypes.verificationRequired, id };
 }
 export function moveDeck(id, x, y) {
-    return { type: MOVE_DECK, id, x, y };
+    return { type: MOVE_DECK, access: TableActionAccessTypes.notification, id, x, y };
 }
-export function deckUp(id, mx, my, z) {
-    return { type: DECK_UP, id, mx, my, z };
+export function deckUp(id, alpha, mx, my, z) {
+    return { type: DECK_UP, access: TableActionAccessTypes.verificationRequired, id, alpha, mx, my, z };
 }
 export function deckDown(id, x, y, h, w) {
-    return { type: DECK_DOWN, id, x, y, h, w };
+    return { type: DECK_DOWN, access: TableActionAccessTypes.verificationRequired, id, x, y, h, w };
 }
 export function shuffleDeck(id) {
-    return { type: SHUFFLE_DECK, id };
+    return { type: SHUFFLE_DECK, access: TableActionAccessTypes.verificationRequired, id };
 }
-export function takeTopDeckCard(id, mx, my) {
-    return { type: TAKE_TOP_DECK_CARD, id, mx, my };
+export function takeTopDeckCard(id, alpha, mx, my) {
+    return { type: TAKE_TOP_DECK_CARD, access: TableActionAccessTypes.verificationRequired, id, alpha, mx, my };
 }

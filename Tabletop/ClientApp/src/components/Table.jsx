@@ -73,12 +73,13 @@ class Table extends React.Component {
     }
 
     updateCursor(e) {
-        const { onCursorMove, onUserMove, cards } = this.props;
+        const { onCursorMove, onUserMove, cards, decks } = this.props;
         const { x, y } = this.project(e.clientX, e.clientY);
         const mx = Math.round(x);
         const my = Math.round(y);
         onCursorMove(mx, my);
-        if (cards.filter(i => i.active && i.isOwner).length === 0) {
+        if (cards.filter(i => i.active && i.isOwner).length === 0 &&
+            decks.filter(i => i.active && i.isOwner).length === 0) {
             onUserMove(mx, my);
         }
     }
@@ -132,52 +133,56 @@ class Table extends React.Component {
         const alpha = camera.alpha + angle;
         onRotate(alpha, camera.x, camera.y);
     }
+
+    tableMove(ax, ay, vx, vy, x, y) {
+        const { onTableMove } = this.props;
+        onTableMove(ax, ay, vx, vy, x, y);
+    }
     
     keyPress(e) {
-        const { onTableMove } = this.props;
         const { ax, ay, vx, vy, x, y } = this.props.camera;
-        switch (e.key) {
-            case 'q': {
+        switch (e.keyCode) {
+            case 'Q'.charCodeAt(0): {
                 if (e.type === 'keydown') {
                     this.rotate(-tableRotateStep);
                 }
                 break;
             }
-            case 'e': {
+            case 'E'.charCodeAt(0): {
                 if (e.type === 'keydown') {
                     this.rotate(tableRotateStep);
                 }
                 break;
             }
-            case 'w': {
+            case 'W'.charCodeAt(0): {
                 if (e.type === 'keydown') {
-                    onTableMove(ax, _moveAcceleration, vx, (vy > 0 ? vy : 0), x, y);
+                    this.tableMove(ax, _moveAcceleration, vx, (vy > 0 ? vy : 0), x, y);
                 } else if (e.type === 'keyup' && ay > 0) {
-                    onTableMove(ax, 0, vx, vy, x, y);
+                    this.tableMove(ax, 0, vx, vy, x, y);
                 }
                 break;
             }
-            case 'a': {
+            case 'A'.charCodeAt(0): {
                 if (e.type === 'keydown') {
-                    onTableMove(_moveAcceleration, ay, (vx > 0 ? vx : 0), vy, x, y);
+                    this.tableMove(_moveAcceleration, ay, (vx > 0 ? vx : 0), vy, x, y);
                 } else if (e.type === 'keyup' && ax > 0) {
-                    onTableMove(0, ay, vx, vy, x, y);
+                    this.tableMove(0, ay, vx, vy, x, y);
                 }
                 break;
             }
-            case 's': {
+            case 'S'.charCodeAt(0): {
                 if (e.type === 'keydown') {
-                    onTableMove(ax, -_moveAcceleration, vx, (vy < 0 ? vy : 0), x, y);
+                    this.tableMove(ax, -_moveAcceleration, vx, (vy < 0 ? vy : 0), x, y);
                 } else if (e.type === 'keyup' && ay < 0) {
-                    onTableMove(ax, 0, vx, vy, x, y);
+                    this.tableMove(ax, 0, vx, vy, x, y);
                 }
                 break;
             }
-            case 'd': {
+            case 'D'.charCodeAt(0): {
                 if (e.type === 'keydown') {
-                    onTableMove(-_moveAcceleration, ay, (vx < 0 ? vx : 0), vy, x, y);
+                    this.tableMove(-_moveAcceleration, ay, (vx < 0 ? vx : 0), vy, x, y);
                 } else if (e.type === 'keyup' && ax < 0) {
-                    onTableMove(0, ay, vx, vy, x, y);
+                    this.tableMove(0, ay, vx, vy, x, y);
                 }
                 break;
             }
@@ -259,6 +264,8 @@ class Table extends React.Component {
                     z={deck.z}
                     h={deck.h}
                     w={deck.w}
+                    alpha={deck.alpha}
+                    mouse={mouse}
                     active={deck.active}
                     isOwner={deck.isOwner}
                     length={deck.length}

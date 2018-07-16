@@ -28,7 +28,7 @@ const mapDispatchToProps = function (dispatch) {
 class Card extends React.Component {
 
     componentDidMount() {
-        let { id, mx, my, active, isOwner } = this.props;
+        const { id, mx, my, active, isOwner } = this.props;
         this.mouseDown = this.mouseDown.bind(this);
         this.onContextMenu = this.onContextMenu.bind(this);
         if (active && isOwner) {
@@ -49,7 +49,7 @@ class Card extends React.Component {
         let { id, x, y, z, active, onCardUp, mouse } = this.props;
         //console.log('Down', id);
         if (!active && e.button === 0) {
-            onCardUp(id, mouse.alpha % Math.PI, x - mouse.x, y - mouse.y, z);
+            onCardUp(id, mouse.alpha % (2 * Math.PI), x - mouse.x, y - mouse.y, z);
             this.callbackService.onMouseUp(id, this.mouseUp.bind(this));
         }
         e.stopPropagation();
@@ -57,23 +57,22 @@ class Card extends React.Component {
     }
 
     onContextMenu(e) {
-        let { id, onFlipCard } = this.props;
+        const { id, onFlipCard } = this.props;
         e.preventDefault();
         onFlipCard(id);
         return false;
     }
     
     mouseUp(e) {
-        let { id, x, y, onCardDown } = this.props;
+        const { id, x, y, onCardDown } = this.props;
         //console.log('Up', id);
         onCardDown(id, x, y);
         this.callbackService.unsubscribeOnMouseUp(id);
-        this.callbackService.unsubscribeOnMouseMove(id);
         return false;
     }
 
     render() {
-        let { x, y, z, h, w, active, alpha, content } = this.props;
+        const { x, y, z, h, w, active, alpha, content } = this.props;
 
         let cardContent;
         if (content) {

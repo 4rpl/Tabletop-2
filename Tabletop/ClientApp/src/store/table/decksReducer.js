@@ -72,7 +72,6 @@ function cardsReducer(state = [], action) {
                     return {
                         ...deck,
                         active: true,
-                        isOwner: action.isOwner,
                         mx: action.mx,
                         my: action.my,
                         z: initialZIndex + state.length
@@ -87,8 +86,43 @@ function cardsReducer(state = [], action) {
                 }
             })
         }
+        case TableActions.DECK_GRAB: {
+            return state.map(deck => {
+                const z = state.find(i => i.id === action.id).z;
+                if (deck.id === action.id) {
+                    return {
+                        ...deck,
+                        active: true,
+                        isOwner: true,
+                        mx: action.mx,
+                        my: action.my,
+                        alpha: action.alpha,
+                        z: initialZIndex + state.length
+                    };
+                } else if (deck.z > z) {
+                    return {
+                        ...deck,
+                        z: deck.z - 1
+                    }
+                } else {
+                    return deck;
+                }
+            });
+        }
         case TableActions.DECK_DOWN: {
             return state.map(function (deck) {
+                if (deck.id === action.id) {
+                    return {
+                        ...deck,
+                        active: false
+                    };
+                } else {
+                    return deck;
+                }
+            });
+        }
+        case TableActions.DECK_DROP: {
+            return state.map(deck => {
                 if (deck.id === action.id) {
                     return {
                         ...deck,
@@ -178,6 +212,50 @@ function cardsReducer(state = [], action) {
                     return deck;
                 }
             });
+        }
+        case TableActions.CREATE_DECK: {
+            const deck = action.deck;
+            return [
+                ...state,
+                {
+                    id: deck.id,
+                    x: deck.x,
+                    y: deck.y,
+                    z: deck.z,
+                    mx: 0,
+                    my: 0,
+                    h: deck.h,
+                    w: deck.w,
+                    active: deck.active,
+                    content: deck.content,
+                    length: deck.length
+                }
+            ]
+        }
+        case TableActions.CARD_PUT_IN_DECK: {
+            return state.map(deck => {
+                if (deck.id === action.deckId) {
+                    return {
+                        ...deck,
+                        content: action.content,
+                        length: action.deckLength,
+                    };
+                } else {
+                    return deck;
+                }
+            });
+        }
+        case TableActions.DECK_MERGE: {
+            const top = state.find(i => i.id === action.topDeckId);
+            const bottom = state.find(i => i.id === action.bottomDeckId);
+            return [
+                ...state.filter(i => i.id !== top.id && i.id !== bottom.id),
+                {
+                    ...bottom,
+                    content: bottom.content ? top.content : null,
+                    length: bottom.length + top.length,
+                }
+            ];
         }
         default: {
             return state;

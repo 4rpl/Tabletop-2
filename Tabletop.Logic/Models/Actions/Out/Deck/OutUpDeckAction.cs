@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using CardModel = Tabletop.Logic.Models.Card;
+using DeckModel = Tabletop.Logic.Models.Deck;
 
-namespace Tabletop.Logic.Models.Actions.Out.Card
+namespace Tabletop.Logic.Models.Actions.Out.Deck
 {
-    public class OutUpCardAction : OutActionBase
+    public class OutUpDeckAction : OutActionBase
     {
-        public OutUpCardAction( CardModel card )
+        public OutUpDeckAction( DeckModel card )
         {
             Type = OutActionNames.CardUp;
-            Resiever = Resiever.Others;
             Id = card.Id;
             Mx = card.Mx;
             My = card.My;
             Alpha = card.Alpha;
+            Resiever = Resiever.Others;
         }
 
         public Guid Id { get; set; }

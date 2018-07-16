@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using CardModel = Tabletop.Logic.Models.Card;
+using DeckModel = Tabletop.Logic.Models.Deck;
 
 namespace Tabletop.Logic.Models.Actions.Out.Card
 {
-    public class OutGrabCardAction : OutActionBase
+    public class OutGrabDeckAction : OutActionBase
     {
-        public OutGrabCardAction( CardModel card )
+        public OutGrabDeckAction( DeckModel deck )
         {
-            Type = OutActionNames.GrabCard;
-            Id = card.Id;
+            Type = OutActionNames.GrabDeck;
+            Id = deck.Id;
+            Mx = deck.Mx;
+            My = deck.My;
+            Alpha = deck.Alpha;
             Resiever = Resiever.Caller;
-            Mx = card.Mx;
-            My = card.My;
-            Alpha = card.Alpha;
         }
         public Guid Id { get; set; }
         public int Mx { get; set; }

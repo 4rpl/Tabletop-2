@@ -11,9 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\Actions\In\Deck\" />
     <Folder Include="Models\Actions\In\Filter\" />
-    <Folder Include="Models\Actions\Out\Deck\" />
     <Folder Include="Models\Actions\Out\Filter\" />
   </ItemGroup>
 

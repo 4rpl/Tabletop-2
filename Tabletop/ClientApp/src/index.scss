@@ -2,6 +2,7 @@
 
 body {
     background-color: #333;
+    overflow: hidden;
 }
 
 .table {
@@ -61,7 +62,6 @@ body {
     background-color: #999;
     position: absolute;
     cursor: move;
-    transition: box-shadow 0.15s ease-out;
 
     & * {
         border-radius: $card-border-radius;
@@ -156,11 +156,12 @@ body {
     @extend .noselect-content;
     z-index: 150000;
     position: absolute;
-    margin-left: -17px;
-    margin-top: -12px;
-    width: 50px;
-    height: 50px;
-    background: url(http://cursor.in/assets/pointinghand.svg);
+    margin-left: -3px;
+    margin-top: 0px;
+    width: 20px;
+    height: 20px;
+    background-image: url(https://image.flaticon.com/icons/svg/587/587376.svg);
+    fill: #fff;
 }
 
 .filter {

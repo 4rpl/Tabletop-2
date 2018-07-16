@@ -9,6 +9,7 @@ using Tabletop.Logic.Models.Actions.Card;
 using Tabletop.Logic.Models.Actions.Deck;
 using Tabletop.Logic.Models.Actions.Filter;
 using Tabletop.Logic.Models.Actions.In.Card;
+using Tabletop.Logic.Models.Actions.In.Deck;
 using Tabletop.Logic.Models.Actions.In.User;
 using Tabletop.Logic.Models.Actions.User;
 
@@ -82,22 +83,21 @@ namespace Tabletop.Hubs
             await PerformActions( _table.Dispatch( action, Context.ConnectionId ) );
         }
 
-        public async Task FlipDeck( FlipDeckAction action )
+        public async Task FlipDeck( InFlipDeckAction action )
         {
             await PerformActions( _table.Dispatch( action ) );
         }
-        public async Task MoveDeck( MoveDeckAction action )
+        public async Task MoveDeck( InMoveDeckAction action )
         {
-            await PerformActions( _table.Dispatch( action ) );
+            await PerformActions( _table.Dispatch( action, Context.ConnectionId ) );
         }
-        public async Task DeckUp( DeckUpAction action )
+        public async Task DeckUp( InDeckUpAction action )
         {
-            action.OwnerId = Context.ConnectionId;
-            await PerformActions( _table.Dispatch( action ) );
+            await PerformActions( _table.Dispatch( action, Context.ConnectionId ) );
         }
-        public async Task DeckDown( DeckDownAction action )
+        public async Task DeckDown( InDropDeckAction action )
         {
-            await PerformActions( _table.Dispatch( action ) );
+            await PerformActions( _table.Dispatch( action, Context.ConnectionId ) );
         }
         public async Task ShuffleDeck( ShuffleDeckAction action )
         {

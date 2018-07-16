@@ -7,10 +7,10 @@ namespace Tabletop.Logic.Models.Actions.Out.Card
 {
     public class OutChangeCardContent : OutActionBase
     {
-        public OutChangeCardContent( CardModel card, List<string> resievers, bool visible )
+        public OutChangeCardContent( CardModel card, bool visible )
         {
-            Type = OutActionNames.MoveCardAndChangeContent;
-            ResieverIds = resievers;
+            Type = OutActionNames.ChangeCardContent;
+            Resiever = Resiever.Caller;
             Content = visible ? card.GetContent() : null;
         }
 

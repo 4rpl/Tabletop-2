@@ -7,10 +7,10 @@ namespace Tabletop.Logic.Models.Actions.Out.Card
 {
     public class OutDropCardAction : OutActionBase
     {
-        public OutDropCardAction( CardModel card, List<string> resievers )
+        public OutDropCardAction( CardModel card )
         {
             Type = OutActionNames.DropCard;
-            ResieverIds = resievers;
+            Resiever = Resiever.All;
             Id = card.Id;
             X = card.X;
             Y = card.Y;

@@ -18,5 +18,13 @@ namespace Tabletop.Logic.Models.Actions.Out
         public static string MoveCardAndChangeContent = "MoveCardAndChangeContent";
 
         public static string RemoveUser = "RemoveUser";
+
+        public static string FlipDeck = "FlipDeck";
+        public static string GrabDeck = "GrabDeck";
+        public static string MoveDeck = "MoveDeck";
+        public static string ChangeDeckContent = "ChangeDeckContent";
+        public static string MoveDeckAndChangeContent = "MoveDeckAndChangeContent";
+        public static string MergeDecks = "MergeDecks";
+        public static string DropDeck = "DropDeck";
     }
 }

@@ -54,7 +54,7 @@ namespace Tabletop.Logic.Models
 
         public void Drop()
         {
-            if( _isGrabbed )
+            if( !_isGrabbed )
             {
                 throw new MethodAccessException( $"Колода не была взята. Id: {Id}" );
             }
@@ -78,7 +78,9 @@ namespace Tabletop.Logic.Models
                 throw new MethodAccessException( $"Колода уже была взята. Id: {Id}, UserId: {owner.Id}, OwnerId: {Owner.Id}" );
             }
             Owner = owner;
-            Alpha = owner.Alpha;
+            Alpha = alpha;
+            Mx = mx;
+            My = my;
             _isGrabbed = true;
         }
 
@@ -117,6 +119,11 @@ namespace Tabletop.Logic.Models
         public void Add( IEnumerable<Card> cards )
         {
             _cards.InsertRange( 0, cards );
+        }
+
+        public void Add( Deck deck )
+        {
+            Add( deck._cards );
         }
 
         public Card TakeTop()

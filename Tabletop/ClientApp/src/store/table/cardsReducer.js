@@ -162,6 +162,12 @@ function cardsReducer(state = [], action) {
                 }
             });
         }
+        case TableActions.CREATE_DECK: {
+            return state.filter(card => action.cardsToRemove.indexOf(card.id) === -1);
+        }
+        case TableActions.CARD_PUT_IN_DECK: {
+            return state.filter(card => action.cardToRemove !== card.id);
+        }
         default: {
             return state;
         }

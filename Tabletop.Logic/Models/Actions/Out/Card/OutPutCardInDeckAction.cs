@@ -1,18 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using CardModel = Tabletop.Logic.Models.Card;
 using DeckModel = Tabletop.Logic.Models.Deck;
 
 namespace Tabletop.Logic.Models.Actions.Out.Card
 {
     public class OutPutCardInDeckAction : OutActionBase
     {
-        public OutPutCardInDeckAction( DeckModel deck, List<string> resievers, bool visible )
+        public OutPutCardInDeckAction( CardModel card, DeckModel deck, List<string> resievers, bool visible )
         {
             Type = OutActionNames.PutCardInDeck;
-            ResieverIds = resievers;
+            DeckId = deck.Id;
+            CardToRemove = card.Id;
             DeckLength = deck.Length;
-            Content = visible ? deck.GetContent() : null;
+            ResieverIds = resievers;
+            Content = visible ? card.GetContent() : null;
         }
 
         public Guid DeckId { get; set; }
