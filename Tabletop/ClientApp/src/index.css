@@ -43,7 +43,8 @@
   border-radius: 5px;
   background-color: #999;
   position: absolute;
-  cursor: move; }
+  cursor: move;
+  transition: box-shadow .2s ease-in-out, transform .2s ease-in-out; }
   .deck * {
     border-radius: 5px;
     height: 100%;
@@ -126,12 +127,9 @@
 .cursor {
   z-index: 150000;
   position: absolute;
-  margin-left: -3px;
-  margin-top: 0px;
-  width: 20px;
-  height: 20px;
-  background-image: url(https://image.flaticon.com/icons/svg/587/587376.svg);
-  fill: #fff; }
+  background-color: red;
+  border: 3px solid red;
+  border-radius: 100%; }
 
 .filter {
   z-index: 200000;

@@ -99,13 +99,13 @@ namespace Tabletop.Hubs
         {
             await PerformActions( _table.Dispatch( action, Context.ConnectionId ) );
         }
-        public async Task ShuffleDeck( ShuffleDeckAction action )
+        public async Task ShuffleDeck( InShuffleDeckAction action )
         {
             await PerformActions( _table.Dispatch( action ) );
         }
-        public async Task TakeTopDeckCard( TakeTopDeckCardAction action )
+        public async Task TakeTopDeckCard( InTakeTopDeckCardAction action )
         {
-            await PerformActions( _table.Dispatch( action ) );
+            await PerformActions( _table.Dispatch( action, Context.ConnectionId ) );
         }
 
         private async Task PerformActions( IEnumerable<ITableAction> actions )

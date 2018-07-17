@@ -12,8 +12,9 @@ function cardsReducer(state = [], action) {
                     x: card.x,
                     y: card.y,
                     z: card.z,
-                    mx: card.mx || -15,
-                    my: card.my || -15,
+                    mx: card.mx,
+                    my: card.my,
+                    alpha: card.alpha,
                     isOwner: action.isOwner,
                     h: card.h,
                     w: card.w,
@@ -99,6 +100,7 @@ function cardsReducer(state = [], action) {
                     y: action.y,
                     mx: action.mx,
                     my: action.my,
+                    alpha: action.alpha,
                     z: initialZIndex + state.length,
                     h: action.h,
                     w: action.w,
@@ -167,6 +169,56 @@ function cardsReducer(state = [], action) {
         }
         case TableActions.CARD_PUT_IN_DECK: {
             return state.filter(card => action.cardToRemove !== card.id);
+        }
+        case TableActions.TAKE_TOP_DECK_CARD: {
+            if (action.bottomId) {
+                return [
+                    ...state,
+                    {
+                        id: action.bottomId,
+                        x: action.x,
+                        y: action.y,
+                        mx: 0,
+                        my: 0,
+                        z: initialZIndex + state.length,
+                        h: action.h,
+                        w: action.w,
+                        active: false,
+                        isOwner: false,
+                        content: action.bottomContent,
+                    },
+                    {
+                        id: action.topId,
+                        x: action.x,
+                        y: action.y,
+                        mx: action.mx,
+                        my: action.my,
+                        alpha: action.alpha,
+                        z: initialZIndex + state.length + 1,
+                        h: action.h,
+                        w: action.w,
+                        active: true,
+                        isOwner: true,
+                        content: action.topContent,
+                    },
+                ];
+            }
+            return [
+                ...state,
+                {
+                    id: action.topId,
+                    x: action.x,
+                    y: action.y,
+                    mx: action.mx,
+                    my: action.my,
+                    z: initialZIndex + state.length,
+                    h: action.h,
+                    w: action.w,
+                    active: true,
+                    isOwner: true,
+                    content: action.topContent,
+                },
+            ];
         }
         default: {
             return state;

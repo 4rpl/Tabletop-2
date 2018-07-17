@@ -48,6 +48,17 @@ function usersReducer(state = [], action) {
                     : user;
             });
         }
+        case TableActions.MOVE_DECK: {
+            return state.map(user => {
+                return user.id === action.userId
+                    ? {
+                        ...user,
+                        x: action.x - action.mx,
+                        y: action.y - action.my,
+                    }
+                    : user;
+            });
+        }
         default: {
             return state;
         }

@@ -24,10 +24,10 @@ const mapDispatchToProps = function (dispatch) {
         onDeckDown: function (id, x, y, h, w) {
             dispatch(deckDown(id, x, y, h, w));
         },
-        takeTopDeckCard: function (id, alpha, mx, my) {
+        onTakeTopDeckCard: function (id, alpha, mx, my) {
             dispatch(takeTopDeckCard(id, alpha, mx, my));
         },
-        shuffleDeck: function (id) {
+        onShuffleDeck: function (id) {
             dispatch(shuffleDeck(id));
         }
     };
@@ -35,14 +35,26 @@ const mapDispatchToProps = function (dispatch) {
 
 class Deck extends React.Component {
 
-    componentDidMount() {
-        const { id, mx, my, active, isOwner } = this.props;
+    constructor(props) {
+        super();
+        const { id, mx, my, active, isOwner } = props;
         this.mouseDown = this.mouseDown.bind(this);
         this.onContextMenu = this.onContextMenu.bind(this);
         this.keyPress = this.keyPress.bind(this);
         if (active && isOwner) {
             this.callbackService.onMouseUp(id, this.mouseUp.bind(this));
         }
+    }
+    
+    shouldComponentUpdate(nextProps) {
+        return this.props.active && this.props.mouse.x !== nextProps.mouse.x
+            || this.props.active && this.props.mouse.y !== nextProps.mouse.y
+            || this.props.x !== nextProps.x
+            || this.props.y !== nextProps.y
+            || this.props.z !== nextProps.z
+            || this.props.content !== nextProps.content
+            || this.props.alpha !== nextProps.alpha
+            || this.props.active !== nextProps.active;
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -55,11 +67,11 @@ class Deck extends React.Component {
     callbackService = CallbackService.getInstance();
 
     mouseDown(e) {
-        const { id, x, y, z, active, onDeckUp, mouse } = this.props;
+        const { id, x, y, z, active, onDeckUp, mouse, onTakeTopDeckCard } = this.props;
         //console.log('Down');
         if (!active) {
             if (e.shiftKey) {
-                takeTopDeckCard(id, mouse.alpha % (2 * Math.PI), x - mouse.x, y - mouse.y, z);
+                onTakeTopDeckCard(id, mouse.alpha % (2 * Math.PI), x - mouse.x, y - mouse.y);
             } else if (e.button === 0) {
                 onDeckUp(id, mouse.alpha % (2 * Math.PI), x - mouse.x, y - mouse.y, z);
                 this.callbackService.onMouseUp(id, this.mouseUp.bind(this));
@@ -85,9 +97,9 @@ class Deck extends React.Component {
     }
 
     keyPress(e) {
-        const { id } = this.props;
+        const { id, onShuffleDeck } = this.props;
         if (e.keyCode === 'R'.charCodeAt(0)) {
-            this.shuffleDeck(id);
+            onShuffleDeck(id);
         }
         return false;
     }
@@ -122,12 +134,12 @@ class Deck extends React.Component {
         }
 
         return (
-            <div style={{ top: y, left: x, width: w, height: h, zIndex: z }}
+            <div style={{ top: y, left: x, width: w, height: h, zIndex: z, transform: `rotate(${-alpha}rad)` }}
                 onMouseDown={this.mouseDown}
                 onKeyDown={this.keyPress}
                 tabIndex="-1"
                 onContextMenu={this.onContextMenu}
-                className="deck noselect">
+                className={'deck noselect' + (active ? ' grabbed' : '')}>
                 <span className="deckCardsCounter">{length}</span>
                 {deckContent}
             </div>

@@ -29,18 +29,21 @@
     __onMouseDown = [];
 
     onMouseMove(id, action) {
+        console.log(id, 'on mouse move');
         this.__onMouseMove.push({
             id,
             action
         });
     }
     onMouseUp(id, action) {
+        console.log(id, 'on mouse up');
         this.__onMouseUp.push({
             id,
             action
         });
     }
     onMouseDown(id, action) {
+        console.log(id, 'on mouse down');
         this.__onMouseDown.push({
             id,
             action

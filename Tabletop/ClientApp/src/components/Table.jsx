@@ -56,21 +56,42 @@ const _maxVelocity = 40;
 const _moveAcceleration = 4;
 const _moveTickMs = 20;
 const tableRotateStep = Math.PI / 4;
+const cursorCallbackId = 'CURSOR';
+const userCallbackId = 'USER';
 
 class Table extends React.Component {
-    
-    componentDidMount() {
+
+    constructor(props) {
+        super();
         const callbackService = CallbackService.getInstance();
         //callbackService.onMouseMove('CURSOR', this.CursorMove.bind(this));
-        console.log(this.props.onAddFilter);
+        console.log(props.onAddFilter);
         document.onkeydown = this.keyPress.bind(this);
         document.onkeyup = this.keyPress.bind(this);
-        document.onmousemove = this.updateCursor.bind(this);
+        callbackService.onMouseDown(cursorCallbackId, e => {
+            this.updateCursor(e);
+            callbackService.onMouseMove(cursorCallbackId, this.updateCursor.bind(this));
+        });
+        callbackService.onMouseUp(cursorCallbackId, e => {
+            callbackService.unsubscribeOnMouseMove(cursorCallbackId);
+        });
+        callbackService.onMouseMove(userCallbackId, this.updateUser.bind(this));
         this.wheel = this.wheel.bind(this);
         this.preload();
 
         setInterval(this.updateCamera.bind(this), _moveTickMs);
     }
+
+    // TODO:
+    //shouldComponentUpdate(nextProps) {
+    //    return this.props.camera.x !== nextProps.camera.x
+    //        || this.props.camera.y !== nextProps.camera.y
+    //        || this.props.camera.scale !== nextProps.camera.scale
+    //        || this.props.camera.alpha !== nextProps.camera.alpha
+    //        || this.props.cards !== nextProps.cards
+    //        || this.props.decks.filter(i => i.active).length > 0
+    //        || this.props.cards.filter(i => i.active).length > 0;
+    //}
 
     updateCursor(e) {
         const { onCursorMove, onUserMove, cards, decks } = this.props;
@@ -78,8 +99,15 @@ class Table extends React.Component {
         const mx = Math.round(x);
         const my = Math.round(y);
         onCursorMove(mx, my);
+    }
+
+    updateUser(e) {
+        const { onCursorMove, onUserMove, cards, decks } = this.props;
         if (cards.filter(i => i.active && i.isOwner).length === 0 &&
             decks.filter(i => i.active && i.isOwner).length === 0) {
+            const { x, y } = this.project(e.clientX, e.clientY);
+            const mx = Math.round(x);
+            const my = Math.round(y);
             onUserMove(mx, my);
         }
     }

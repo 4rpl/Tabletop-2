@@ -14,6 +14,7 @@ function cardsReducer(state = [], action) {
                     z: deck.z,
                     mx: deck.mx,
                     my: deck.my,
+                    alpha: deck.alpha,
                     h: deck.h,
                     w: deck.w,
                     active: deck.active,
@@ -31,6 +32,7 @@ function cardsReducer(state = [], action) {
                     y: action.y,
                     mx: action.mx,
                     my: action.my,
+                    alpha: action.alpha,
                     z: initialZIndex + state.length,
                     h: action.h,
                     w: action.w,
@@ -74,6 +76,7 @@ function cardsReducer(state = [], action) {
                         active: true,
                         mx: action.mx,
                         my: action.my,
+                        alpha: action.alpha,
                         z: initialZIndex + state.length
                     };
                 } else if (deck.z > z) {
@@ -162,12 +165,15 @@ function cardsReducer(state = [], action) {
             });
         }
         case TableActions.TAKE_TOP_DECK_CARD: {
+            if (action.bottomId) {
+                return state.filter(i => i.id !== action.deckId);
+            }
             return state.map(deck => {
-                if (deck.id === action.id) {
+                if (deck.id === action.deckId) {
                     return {
                         ...deck,
-                        length: action.length,
-                        content: action.content
+                        length: deck.length - 1,
+                        content: action.bottomContent,
                     }
                 } else {
                     return deck;
@@ -222,6 +228,7 @@ function cardsReducer(state = [], action) {
                     x: deck.x,
                     y: deck.y,
                     z: deck.z,
+                    alpha: action.alpha,
                     mx: 0,
                     my: 0,
                     h: deck.h,

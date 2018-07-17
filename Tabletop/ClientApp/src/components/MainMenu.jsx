@@ -16,7 +16,6 @@ const mapDispatchToProps = function (dispatch) {
 const MainMenu = () => {
 
     let askForGameId = () => {
-        console.log(123);
         let gameId = prompt('Game Id?', '');
         if (gameId) {
             window.location = '/table/' + gameId;

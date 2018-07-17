@@ -62,6 +62,9 @@ body {
     background-color: #999;
     position: absolute;
     cursor: move;
+    transition:
+        box-shadow .2s ease-in-out,
+        transform .2s ease-in-out;
 
     & * {
         border-radius: $card-border-radius;
@@ -75,7 +78,6 @@ body {
         border-bottom: 2px solid #fb9;
         background-color: #fb9;
     }
-
     //&:active {
     //    box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3);
     //}
@@ -156,12 +158,9 @@ body {
     @extend .noselect-content;
     z-index: 150000;
     position: absolute;
-    margin-left: -3px;
-    margin-top: 0px;
-    width: 20px;
-    height: 20px;
-    background-image: url(https://image.flaticon.com/icons/svg/587/587376.svg);
-    fill: #fff;
+    background-color: red;
+    border: 3px solid red;
+    border-radius: 100%;
 }
 
 .filter {

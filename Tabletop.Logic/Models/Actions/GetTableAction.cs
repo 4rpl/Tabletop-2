@@ -44,6 +44,7 @@ namespace Tabletop.Logic.Models.Actions
             X = card.X;
             Y = card.Y;
             Z = card.Z;
+            Alpha = card.Alpha;
         }
         
         public Guid? Id { get; set; }
@@ -52,6 +53,7 @@ namespace Tabletop.Logic.Models.Actions
         public int Z { get; set; }
         public int H { get; set; }
         public int W { get; set; }
+        public double Alpha { get; set; }
         public bool Active { get; set; }
         public bool IsOwner { get; set; }
         public string Content { get; set; }
@@ -71,6 +73,7 @@ namespace Tabletop.Logic.Models.Actions
             Y = deck.Y;
             Z = deck.Z;
             Length = deck.Length;
+            Alpha = deck.Alpha;
         }
         
         public Guid? Id { get; set; }
@@ -79,6 +82,7 @@ namespace Tabletop.Logic.Models.Actions
         public int Z { get; set; }
         public int H { get; set; }
         public int W { get; set; }
+        public double Alpha { get; set; }
         public bool Active { get; set; }
         public bool IsOwner { get; set; }
         public string Content { get; set; }

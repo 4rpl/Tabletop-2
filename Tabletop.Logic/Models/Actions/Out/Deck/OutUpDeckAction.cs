@@ -5,15 +5,15 @@ using DeckModel = Tabletop.Logic.Models.Deck;
 
 namespace Tabletop.Logic.Models.Actions.Out.Deck
 {
-    public class OutUpDeckAction : OutActionBase
+    public class OutDeckUpAction : OutActionBase
     {
-        public OutUpDeckAction( DeckModel card )
+        public OutDeckUpAction( DeckModel deck )
         {
-            Type = OutActionNames.CardUp;
-            Id = card.Id;
-            Mx = card.Mx;
-            My = card.My;
-            Alpha = card.Alpha;
+            Type = OutActionNames.DeckUp;
+            Id = deck.Id;
+            Mx = deck.Mx;
+            My = deck.My;
+            Alpha = deck.Alpha;
             Resiever = Resiever.Others;
         }
 
