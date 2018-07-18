@@ -6,8 +6,11 @@
         if (!this.instance) {
             this.instance = new CallbackService();
             document.onmousemove = e => {
-                for (let client of this.instance.__onMouseMove) {
-                    client.action(e);
+                if (!this.instance.__wait) {
+                    for (let client of this.instance.__onMouseMove) {
+                        this.instance.__wait = true;
+                        client.action(e);
+                    }
                 }
             }
             document.onmouseup = e => {
@@ -24,26 +27,29 @@
         return this.instance;
     }
 
+    constructor() {
+        setInterval(() => this.__wait = false, this.__delay);
+    }
+
     __onMouseMove = [];
     __onMouseUp = [];
     __onMouseDown = [];
+    __wait = false;
+    __delay = 1000 / 60;
 
     onMouseMove(id, action) {
-        console.log(id, 'on mouse move');
         this.__onMouseMove.push({
             id,
             action
         });
     }
     onMouseUp(id, action) {
-        console.log(id, 'on mouse up');
         this.__onMouseUp.push({
             id,
             action
         });
     }
     onMouseDown(id, action) {
-        console.log(id, 'on mouse down');
         this.__onMouseDown.push({
             id,
             action

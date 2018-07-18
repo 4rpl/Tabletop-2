@@ -8,7 +8,8 @@ function usersReducer(state = [], action) {
                     id: user.id,
                     name: user.name,
                     x: user.x,
-                    y: user.y
+                    y: user.y,
+                    colour: user.colour,
                 };
             });
         }
@@ -19,7 +20,8 @@ function usersReducer(state = [], action) {
                     id: action.id,
                     name: action.name,
                     x: action.x,
-                    y: action.y
+                    y: action.y,
+                    colour: action.colour,
                 }
             ]
         }

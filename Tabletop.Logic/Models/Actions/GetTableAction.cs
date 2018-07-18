@@ -97,11 +97,12 @@ namespace Tabletop.Logic.Models.Actions
             Name = user.Name;
             X = user.X;
             Y = user.Y;
-
+            Colour = user.Colour;
         }
 
         public string Id { get; set; }
         public string Name { get; set; }
+        public string Colour { get; set; }
         public int X { get; set; }
         public int Y { get; set; }
     }

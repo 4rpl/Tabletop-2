@@ -17,13 +17,15 @@
   transition: box-shadow .2s ease-in-out, transform .2s ease-in-out; }
   .card:hover {
     border: 1px solid #fb9; }
-  .card.grabbed {
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.4); }
   .card * {
     border-radius: 5px;
     object-fit: cover;
     height: 100%;
     width: 100%; }
+
+.card.grabbed,
+.deck.grabbed {
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.4); }
 
 .table-logo {
   animation: Table-logo-spin infinite 20s linear;

@@ -68,14 +68,8 @@ class Table extends React.Component {
         console.log(props.onAddFilter);
         document.onkeydown = this.keyPress.bind(this);
         document.onkeyup = this.keyPress.bind(this);
-        callbackService.onMouseDown(cursorCallbackId, e => {
-            this.updateCursor(e);
-            callbackService.onMouseMove(cursorCallbackId, this.updateCursor.bind(this));
-        });
-        callbackService.onMouseUp(cursorCallbackId, e => {
-            callbackService.unsubscribeOnMouseMove(cursorCallbackId);
-        });
-        callbackService.onMouseMove(userCallbackId, this.updateUser.bind(this));
+        callbackService.onMouseDown(cursorCallbackId, this.forceUpdateCursor.bind(this));
+        callbackService.onMouseMove(cursorCallbackId, this.updateCursor.bind(this));
         this.wheel = this.wheel.bind(this);
         this.preload();
 
@@ -98,22 +92,26 @@ class Table extends React.Component {
         const { x, y } = this.project(e.clientX, e.clientY);
         const mx = Math.round(x);
         const my = Math.round(y);
-        onCursorMove(mx, my);
-    }
 
-    updateUser(e) {
-        const { onCursorMove, onUserMove, cards, decks } = this.props;
         if (cards.filter(i => i.active && i.isOwner).length === 0 &&
             decks.filter(i => i.active && i.isOwner).length === 0) {
-            const { x, y } = this.project(e.clientX, e.clientY);
-            const mx = Math.round(x);
-            const my = Math.round(y);
             onUserMove(mx, my);
+        } else {
+            onCursorMove(mx, my);
         }
     }
 
+    forceUpdateCursor(e) {
+        const { onCursorMove, onUserMove, cards, decks } = this.props;
+        const { x, y } = this.project(e.clientX, e.clientY);
+        const mx = Math.round(x);
+        const my = Math.round(y);
+
+        onCursorMove(mx, my);
+    }
+
     updateCamera() {
-        const { camera, onTableMove, table } = this.props;
+        const { camera, onTableMove } = this.props;
         if (camera.ax || camera.ay || camera.vx || camera.vy) {
             let vx = camera.vx + camera.ax;
             let vy = camera.vy + camera.ay;
@@ -150,8 +148,8 @@ class Table extends React.Component {
     }
 
     rotate(angle) {
-        const { camera, onRotate, table } = this.props;
-        const { x, y } = this.project(window.screen.width / 2, window.screen.height / 2);
+        const { camera, onRotate } = this.props;
+        //const { x, y } = this.project(window.screen.width / 2, window.screen.height / 2);
         //const screenCenterX = window.screen.width / 2;
         //const screenCenterY = window.screen.height / 2;
         //const rotCenterX = screenCenterX - camera.x - table.w / 2;
@@ -212,6 +210,9 @@ class Table extends React.Component {
                 } else if (e.type === 'keyup' && ax < 0) {
                     this.tableMove(0, ay, vx, vy, x, y);
                 }
+                break;
+            }
+            default: {
                 break;
             }
         }
@@ -307,7 +308,8 @@ class Table extends React.Component {
                     key={user.id}
                     name={user.name}
                     x={user.x}
-                    y={user.y} />
+                    y={user.y}
+                    colour={user.colour} />
             );
         });
 

@@ -11,10 +11,10 @@ const mapDispatchToProps = function (dispatch) {
     return {};
 }
 
-const Cursor = function ({ x, y, name }) {
+const Cursor = function ({ x, y, name, colour }) {
     return (
         <div
-            style={{ top: y, left: x }}
+            style={{ top: y, left: x, borderColor: colour }}
             className="cursor noselect">
         </div>
     );

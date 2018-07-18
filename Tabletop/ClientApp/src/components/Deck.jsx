@@ -37,7 +37,7 @@ class Deck extends React.Component {
 
     constructor(props) {
         super();
-        const { id, mx, my, active, isOwner } = props;
+        const { id, active, isOwner } = props;
         this.mouseDown = this.mouseDown.bind(this);
         this.onContextMenu = this.onContextMenu.bind(this);
         this.keyPress = this.keyPress.bind(this);
@@ -47,8 +47,8 @@ class Deck extends React.Component {
     }
     
     shouldComponentUpdate(nextProps) {
-        return this.props.active && this.props.mouse.x !== nextProps.mouse.x
-            || this.props.active && this.props.mouse.y !== nextProps.mouse.y
+        return (this.props.active && this.props.mouse.x !== nextProps.mouse.x)
+            || (this.props.active && this.props.mouse.y !== nextProps.mouse.y)
             || this.props.x !== nextProps.x
             || this.props.y !== nextProps.y
             || this.props.z !== nextProps.z

@@ -23,6 +23,17 @@ namespace Tabletop.Logic.Models
         private List<Deck> _decks = new List<Deck>();
         private List<User> _users = new List<User>();
         private List<Filter> _filters = new List<Filter>();
+        private List<string> _colours = new List<string>
+        {
+            "#E53935",
+            "#2196F3",
+            "#43A047",
+            "#FDD835",
+            "#5E35B1",
+            "#009688",
+            "#E91E63",
+            "#795548",
+        };
         private const int _dropRadius = 50;
 
         public readonly int Height;
@@ -58,7 +69,8 @@ namespace Tabletop.Logic.Models
         #region Users
         public IEnumerable<ITableAction> Dispatch( AddUserAction action )
         {
-            var user = new User( action.Id, action.Name, action.X, action.Y );
+            action.Colour = GetNextColour();
+            var user = new User( action.Id, action.Name, action.X, action.Y, action.Colour );
             _users.Add( user );
             return new List<ITableAction>
             {
@@ -86,6 +98,7 @@ namespace Tabletop.Logic.Models
                 throw new ArgumentException( "Пользователь не найден" );
             }
             _users.Remove( user );
+            _colours.Add( user.Colour );
             var deckToDrop = _decks.FirstOrDefault( i => i.Owner == user );
             var cardToDrop = _cards.FirstOrDefault( i => i.Owner == user );
             deckToDrop?.Drop();
@@ -303,161 +316,6 @@ namespace Tabletop.Logic.Models
         #endregion
 
         #region Decks
-        public IEnumerable<ITableAction> Dispatch( FlipDeckAction action )
-        {
-            var deck = _decks.FirstOrDefault( i => i.Id == action.Id );
-            if( deck == null )
-            {
-                throw new ArgumentException( "Колода не найдена" );
-            }
-            var result = new List<ITableAction>
-            {
-                action
-            };
-
-            deck.Flip();
-            action.Content = deck.GetContent();
-            
-            var users = UsersWhoCanSee( deck );
-            action.ResieverIds = users.Select( i => i.Id ).ToList();
-
-            if( users.Count() < _users.Count() )
-            {
-                result.Add( new FlipDeckAction( deck, _users.Except( users ).Select( i => i.Id ).ToList(), true ) );
-            }
-
-            return result;
-        }
-        public IEnumerable<ITableAction> Dispatch( DeckUpAction action )
-        {
-            var deck = _decks.FirstOrDefault( i => i.Id == action.Id );
-            if( deck == null )
-            {
-                throw new ArgumentException( "Колода не найдена" );
-            }
-            action.IsOwner = true;
-            action.ResieverIds = new List<string> { action.OwnerId };
-            var users = _users.Where( i => i.Id != action.OwnerId ).Select( i => i.Id ).ToList();
-            var result = new List<ITableAction>
-            {
-                action,
-                new DeckUpAction( deck, users, false )
-            };
-            deck.Grab( null, 0, 0, 0 );
-            return result;
-        }
-        public IEnumerable<ITableAction> Dispatch( DeckDownAction action )
-        {
-            var deck = _decks.FirstOrDefault( i => i.Id == action.Id );
-            if( deck == null )
-            {
-                throw new ArgumentException( "Колода не найдена" );
-            }
-            deck.Drop();
-            return new List<ITableAction>
-            {
-                action
-            };
-        }
-        public IEnumerable<ITableAction> Dispatch( MoveDeckAction action )
-        {
-            var deck = _decks.FirstOrDefault( i => i.Id == action.Id );
-            if( deck == null )
-            {
-                throw new ArgumentException( "Колода не найдена" );
-            }
-            (action.X, action.Y) = FixCoords( action.X, action.Y, deck.Height, deck.Width );
-            var result = new List<ITableAction>
-            {
-                action
-            };
-
-            // пользователи, которые видели колоду
-            var oldUsers = UsersWhoCanSee( deck );
-
-            // пользователи, которые сейчас видят
-            deck.Move( action.X, action.Y );
-            var newUsers = UsersWhoCanSee( deck );
-
-            var hideFrom = oldUsers.Except( newUsers );
-            var showTo = newUsers.Except( oldUsers );
-
-            if( hideFrom.Any() )
-            {
-                result.Add( new HideDeckContentAction( deck, hideFrom.Select( i => i.Id ) ) );
-            }
-            if( showTo.Any() )
-            {
-                result.Add( new ShowDeckContentAction( deck, showTo.Select( i => i.Id ) ) );
-            }
-
-            return result;
-        }
-        public IEnumerable<ITableAction> Dispatch( TakeTopDeckCardAction action )
-        {
-            var deck = _decks.FirstOrDefault( i => i.Id == action.Id );
-            if( deck == null )
-            {
-                throw new ArgumentException( "Колода не найдена" );
-            }
-
-            var result = new List<ITableAction>();
-
-            var card = deck.TakeTop();
-            _cards.Add( card );
-            card.Grab( null, 0, 0, 0 );
-            var users = UsersWhoCanSee( deck );
-            if( deck.Length > 1 )
-            {
-                action.Content = deck.GetContent();
-                action.Length = deck.Length;
-                result.Add( action );
-            }
-            else
-            {
-                var lastCard = deck.TakeTop();
-                _cards.Add( lastCard );
-                _decks.Remove( deck );
-                result.Add( new AddCardAction( lastCard, users.Select( i => i.Id ).ToList(), false ) );
-                if( users.Count() < _users.Count() )
-                {
-                    result.Add( new AddCardAction( lastCard, _users.Except( users ).Select( i => i.Id ).ToList(), true ) );
-                }
-                result.Add( new RemoveDeckAction( deck ) );
-            }
-            result.Add( new AddCardAction( card, users.Select( i => i.Id ).ToList(), false )
-            {
-                Mx = action.Mx,
-                My = action.My,
-                IsOwner = true
-            } );
-            if( users.Count() < _users.Count() )
-            {
-                result.Add( new AddCardAction( card, _users.Except( users ).Select( i => i.Id ).ToList(), true )
-                {
-                    Mx = action.Mx,
-                    My = action.My,
-                    IsOwner = true
-                } );
-            }
-
-            return result;
-        }
-        public IEnumerable<ITableAction> Dispatch( ShuffleDeckAction action )
-        {
-            var deck = _decks.FirstOrDefault( i => i.Id == action.Id );
-            if( deck == null )
-            {
-                throw new ArgumentException( "Колода не найдена" );
-            }
-            deck.Shuffle();
-            action.Content = deck.GetContent();
-            return new List<ITableAction>
-            {
-                action
-            };
-        }
-        
         public IEnumerable<ITableAction> Dispatch( InFlipDeckAction action )
         {
             var deck = _decks.FirstOrDefault( i => i.Id == action.Id );
@@ -695,6 +553,16 @@ namespace Tabletop.Logic.Models
                 y = maxY;
             }
             return (x, y);
+        }
+        private string GetNextColour()
+        {
+            if(!_colours.Any())
+            {
+                return "#000000";
+            }
+            var colour = _colours.First();
+            _colours.RemoveAt( 0 );
+            return colour;
         }
         #endregion
     }

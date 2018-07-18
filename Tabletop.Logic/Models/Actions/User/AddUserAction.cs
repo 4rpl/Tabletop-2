@@ -14,5 +14,6 @@ namespace Tabletop.Logic.Models.Actions.User
         public int X { get; set; }
         public int Y { get; set; }
         public string Name { get; set; }
+        public string Colour { get; set; }
     }
 }
