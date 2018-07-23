@@ -11,11 +11,14 @@ const mapDispatchToProps = function (dispatch) {
     return {};
 }
 
-const Cursor = function ({ x, y, name, colour }) {
+const Cursor = function ({ x, y, name, color }) {
+    if (!x || !y) {
+        return null;
+    }
     return (
         <div
-            style={{ top: y, left: x, borderColor: colour }}
-            className="cursor noselect">
+            style={{ top: y, left: x, borderColor: color }}
+            className="tt-cursor tt-noselect">
         </div>
     );
 }

@@ -16,6 +16,8 @@ namespace Tabletop.Logic.Models.Actions.Filter
         public int Y { get; set; }
         public int H { get; set; }
         public int W { get; set; }
+        public string Name { get; set; }
+        public string Color { get; set; }
         [JsonIgnore]
         public string OwnerId { get; set; }
     }

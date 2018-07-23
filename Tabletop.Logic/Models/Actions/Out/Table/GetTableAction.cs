@@ -2,27 +2,24 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TableModel = Tabletop.Logic.Models.Table;
 using CardModel = Tabletop.Logic.Models.Card;
 using DeckModel = Tabletop.Logic.Models.Deck;
 using UserModel = Tabletop.Logic.Models.User;
 using FilterModel = Tabletop.Logic.Models.Filter;
 
-namespace Tabletop.Logic.Models.Actions
+namespace Tabletop.Logic.Models.Actions.Out.Table
 {
-    public class GetTableAction : ITableAction
+    public class OutGetTableAction : OutActionBase
     {
-        public GetTableAction() { }
-
-        public GetTableAction( Table table )
+        public OutGetTableAction( TableModel table )
         {
-            Type = "GetTable";
+            Type = OutActionNames.GetTable;
+            Resiever = Resiever.Caller;
             H = table.Height;
             W = table.Width;
         }
-
-        public string Type { get; set; }
-        public Resiever Resiever { get; set; } = Resiever.Caller;
-        public List<string> ResieverIds { get; set; }
+        
         public int H { get; set; }
         public int W { get; set; }
         public List<TableCard> Cards { get; set; }
@@ -97,12 +94,12 @@ namespace Tabletop.Logic.Models.Actions
             Name = user.Name;
             X = user.X;
             Y = user.Y;
-            Colour = user.Colour;
+            Color = user.Color;
         }
 
         public string Id { get; set; }
         public string Name { get; set; }
-        public string Colour { get; set; }
+        public string Color { get; set; }
         public int X { get; set; }
         public int Y { get; set; }
     }

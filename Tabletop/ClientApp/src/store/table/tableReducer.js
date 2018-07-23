@@ -3,6 +3,7 @@ import decksReducer from './decksReducer';
 import usersReducer from './usersReducer';
 import filtersReducer from './filtersReducer';
 import cameraReducer from './cameraReducer';
+import chatReducer from './chatReducer';
 import { TableActions } from './TableActions';
 
 function tableReducer(state = {}, action) {
@@ -18,6 +19,7 @@ function tableReducer(state = {}, action) {
                 filters: filtersReducer(state.filters, action),
                 cards: cardsReducer(state.cards, action),
                 decks: decksReducer(state.decks, action),
+                chat: chatReducer(state.chat, action),
             }
         }
         default: {
@@ -27,7 +29,8 @@ function tableReducer(state = {}, action) {
                 users: usersReducer(state.users, action),
                 filters: filtersReducer(state.filters, action),
                 cards: cardsReducer(state.cards, action),
-                decks: decksReducer(state.decks, action)
+                decks: decksReducer(state.decks, action),
+                chat: chatReducer(state.chat, action),
             };
         }
     }

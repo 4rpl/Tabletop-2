@@ -5,22 +5,20 @@ body {
     overflow: hidden;
 }
 
-.table {
+.tt-table {
     background-color: #fff;
     position: absolute;
     margin: 0;
     transition: transform .1s ease-in-out;
 }
 
-.card {
+.tt-card {
     border: 1px solid #999;
     border-radius: $card-border-radius + 1px;
     position: absolute;
     background-color: #dedede;
     cursor: move;
-    transition:
-        box-shadow .2s ease-in-out,
-        transform .2s ease-in-out;
+    transition: box-shadow .2s ease-in-out, transform .2s ease-in-out;
 
     &:hover {
         border: 1px solid #fb9;
@@ -34,14 +32,14 @@ body {
     }
 }
 
-.card,
-.deck {
-    &.grabbed {
+.tt-card,
+.tt-deck {
+    &.tt-active {
         box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
     }
 }
 
-.table-logo {
+.tt-table-logo {
     animation: Table-logo-spin infinite 20s linear;
     height: 80px;
 }
@@ -56,7 +54,7 @@ body {
     }
 }
 
-.deck {
+.tt-deck {
     outline: none;
     border: 1px solid #999;
     border-right: 3px solid #777;
@@ -65,9 +63,7 @@ body {
     background-color: #999;
     position: absolute;
     cursor: move;
-    transition:
-        box-shadow .2s ease-in-out,
-        transform .2s ease-in-out;
+    transition: box-shadow .2s ease-in-out, transform .2s ease-in-out;
 
     & * {
         border-radius: $card-border-radius;
@@ -86,7 +82,7 @@ body {
     //}
 }
 
-.deckCardsCounter {
+.tt-deckCardsCounter {
     border: 1px solid rgba(0, 0, 0, 0.3);
     top: -11px;
     left: -11px;
@@ -121,7 +117,7 @@ body {
     }
 }*/
 
-.deckAnimaiton {
+.tt-deckAnimaiton {
     outline: none;
     border: 1px solid #999;
     border-radius: 4px;
@@ -139,15 +135,15 @@ body {
     }
 }
 
-.deckAnimaitonLeft {
+.tt-deckAnimaitonLeft {
     animation: Shuffle-animaiton 1 0.35s ease-in-out;
 }
 
-.deckAnimaitonRight {
+.tt-deckAnimaitonRight {
     animation: Shuffle-animaiton 1 0.45s ease-in-out;
 }
 
-.noselect-content {
+.tt-noselect-content {
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
     -khtml-user-select: none; /* Konqueror HTML */
@@ -157,23 +153,134 @@ body {
     pointer-events: none;
 }
 
-.cursor {
-    @extend .noselect-content;
+.tt-cursor {
+    $cursor-radius: 4px;
+    @extend .tt-noselect-content;
     z-index: 150000;
     position: absolute;
     background-color: red;
-    border: 3px solid red;
+    border: $cursor-radius solid red;
+    margin: -$cursor-radius;
     border-radius: 100%;
 }
 
-.filter {
-    @extend .noselect-content;
-
+.tt-filter {
+    @extend .tt-noselect-content;
+    display: flex;
+    justify-content: center;
     z-index: 200000;
     position: absolute;
-    background-color: rgba(255, 128, 128 ,0.3);
+    opacity: 0.5;
+
+    & .tt-filter-name {
+        align-self: center;
+        font-family: Consolas;
+        font-weight: 600;
+        font-size: 50px;
+        color: rgba(255,255,255,.5);
+    }
 }
 
-.noselect * {
-    @extend .noselect-content;
+.tt-noselect * {
+    @extend .tt-noselect-content;
+}
+
+.tt-hud {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+
+    & > .tt-hud-top {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    & > .tt-hud-bottom {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+}
+
+.tt-chat {
+    display: flex;
+    flex-direction: column;
+    font-family: Consolas;
+    background-color: rgba(0, 0, 0, .3);
+    width: 30%;
+    height: 20%;
+    min-width: 500px;
+    min-height: 260px;
+    pointer-events: all;
+    transition: background-color .2s ease-in-out;
+
+    &:hover {
+        background-color: rgba(0, 0, 0, .6);
+    }
+
+    & .tt-chat-messages {
+        flex-grow: 1;
+        align-self: stretch;
+        color: #fff;
+        overflow-y: scroll;
+
+        & .tt-chat-messages-wrapper {
+            display: flex;
+            flex-direction: column-reverse;
+            align-self: stretch;
+            padding: 5px;
+
+            & .tt-chat-sender {
+                font-weight: 600;
+            }
+
+            & .tt-chat-message {
+            }
+        }
+    }
+
+    & .tt-chat-input {
+        flex-grow: 0;
+        display: flex;
+        flex-direction: row;
+        border-top: 1px dotted #000;
+
+        & input {
+            flex-grow: 1;
+            background-color: transparent;
+            border: none;
+            color: #fff;
+            padding: 5px;
+        }
+
+        & button {
+            flex-grow: 0;
+            background-color: #dedede;
+            border: none;
+        }
+    }
+}
+
+ul.tt-users {
+    margin: 5px;
+    list-style-type: none;
+    padding: 0;
+
+    & > li {
+        padding: 5px;
+        margin-top: 5px;
+    }
+
+    & .tt-userbadge {
+        padding: 5px;
+        color: #fff;
+        opacity: .9;
+        border-radius: 4px;
+        font-size: 16px;
+    }
 }

@@ -1,4 +1,6 @@
-﻿const GET_TABLE =           'GetTable';
+﻿const SEND_MESSAGE =        'SendMessage';
+
+const GET_TABLE =           'GetTable';
 
 const ADD_USER =            'AddUser';
 const REMOVE_USER =         'RemoveUser';
@@ -51,6 +53,8 @@ export const TableActionAccessTypes = {
 }
 
 export const TableActions = {
+    SEND_MESSAGE,
+
     GET_TABLE,
 
     ADD_USER,
@@ -96,10 +100,14 @@ export const TableActions = {
 }
 
 export function addFilter(x, y, h, w) {
-    return { type: ADD_FILTER, x, y, h, w };
+    return { type: ADD_FILTER, access: TableActionAccessTypes.verificationRequired, x, y, h, w };
 }
 export function removeFilter(id) {
     return { type: REMOVE_FILTER, id };
+}
+
+export function sendMessage(message) {
+    return { type: SEND_MESSAGE, access: TableActionAccessTypes.verificationRequired, message };
 }
 
 export function tableScale(scale) {

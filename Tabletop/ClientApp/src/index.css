@@ -2,32 +2,32 @@
   background-color: #333;
   overflow: hidden; }
 
-.table {
+.tt-table {
   background-color: #fff;
   position: absolute;
   margin: 0;
   transition: transform .1s ease-in-out; }
 
-.card {
+.tt-card {
   border: 1px solid #999;
   border-radius: 6px;
   position: absolute;
   background-color: #dedede;
   cursor: move;
-  transition: box-shadow .2s ease-in-out, transform .2s ease-in-out; }
-  .card:hover {
+  transition: box-shadow .2s ease-in-out, transform .2s ease-in-out; }
+  .tt-card:hover {
     border: 1px solid #fb9; }
-  .card * {
+  .tt-card * {
     border-radius: 5px;
     object-fit: cover;
     height: 100%;
     width: 100%; }
 
-.card.grabbed,
-.deck.grabbed {
+.tt-card.tt-active,
+.tt-deck.tt-active {
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.4); }
 
-.table-logo {
+.tt-table-logo {
   animation: Table-logo-spin infinite 20s linear;
   height: 80px; }
 
@@ -37,7 +37,7 @@
   to {
     transform: rotate(360deg); } }
 
-.deck {
+.tt-deck {
   outline: none;
   border: 1px solid #999;
   border-right: 3px solid #777;
@@ -46,18 +46,18 @@
   background-color: #999;
   position: absolute;
   cursor: move;
-  transition: box-shadow .2s ease-in-out, transform .2s ease-in-out; }
-  .deck * {
+  transition: box-shadow .2s ease-in-out, transform .2s ease-in-out; }
+  .tt-deck * {
     border-radius: 5px;
     height: 100%;
     width: 100%; }
-  .deck:hover {
+  .tt-deck:hover {
     border: 1px solid #fb9;
     border-right: 3px solid #d96;
     border-bottom: 2px solid #fb9;
     background-color: #fb9; }
 
-.deckCardsCounter {
+.tt-deckCardsCounter {
   border: 1px solid rgba(0, 0, 0, 0.3);
   top: -11px;
   left: -11px;
@@ -90,7 +90,7 @@
         transition: opacity 300ms ease-in;
     }
 }*/
-.deckAnimaiton {
+.tt-deckAnimaiton {
   outline: none;
   border: 1px solid #999;
   border-radius: 4px;
@@ -100,18 +100,18 @@
   width: 102px;
   height: 142px;
   background-color: #efefef; }
-  .deckAnimaiton * {
+  .tt-deckAnimaiton * {
     border-radius: inherit;
     height: 100%;
     width: 100%; }
 
-.deckAnimaitonLeft {
+.tt-deckAnimaitonLeft {
   animation: Shuffle-animaiton 1 0.35s ease-in-out; }
 
-.deckAnimaitonRight {
+.tt-deckAnimaitonRight {
   animation: Shuffle-animaiton 1 0.45s ease-in-out; }
 
-.noselect-content, .cursor, .filter, .noselect * {
+.tt-noselect-content, .tt-cursor, .tt-filter, .tt-noselect * {
   -webkit-touch-callout: none;
   /* iOS Safari */
   -webkit-user-select: none;
@@ -126,15 +126,96 @@
   /* Non-prefixed version, currently */
   pointer-events: none; }
 
-.cursor {
+.tt-cursor {
   z-index: 150000;
   position: absolute;
   background-color: red;
-  border: 3px solid red;
+  border: 4px solid red;
+  margin: -4px;
   border-radius: 100%; }
 
-.filter {
+.tt-filter {
+  display: flex;
+  justify-content: center;
   z-index: 200000;
   position: absolute;
-  background-color: rgba(255, 128, 128, 0.3); }
+  opacity: 0.5; }
+  .tt-filter .tt-filter-name {
+    align-self: center;
+    font-family: Consolas;
+    font-weight: 600;
+    font-size: 50px;
+    color: rgba(255, 255, 255, 0.5); }
+
+.tt-hud {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; }
+  .tt-hud > .tt-hud-top {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; }
+  .tt-hud > .tt-hud-bottom {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; }
+
+.tt-chat {
+  display: flex;
+  flex-direction: column;
+  font-family: Consolas;
+  background-color: rgba(0, 0, 0, 0.3);
+  width: 30%;
+  height: 20%;
+  min-width: 500px;
+  min-height: 260px;
+  pointer-events: all;
+  transition: background-color .2s ease-in-out; }
+  .tt-chat:hover {
+    background-color: rgba(0, 0, 0, 0.6); }
+  .tt-chat .tt-chat-messages {
+    flex-grow: 1;
+    align-self: stretch;
+    color: #fff;
+    overflow-y: scroll; }
+    .tt-chat .tt-chat-messages .tt-chat-messages-wrapper {
+      display: flex;
+      flex-direction: column-reverse;
+      align-self: stretch;
+      padding: 5px; }
+      .tt-chat .tt-chat-messages .tt-chat-messages-wrapper .tt-chat-sender {
+        font-weight: 600; }
+  .tt-chat .tt-chat-input {
+    flex-grow: 0;
+    display: flex;
+    flex-direction: row;
+    border-top: 1px dotted #000; }
+    .tt-chat .tt-chat-input input {
+      flex-grow: 1;
+      background-color: transparent;
+      border: none;
+      color: #fff;
+      padding: 5px; }
+    .tt-chat .tt-chat-input button {
+      flex-grow: 0;
+      background-color: #dedede;
+      border: none; }
+
+ul.tt-users {
+  margin: 5px;
+  list-style-type: none;
+  padding: 0; }
+  ul.tt-users > li {
+    padding: 5px;
+    margin-top: 5px; }
+  ul.tt-users .tt-userbadge {
+    padding: 5px;
+    color: #fff;
+    opacity: .9;
+    border-radius: 4px;
+    font-size: 16px; }
 

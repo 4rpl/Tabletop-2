@@ -28,7 +28,14 @@ export default class ServerSyncService {
             this.onMessage(action)
         });
 
-        this.__hubConnection.start().then(() => { this.__connected = true });
+        this.__hubConnection.start().then(() => {
+            this.__connected = true;
+            let name = '';
+            while (!name) {
+                name = prompt('Имя?');
+            }
+            this.__hubConnection.invoke('connect', { name })
+        });
     }
 
     sendAction = action => {

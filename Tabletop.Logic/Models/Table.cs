@@ -8,10 +8,13 @@ using Tabletop.Logic.Models.Actions.Card;
 using Tabletop.Logic.Models.Actions.Deck;
 using Tabletop.Logic.Models.Actions.Filter;
 using Tabletop.Logic.Models.Actions.In.Card;
+using Tabletop.Logic.Models.Actions.In.Chat;
 using Tabletop.Logic.Models.Actions.In.Deck;
 using Tabletop.Logic.Models.Actions.In.User;
 using Tabletop.Logic.Models.Actions.Out.Card;
+using Tabletop.Logic.Models.Actions.Out.Chat;
 using Tabletop.Logic.Models.Actions.Out.Deck;
+using Tabletop.Logic.Models.Actions.Out.Table;
 using Tabletop.Logic.Models.Actions.Out.User;
 using Tabletop.Logic.Models.Actions.User;
 
@@ -23,7 +26,7 @@ namespace Tabletop.Logic.Models
         private List<Deck> _decks = new List<Deck>();
         private List<User> _users = new List<User>();
         private List<Filter> _filters = new List<Filter>();
-        private List<string> _colours = new List<string>
+        private List<string> _colors = new List<string>
         {
             "#E53935",
             "#2196F3",
@@ -45,32 +48,47 @@ namespace Tabletop.Logic.Models
             Width = width;
         }
 
-        #region Table
-        public GetTableAction GetTable( string userId )
+        #region Chat
+        public IEnumerable<ITableAction> Dispatch( InSendMessageAction action, string userId )
         {
             var user = _users.FirstOrDefault( i => i.Id == userId );
             if( user == null )
             {
                 throw new ArgumentException( "Пользователь не найден" );
             }
-
-            var action = new GetTableAction( this )
+            return new List<ITableAction>
             {
-                Cards = _cards.Select( card => new TableCard( card, user ) ).ToList(),
-                Decks = _decks.Select( deck => new TableDeck( deck, user ) ).ToList(),
-                Users = _users.Where( i => i.Id != userId ).Select( u => new TableUser( u ) ).ToList(),
-                Filters = _filters.Select( filter => new TableFilter( filter ) ).ToList(),
+                new OutSendMessageAction( user, action.Message ),
             };
-            action.ResieverIds = _users.Except( new List<User> { user } ).Select( i => i.Id ).ToList();
-            return action;
+        }
+        #endregion
+
+        #region Table
+        public IEnumerable<ITableAction> Dispatch( InConnectAction action, string userId )
+        {
+            var color = GetNextColor();
+            var user = new User( userId, action.Name, 0, 0, color );
+            _users.Add( user );
+
+            return new List<ITableAction>
+            {
+                new OutAddUserAction( user ),
+                new OutGetTableAction( this )
+                {
+                    Cards = _cards.Select( card => new TableCard( card, user ) ).ToList(),
+                    Decks = _decks.Select( deck => new TableDeck( deck, user ) ).ToList(),
+                    Users = _users.Select( u => new TableUser( u ) ).ToList(),
+                    Filters = _filters.Select( filter => new TableFilter( filter ) ).ToList(),
+                },
+            };
         }
         #endregion
 
         #region Users
         public IEnumerable<ITableAction> Dispatch( AddUserAction action )
         {
-            action.Colour = GetNextColour();
-            var user = new User( action.Id, action.Name, action.X, action.Y, action.Colour );
+            action.Color = GetNextColor();
+            var user = new User( action.Id, action.Name, action.X, action.Y, action.Color );
             _users.Add( user );
             return new List<ITableAction>
             {
@@ -98,7 +116,7 @@ namespace Tabletop.Logic.Models
                 throw new ArgumentException( "Пользователь не найден" );
             }
             _users.Remove( user );
-            _colours.Add( user.Colour );
+            _colors.Add( user.Color );
             var deckToDrop = _decks.FirstOrDefault( i => i.Owner == user );
             var cardToDrop = _cards.FirstOrDefault( i => i.Owner == user );
             deckToDrop?.Drop();
@@ -121,6 +139,8 @@ namespace Tabletop.Logic.Models
             }
             var filter = new Filter( user, action.X, action.Y, action.H, action.W );
             action.Id = filter.Id;
+            action.Name = user.Name;
+            action.Color = user.Color;
             _filters.Add( filter );
             return new List<ITableAction>
             {
@@ -278,7 +298,7 @@ namespace Tabletop.Logic.Models
             var card = _cards.FirstOrDefault( i => i.Id == action.Id && i.IsGrabbed && i.Owner.Id == userId );
             if( card == null )
             {
-                throw new ArgumentException( "Карта не найдена" );
+                return new List<ITableAction>();
             }
             (action.X, action.Y) = FixCoords( action.X, action.Y, card.Height, card.Width );
             var oldShownTo = UsersWhoCanSee( card );
@@ -554,15 +574,15 @@ namespace Tabletop.Logic.Models
             }
             return (x, y);
         }
-        private string GetNextColour()
+        private string GetNextColor()
         {
-            if(!_colours.Any())
+            if(!_colors.Any())
             {
                 return "#000000";
             }
-            var colour = _colours.First();
-            _colours.RemoveAt( 0 );
-            return colour;
+            var color = _colors.First();
+            _colors.RemoveAt( 0 );
+            return color;
         }
         #endregion
     }

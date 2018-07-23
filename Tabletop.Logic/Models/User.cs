@@ -8,13 +8,13 @@ namespace Tabletop.Logic.Models
 {
     public class User : IObject
     {
-        public User( string id, string name, int x, int y, string colour )
+        public User( string id, string name, int x, int y, string color )
         {
             Id = id;
             Name = name;
             X = x;
             Y = y;
-            Colour = colour;
+            Color = color;
         }
 
         #region impl
@@ -39,6 +39,6 @@ namespace Tabletop.Logic.Models
 
         public string Name { get; protected set; }
 
-        public string Colour { get; protected set; }
+        public string Color { get; protected set; }
     }
 }

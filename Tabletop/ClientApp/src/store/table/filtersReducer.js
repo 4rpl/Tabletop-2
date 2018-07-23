@@ -18,6 +18,8 @@ function usersReducer(state = [], action) {
                 ...state,
                 {
                     id: action.id,
+                    name: action.name,
+                    color: action.color,
                     x: action.x,
                     y: action.y,
                     h: action.h,

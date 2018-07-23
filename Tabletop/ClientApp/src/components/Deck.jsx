@@ -47,14 +47,13 @@ class Deck extends React.Component {
     }
     
     shouldComponentUpdate(nextProps) {
-        return (this.props.active && this.props.mouse.x !== nextProps.mouse.x)
-            || (this.props.active && this.props.mouse.y !== nextProps.mouse.y)
-            || this.props.x !== nextProps.x
-            || this.props.y !== nextProps.y
-            || this.props.z !== nextProps.z
-            || this.props.content !== nextProps.content
-            || this.props.alpha !== nextProps.alpha
-            || this.props.active !== nextProps.active;
+        const { active, isOwner } = this.props;
+        return active !== nextProps.active
+            || (isOwner && this.props.mouse.x !== nextProps.mouse.x)
+            || (isOwner && this.props.mouse.y !== nextProps.mouse.y)
+            || (active && this.props.x !== nextProps.x)
+            || (active && this.props.y !== nextProps.y)
+            || this.props.content !== nextProps.content;
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -139,8 +138,8 @@ class Deck extends React.Component {
                 onKeyDown={this.keyPress}
                 tabIndex="-1"
                 onContextMenu={this.onContextMenu}
-                className={'deck noselect' + (active ? ' grabbed' : '')}>
-                <span className="deckCardsCounter">{length}</span>
+                className={'tt-deck tt-noselect' + (active ? ' tt-active' : '')}>
+                <span className="tt-deckCardsCounter">{length}</span>
                 {deckContent}
             </div>
         );

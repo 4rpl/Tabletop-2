@@ -129,7 +129,8 @@ function cardsReducer(state = [], action) {
                 if (deck.id === action.id) {
                     return {
                         ...deck,
-                        active: false
+                        active: false,
+                        isOwner: false,
                     };
                 } else {
                     return deck;

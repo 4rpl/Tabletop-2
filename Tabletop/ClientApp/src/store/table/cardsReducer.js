@@ -115,7 +115,8 @@ function cardsReducer(state = [], action) {
                 if (card.id === action.id) {
                     return {
                         ...card,
-                        active: false
+                        active: false,
+                        isOwner: false,
                     };
                 } else {
                     return card;

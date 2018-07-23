@@ -3,8 +3,7 @@ import { connect } from 'react-redux';
 import { flipCard, moveCard, cardUp, cardDown } from '../store/table/TableActions';
 import CallbackService from '../services/CallbackService';
 
-const mapStateToProps = state =>
-{
+const mapStateToProps = state => {
     return { state }
 };
 
@@ -38,20 +37,32 @@ class Card extends React.Component {
     }
 
     shouldComponentUpdate(nextProps) {
-        return (this.props.active && this.props.mouse.x !== nextProps.mouse.x)
-            || (this.props.active && this.props.mouse.y !== nextProps.mouse.y)
-            || this.props.x !== nextProps.x
-            || this.props.y !== nextProps.y
-            || this.props.z !== nextProps.z
-            || this.props.content !== nextProps.content
-            || this.props.alpha !== nextProps.alpha
-            || this.props.active !== nextProps.active;
+        const { active, isOwner } = this.props;
+        return active !== nextProps.active
+            || (isOwner && this.props.mouse.x !== nextProps.mouse.x)
+            || (isOwner && this.props.mouse.y !== nextProps.mouse.y)
+            || (active && this.props.x !== nextProps.x)
+            || (active && this.props.y !== nextProps.y)
+            || this.props.content !== nextProps.content;
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        let { id, mx, my, active, isOwner, mouse, onMoveCard } = this.props;
+        const { id, mx, my, w, h, active, isOwner, mouse, table, onMoveCard } = this.props;
         if (active && isOwner && (mouse.x !== prevProps.mouse.x || mouse.y !== prevProps.mouse.y)) {
-            onMoveCard(id, mx + mouse.x, my + mouse.y);
+            let x = mx + mouse.x;
+            let y = my + mouse.y;
+            if (x > table.w - w) {
+                x = table.w - w;
+            } else if (x < 0) {
+                x = 0;
+            }
+            if (y > table.h - h) {
+                y = table.h - h;
+            } else if (y < 0) {
+                y = 0;
+            }
+
+            onMoveCard(id, x, y);
         }
     }
 
@@ -97,7 +108,7 @@ class Card extends React.Component {
                 style={{ top: y, left: x, width: w, height: h, zIndex: z, transform: `rotate(${-alpha}rad)` }}
                 onMouseDown={this.mouseDown}
                 onContextMenu={this.onContextMenu}
-                className={'card noselect' + (active ? ' grabbed' : '')}>
+                className={'tt-card tt-noselect' + (active ? ' tt-active' : '')}>
                 {cardContent}
             </div>
         );

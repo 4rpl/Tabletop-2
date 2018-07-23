@@ -19,6 +19,7 @@
     "redux-thunk": "^2.2.0",
     "rimraf": "^2.6.2",
     "tslib": "^1.9.2",
+    "moment": "^2.22.2",
     "victor": "^1.1.0"
   },
   "scripts": {

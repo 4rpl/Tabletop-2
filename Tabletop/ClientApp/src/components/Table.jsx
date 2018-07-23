@@ -57,7 +57,6 @@ const _moveAcceleration = 4;
 const _moveTickMs = 20;
 const tableRotateStep = Math.PI / 4;
 const cursorCallbackId = 'CURSOR';
-const userCallbackId = 'USER';
 
 class Table extends React.Component {
 
@@ -66,8 +65,8 @@ class Table extends React.Component {
         const callbackService = CallbackService.getInstance();
         //callbackService.onMouseMove('CURSOR', this.CursorMove.bind(this));
         console.log(props.onAddFilter);
-        document.onkeydown = this.keyPress.bind(this);
-        document.onkeyup = this.keyPress.bind(this);
+        this.keyPress = this.keyPress.bind(this);
+        this.keyPress = this.keyPress.bind(this);
         callbackService.onMouseDown(cursorCallbackId, this.forceUpdateCursor.bind(this));
         callbackService.onMouseMove(cursorCallbackId, this.updateCursor.bind(this));
         this.wheel = this.wheel.bind(this);
@@ -102,7 +101,7 @@ class Table extends React.Component {
     }
 
     forceUpdateCursor(e) {
-        const { onCursorMove, onUserMove, cards, decks } = this.props;
+        const { onCursorMove } = this.props;
         const { x, y } = this.project(e.clientX, e.clientY);
         const mx = Math.round(x);
         const my = Math.round(y);
@@ -272,6 +271,7 @@ class Table extends React.Component {
                     z={card.z}
                     h={card.h}
                     w={card.w}
+                    table={table}
                     alpha={card.alpha}
                     mouse={mouse}
                     active={card.active}
@@ -293,6 +293,7 @@ class Table extends React.Component {
                     z={deck.z}
                     h={deck.h}
                     w={deck.w}
+                    table={table}
                     alpha={deck.alpha}
                     mouse={mouse}
                     active={deck.active}
@@ -309,7 +310,7 @@ class Table extends React.Component {
                     name={user.name}
                     x={user.x}
                     y={user.y}
-                    colour={user.colour} />
+                    color={user.color} />
             );
         });
 
@@ -317,6 +318,8 @@ class Table extends React.Component {
             return (
                 <Filter
                     key={filter.id}
+                    name={filter.name}
+                    color={filter.color}
                     x={filter.x}
                     y={filter.y}
                     h={filter.h}
@@ -325,7 +328,8 @@ class Table extends React.Component {
         })
 
         return (
-            <div className="table"
+            <div className="tt-table"
+                tabIndex="1"
                 style={{
                     top: camera.y,
                     left: camera.x,
@@ -335,6 +339,8 @@ class Table extends React.Component {
                     height: table.h,
                     maxHeight: table.h
                 }}
+                onKeyDown={this.keyPress}
+                onKeyUp={this.keyPress}
                 onWheel={this.wheel}>
                 <button onClick={onAddCard}>+</button>
                 {userViews}

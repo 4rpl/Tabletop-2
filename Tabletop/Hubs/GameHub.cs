@@ -5,10 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Tabletop.Logic.Models;
 using Tabletop.Logic.Models.Actions;
-using Tabletop.Logic.Models.Actions.Card;
-using Tabletop.Logic.Models.Actions.Deck;
 using Tabletop.Logic.Models.Actions.Filter;
 using Tabletop.Logic.Models.Actions.In.Card;
+using Tabletop.Logic.Models.Actions.In.Chat;
 using Tabletop.Logic.Models.Actions.In.Deck;
 using Tabletop.Logic.Models.Actions.In.User;
 using Tabletop.Logic.Models.Actions.User;
@@ -19,21 +18,10 @@ namespace Tabletop.Hubs
     {
         private static Table _table = new Table( 1000, 1000 );
 
-        public override async Task OnConnectedAsync()
+        public async Task Connect( InConnectAction action )
         {
             var result = new List<ITableAction>();
-            result.AddRange( _table.Dispatch( new AddUserAction
-            {
-                Id = Context.ConnectionId,
-                Type = "AddUser",
-                Name = "Test",
-                X = 0,
-                Y = 0
-            } ) );
-            result.Add( _table.GetTable( Context.ConnectionId ) );
-            await PerformActions( result );
-
-            await base.OnConnectedAsync();
+            await PerformActions( _table.Dispatch( action, Context.ConnectionId ) );
         }
         public override async Task OnDisconnectedAsync( Exception exception )
         {
@@ -45,7 +33,12 @@ namespace Tabletop.Hubs
 
             await base.OnDisconnectedAsync( exception );
         }
-        
+
+        public async Task SendMessage( InSendMessageAction action )
+        {
+            await PerformActions( _table.Dispatch( action, Context.ConnectionId ) );
+        }
+
         public async Task MoveUser( MoveUserAction action )
         {
             action.Id = Context.ConnectionId;
