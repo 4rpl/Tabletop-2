@@ -67,7 +67,6 @@
   width: initial;
   height: initial;
   padding: 0 6px;
-  width: no;
   border-radius: 5px;
   position: absolute; }
 
@@ -218,3 +217,24 @@ ul.tt-users {
     opacity: .9;
     border-radius: 4px;
     font-size: 16px; }
+
+.tt-context-menu {
+  position: absolute;
+  background: #dedede;
+  border: 1px solid #999;
+  font-family: Consolas;
+  font-size: 11px;
+  z-index: 200000; }
+  .tt-context-menu ul {
+    margin: unset;
+    padding: unset; }
+    .tt-context-menu ul li {
+      list-style: none;
+      cursor: pointer;
+      padding: 5px; }
+      .tt-context-menu ul li:not(:last-of-type) {
+        border-bottom: 1px dotted #999; }
+      .tt-context-menu ul li:hover {
+        background: #ccc; }
+        .tt-context-menu ul li:hover:active {
+          background: #fb9; }

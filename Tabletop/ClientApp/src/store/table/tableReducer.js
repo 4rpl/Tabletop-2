@@ -22,9 +22,20 @@ function tableReducer(state = {}, action) {
                 chat: chatReducer(state.chat, action),
             }
         }
+        case TableActions.OPEN_CONTEXT_MENU: {
+            return {
+                ...state,
+                contextMenu: {
+                    x: action.x,
+                    y: action.y,
+                    menuItems: action.menuItems,
+                }
+            }
+        }
         default: {
             return {
                 table: state.table || {},
+                contextMenu: state.contextMenu || {},
                 camera: cameraReducer(state.camera, action),
                 users: usersReducer(state.users, action),
                 filters: filtersReducer(state.filters, action),

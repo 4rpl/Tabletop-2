@@ -46,7 +46,7 @@ class Chat extends React.Component {
     onInputKeyDown(e) {
         switch (e.keyCode) {
             case 13: {
-                const { onSendMessage, chat } = this.props;
+                const { chat } = this.props;
                 this.sendMessage(chat.value);
                 break;
             }
@@ -70,7 +70,7 @@ class Chat extends React.Component {
     }
 
     render() {
-        const { chat, onChangeInput } = this.props;
+        const { chat } = this.props;
         const messages = chat.log.map(i => {
             const sender = <span><span className="tt-chat-sender" style={{ background: i.color }}>{i.from}</span>:</span>;
             const date = <span className="tt-chat-date">{moment(i.date).format('HH:mm:ss')}</span>;

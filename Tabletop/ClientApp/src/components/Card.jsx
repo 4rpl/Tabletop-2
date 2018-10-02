@@ -75,13 +75,13 @@ class Card extends React.Component {
             onCardUp(id, mouse.alpha % (2 * Math.PI), x - mouse.x, y - mouse.y, z);
             this.callbackService.onMouseUp(id, this.mouseUp.bind(this));
         }
-        e.stopPropagation();
         return false;
     }
 
     onContextMenu(e) {
         const { id, onFlipCard } = this.props;
         e.preventDefault();
+        e.stopPropagation();
         onFlipCard(id);
         return false;
     }

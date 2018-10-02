@@ -5,7 +5,8 @@ import Card from './Card';
 import Deck from './Deck';
 import Cursor from './Cursor';
 import Filter from './Filter';
-import { addCard, tableScale, tableMove, addFilter, tableRotate, moveCursor, moveUser } from '../store/table/TableActions';
+import ContextMenu from './ContextMenu';
+import { addCard, tableScale, tableMove, addFilter, tableRotate, moveCursor, moveUser, openContextMenu } from '../store/table/TableActions';
 import CallbackService from '../services/CallbackService';
 import ServerListener from './ServerListener';
 
@@ -37,7 +38,10 @@ const mapDispatchToProps = function (dispatch) {
                 `Cards/${rnd}.jpg`,
                 'Cards/0.jpg'
             ));
-        }
+        },
+        onOpenContextMenu: (x, y, menuItems) => {
+            dispatch(openContextMenu(x, y, menuItems));
+        },
     }
 }
 
@@ -49,6 +53,7 @@ const mapStateToProps = function (state) {
         filters: state.game.filters,
         users: state.game.users,
         camera: state.game.camera,
+        isContextMenuOpened: state.game.contextMenu && state.game.contextMenu.menuItems && state.game.contextMenu.menuItems.length > 0,
     };
 }
 
@@ -64,9 +69,9 @@ class Table extends React.Component {
         super();
         const callbackService = CallbackService.getInstance();
         //callbackService.onMouseMove('CURSOR', this.CursorMove.bind(this));
-        console.log(props.onAddFilter);
         this.keyPress = this.keyPress.bind(this);
-        this.keyPress = this.keyPress.bind(this);
+        this.onMouseDown = this.onMouseDown.bind(this);
+        this.onContextMenu = this.onContextMenu.bind(this);
         callbackService.onMouseDown(cursorCallbackId, this.forceUpdateCursor.bind(this));
         callbackService.onMouseMove(cursorCallbackId, this.updateCursor.bind(this));
         this.wheel = this.wheel.bind(this);
@@ -217,6 +222,34 @@ class Table extends React.Component {
         }
     }
 
+    onMouseDown(e) {
+        if (this.props.isContextMenuOpened) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.props.onOpenContextMenu(0, 0, []);
+        }
+    }
+
+    onContextMenu(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const v = this.project(e.clientX, e.clientY);
+        this.props.onOpenContextMenu(v.x, v.y, [
+            {
+                name: 'Создать приватную зону',
+                callback: null,
+            },
+            {
+                name: 'Копировать',
+                callback: null,
+            },
+            {
+                name: 'Вставить',
+                callback: null,
+            },
+        ]);
+    }
+
     project(x, y) {
         const { table, camera } = this.props;
 
@@ -341,12 +374,15 @@ class Table extends React.Component {
                 }}
                 onKeyDown={this.keyPress}
                 onKeyUp={this.keyPress}
+                onMouseDown={this.onMouseDown}
+                onContextMenu={this.onContextMenu}
                 onWheel={this.wheel}>
                 <button onClick={onAddCard}>+</button>
                 {userViews}
                 {deckViews}
                 {cardViews}
                 {filterViews}
+                <ContextMenu />
                 <ServerListener />
             </div>
         );

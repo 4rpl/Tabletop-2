@@ -1,4 +1,6 @@
-﻿const CHANGE_CHAT_INPUT =   'ChangeChatInput';
+﻿const OPEN_CONTEXT_MENU =   'OpenContextMenu';
+
+const CHANGE_CHAT_INPUT =   'ChangeChatInput';
 const SEND_MESSAGE =        'SendMessage';
 
 const GET_TABLE =           'GetTable';
@@ -54,6 +56,8 @@ export const TableActionAccessTypes = {
 }
 
 export const TableActions = {
+    OPEN_CONTEXT_MENU,
+
     CHANGE_CHAT_INPUT,
     SEND_MESSAGE,
 
@@ -99,6 +103,10 @@ export const TableActions = {
     TAKE_TOP_DECK_CARD,
     CARD_PUT_IN_DECK,
     DECK_MERGE,
+}
+
+export function openContextMenu(x, y, menuItems) {
+    return { type: OPEN_CONTEXT_MENU, access: TableActionAccessTypes.private, x, y, menuItems };
 }
 
 export function addFilter(x, y, h, w) {
