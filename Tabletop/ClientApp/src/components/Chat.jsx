@@ -61,9 +61,10 @@ class Chat extends React.Component {
         if (msgWrapper.children.length > 0) {
             // Первый, т.к. расположены column-reversed
             const lastChildHeight = msgWrapper.children[0].scrollHeight;
-            console.log(log.scrollTop, lastChildHeight, log.scrollTopMax, log)
-            if (log.scrollTop + lastChildHeight >= log.scrollTopMax) {
-                log.scrollTop = log.scrollTopMax;
+            const contentHeight = log.children[0].offsetHeight;
+            const windowHeigth = log.offsetHeight;
+            if (log.scrollTop + windowHeigth + lastChildHeight >= contentHeight) {
+                log.scrollTop = contentHeight;
             }
         }
     }
@@ -88,7 +89,7 @@ class Chat extends React.Component {
                     </div>
                 </div>
                 <div className="tt-chat-input">
-                    <input ref="input" onChange={this.changeInput} onKeyDown={this.onInputKeyDown} placeholder="Введите сообщение..." value={chat.value} />
+                    <input ref="input" onChange={this.changeInput} onKeyDown={this.onInputKeyDown} value={chat.value} />
                     <button onClick={this.sendMessage}>Отправить</button>
                 </div>
             </div>

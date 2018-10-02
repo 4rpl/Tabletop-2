@@ -172,7 +172,7 @@
   min-height: 260px;
   pointer-events: all;
   transition: background-color .2s ease-in-out; }
-  .tt-chat:hover {
+  .tt-chat:focus, .tt-chat:hover {
     background-color: rgba(0, 0, 0, 0.6); }
   .tt-chat .tt-chat-messages {
     flex-grow: 1;
@@ -189,6 +189,7 @@
         padding: 0 3px;
         cursor: pointer; }
   .tt-chat .tt-chat-input {
+    min-height: 30px;
     flex-grow: 0;
     display: flex;
     flex-direction: row;
@@ -217,4 +218,3 @@ ul.tt-users {
     opacity: .9;
     border-radius: 4px;
     font-size: 16px; }
-
