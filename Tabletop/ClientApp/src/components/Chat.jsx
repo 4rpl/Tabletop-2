@@ -15,9 +15,7 @@ const mapDispatchToProps = (dispatch) => {
             dispatch(changeChatInput(value));
         },
         onSendMessage: (message) => {
-            if (message) {
-                dispatch(sendMessage(message));
-            }
+            dispatch(sendMessage(message));
         },
     };
 }
@@ -33,7 +31,11 @@ class Chat extends React.Component {
 
     sendMessage() {
         const { onSendMessage, chat } = this.props;
-        onSendMessage(chat.value);
+
+        if (chat.value) {
+            onSendMessage(chat.value);
+        }
+        this.refs.input.focus();
     }
 
     changeInput(event) {
@@ -45,7 +47,7 @@ class Chat extends React.Component {
         switch (e.keyCode) {
             case 13: {
                 const { onSendMessage, chat } = this.props;
-                onSendMessage(chat.value);
+                this.sendMessage(chat.value);
                 break;
             }
             default: {
@@ -56,9 +58,10 @@ class Chat extends React.Component {
 
     componentDidUpdate() {
         const { log, msgWrapper } = this.refs;
-        const childrenTotal = msgWrapper.children.length;
-        if (childrenTotal > 0) {
-            const lastChildHeight = msgWrapper.children[childrenTotal - 1].scrollHeight;
+        if (msgWrapper.children.length > 0) {
+            // Первый, т.к. расположены column-reversed
+            const lastChildHeight = msgWrapper.children[0].scrollHeight;
+            console.log(log.scrollTop, lastChildHeight, log.scrollTopMax, log)
             if (log.scrollTop + lastChildHeight >= log.scrollTopMax) {
                 log.scrollTop = log.scrollTopMax;
             }
@@ -68,7 +71,7 @@ class Chat extends React.Component {
     render() {
         const { chat, onChangeInput } = this.props;
         const messages = chat.log.map(i => {
-            const sender = <span><span className="tt-chat-sender" style={{ color: i.color }}>{i.from}</span>:</span>;
+            const sender = <span><span className="tt-chat-sender" style={{ background: i.color }}>{i.from}</span>:</span>;
             const date = <span className="tt-chat-date">{moment(i.date).format('HH:mm:ss')}</span>;
             const msg = <span className="tt-chat-message">{i.message}</span>;
             return (
@@ -85,7 +88,7 @@ class Chat extends React.Component {
                     </div>
                 </div>
                 <div className="tt-chat-input">
-                    <input onChange={this.changeInput} onKeyDown={this.onInputKeyDown} placeholder="Введите сообщение..." value={chat.value} />
+                    <input ref="input" onChange={this.changeInput} onKeyDown={this.onInputKeyDown} placeholder="Введите сообщение..." value={chat.value} />
                     <button onClick={this.sendMessage}>Отправить</button>
                 </div>
             </div>

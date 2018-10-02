@@ -97,7 +97,7 @@ body {
     position: absolute;
 }
 
-/*.shuffleAnimaiton-enter {
+.shuffleAnimaiton-enter {
     position: absolute;
     opacity: 0.01;
 
@@ -115,7 +115,7 @@ body {
         opacity: 0.01;
         transition: opacity 300ms ease-in;
     }
-}*/
+}
 
 .tt-deckAnimaiton {
     outline: none;
@@ -239,6 +239,8 @@ body {
 
             & .tt-chat-sender {
                 font-weight: 600;
+                padding: 0 3px;
+                cursor: pointer;
             }
 
             & .tt-chat-message {

@@ -8,7 +8,7 @@ function tableReducer(state = { value: '', log: [], }, action) {
                 log: [
                     {
                         from: 'System',
-                        color: '#ddd',
+                        color: '#000',
                         date: new Date(),
                         message: 'Successfully connected!',
                     },

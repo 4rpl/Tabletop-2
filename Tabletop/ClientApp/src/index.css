@@ -71,25 +71,20 @@
   border-radius: 5px;
   position: absolute; }
 
-/*.shuffleAnimaiton-enter {
-    position: absolute;
-    opacity: 0.01;
-
-    &.shuffleAnimaiton-enter-active {
-        opacity: 1;
-        transition: opacity 500ms ease-in;
-    }
-}
+.shuffleAnimaiton-enter {
+  position: absolute;
+  opacity: 0.01; }
+  .shuffleAnimaiton-enter.shuffleAnimaiton-enter-active {
+    opacity: 1;
+    transition: opacity 500ms ease-in; }
 
 .shuffleAnimaiton-leave {
-    position: absolute;
-    opacity: 1;
+  position: absolute;
+  opacity: 1; }
+  .shuffleAnimaiton-leave.shuffleAnimaiton-leave-active {
+    opacity: 0.01;
+    transition: opacity 300ms ease-in; }
 
-    &.shuffleAnimaiton-leave-active {
-        opacity: 0.01;
-        transition: opacity 300ms ease-in;
-    }
-}*/
 .tt-deckAnimaiton {
   outline: none;
   border: 1px solid #999;
@@ -190,7 +185,9 @@
       align-self: stretch;
       padding: 5px; }
       .tt-chat .tt-chat-messages .tt-chat-messages-wrapper .tt-chat-sender {
-        font-weight: 600; }
+        font-weight: 600;
+        padding: 0 3px;
+        cursor: pointer; }
   .tt-chat .tt-chat-input {
     flex-grow: 0;
     display: flex;
