@@ -10,6 +10,7 @@ const REMOVE_USER =         'RemoveUser';
 const MOVE_USER =           'MoveUser';
 
 const ADD_FILTER =          'AddFilter';
+const SET_FILTER_ACTIVE =   'SetFilterActive';
 const REMOVE_FILTER =       'RemoveFilter';
 
 const TABLE_SCALE =         'TableScale';
@@ -68,6 +69,7 @@ export const TableActions = {
     MOVE_USER,
 
     ADD_FILTER,
+    SET_FILTER_ACTIVE,
     REMOVE_FILTER,
 
     TABLE_SCALE,
@@ -111,6 +113,9 @@ export function openContextMenu(x, y, menuItems) {
 
 export function addFilter(x, y, h, w) {
     return { type: ADD_FILTER, access: TableActionAccessTypes.verificationRequired, x, y, h, w };
+}
+export function setFilterActive(id, isActive) {
+    return { type: SET_FILTER_ACTIVE, access: TableActionAccessTypes.private, id, isActive };
 }
 export function removeFilter(id) {
     return { type: REMOVE_FILTER, id };

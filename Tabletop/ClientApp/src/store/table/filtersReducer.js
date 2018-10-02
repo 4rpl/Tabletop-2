@@ -27,6 +27,14 @@ function usersReducer(state = [], action) {
                 }
             ]
         }
+        case TableActions.SET_FILTER_ACTIVE: {
+            return state.map(i => {
+                return i.id === action.id ? {
+                    ...i,
+                    isActive: action.isActive,
+                } : i;
+            });
+        }
         case TableActions.REMOVE_FILTER: {
             return state.filter(filter => filter.id !== action.id);
         }

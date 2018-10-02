@@ -105,7 +105,7 @@
 .tt-deckAnimaitonRight {
   animation: Shuffle-animaiton 1 0.45s ease-in-out; }
 
-.tt-noselect-content, .tt-cursor, .tt-filter, .tt-noselect * {
+.tt-noselect-content, .tt-cursor, .tt-noselect * {
   -webkit-touch-callout: none;
   /* iOS Safari */
   -webkit-user-select: none;
@@ -134,6 +134,8 @@
   z-index: 200000;
   position: absolute;
   opacity: 0.5; }
+  .tt-filter.tt-filter-active {
+    border: 3px solid red; }
   .tt-filter .tt-filter-name {
     align-self: center;
     font-family: Consolas;

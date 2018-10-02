@@ -234,18 +234,13 @@ class Table extends React.Component {
         e.preventDefault();
         e.stopPropagation();
         const v = this.project(e.clientX, e.clientY);
+        const zoneSize = 100;
         this.props.onOpenContextMenu(v.x, v.y, [
             {
                 name: 'Создать приватную зону',
-                callback: null,
-            },
-            {
-                name: 'Копировать',
-                callback: null,
-            },
-            {
-                name: 'Вставить',
-                callback: null,
+                callback: () => {
+                    this.props.onAddFilter(v.x - zoneSize / 2, v.y - zoneSize / 2, zoneSize, zoneSize);
+                },
             },
         ]);
     }
@@ -351,8 +346,10 @@ class Table extends React.Component {
             return (
                 <Filter
                     key={filter.id}
+                    id={filter.id}
                     name={filter.name}
                     color={filter.color}
+                    isActive={filter.isActive}
                     x={filter.x}
                     y={filter.y}
                     h={filter.h}

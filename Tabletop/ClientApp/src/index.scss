@@ -164,12 +164,15 @@ body {
 }
 
 .tt-filter {
-    @extend .tt-noselect-content;
     display: flex;
     justify-content: center;
     z-index: 200000;
     position: absolute;
     opacity: 0.5;
+
+    &.tt-filter-active {
+        border: 3px solid red;
+    }
 
     & .tt-filter-name {
         align-self: center;
