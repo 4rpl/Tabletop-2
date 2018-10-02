@@ -7,7 +7,6 @@ export default class ServerSyncService {
     static getInstance() {
         if (!this.instance) {
             this.instance = new ServerSyncService();
-            this.instance.connect();
         }
         return this.instance;
     }
@@ -18,7 +17,7 @@ export default class ServerSyncService {
 
     onMessage = () => { }
 
-    connect = () => {
+    async connect() {
         this.__hubConnection = new HubConnectionBuilder()
             .withUrl(this.hubUrl)
             .configureLogging(LogLevel.Information)
@@ -28,20 +27,22 @@ export default class ServerSyncService {
             this.onMessage(action)
         });
 
-        this.__hubConnection.start().then(() => {
-            this.__connected = true;
-            let name = '';
-            while (!name) {
-                name = prompt('Имя?');
-            }
-            this.__hubConnection.invoke('connect', { name })
-        });
+        await this.__hubConnection.start();
+
+        this.__connected = true;
+        let name = '';
+        while (!name) {
+            name = prompt('Имя?');
+        }
+        this.__hubConnection.invoke('connect', { name });
     }
 
-    sendAction = action => {
+    async sendAction(action) {
+        if (!this.__hubConnection && !this.__connected) {
+            await this.connect();
+        }
         if (!this.__hubConnection || !this.__connected) {
-            console.error("ServerSyncService: socket is not connected");
-            return;
+            throw "ServerSyncService: socket is not connected";
         }
         //console.log('sending:', action);
         this.__hubConnection.invoke(action.type, action);

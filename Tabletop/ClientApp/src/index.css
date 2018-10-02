@@ -158,11 +158,13 @@
   .tt-hud > .tt-hud-top {
     display: flex;
     flex-direction: column;
-    justify-content: space-between; }
+    justify-content: space-between;
+    height: 0; }
   .tt-hud > .tt-hud-bottom {
     display: flex;
-    flex-direction: column;
-    justify-content: space-between; }
+    flex-direction: column-reverse;
+    justify-content: space-between;
+    height: 0; }
 
 .tt-chat {
   display: flex;

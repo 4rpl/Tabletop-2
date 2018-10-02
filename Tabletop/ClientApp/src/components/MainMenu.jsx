@@ -1,5 +1,6 @@
 ﻿import React from 'react';
 import { connect } from 'react-redux';
+import Api from '../services/Api';
 
 const mapStateToProps = function (state) {
     return {
@@ -15,36 +16,33 @@ const mapDispatchToProps = function (dispatch) {
 
 const MainMenu = () => {
 
-    let askForGameId = () => {
-        let gameId = prompt('Game Id?', '');
-        if (gameId) {
-            window.location = '/table/' + gameId;
-        }
+    const create = () => {
+        let id = prompt('Id');
+        Api.create(id).then(responce => {
+            if (responce.redirected) {
+                window.location = responce.url;
+            }
+        });
+    }
+
+    const join = () => {
+        let id = prompt('Id');
+        let pwd = prompt('Pwd');
+        Api.join(id, pwd).then(responce => {
+            if (responce.redirected) {
+                window.location = responce.url;
+            }
+        });
+    }
+
+    const editor = () => {
     }
 
     return (
-        <div className="main-menu">
-            <nav>
-                <div className="nav-wrapper">
-                    <a href="#" className="brand-logo">Logo</a>
-                    <ul id="nav-mobile" className="right hide-on-med-and-down">
-                        <li><a href="sass.html">Sass</a></li>
-                        <li><a href="badges.html">Components</a></li>
-                        <li><a href="collapsible.html">JavaScript</a></li>
-                    </ul>
-                </div>
-            </nav>
-            <h1>Стол v.2</h1>
-            <input type="text" placeholder="Имя" />
-            <h2>
-                <a href="/table">> Создать игру</a>
-            </h2>
-            <h2>
-                <a href="#" onClick={askForGameId}>> К игре</a>
-            </h2>
-            <h2>
-                <a href="/editor">> Редактор</a>
-            </h2>
+        <div>
+            <button onClick={create}>Создать комнату</button>
+            <button onClick={join}>Присоединиться к игре</button>
+            <button onClick={editor}>Редактор</button>
         </div>
     );
 }

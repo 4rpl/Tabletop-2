@@ -1,4 +1,5 @@
-﻿const SEND_MESSAGE =        'SendMessage';
+﻿const CHANGE_CHAT_INPUT =   'ChangeChatInput';
+const SEND_MESSAGE =        'SendMessage';
 
 const GET_TABLE =           'GetTable';
 
@@ -53,6 +54,7 @@ export const TableActionAccessTypes = {
 }
 
 export const TableActions = {
+    CHANGE_CHAT_INPUT,
     SEND_MESSAGE,
 
     GET_TABLE,
@@ -108,6 +110,9 @@ export function removeFilter(id) {
 
 export function sendMessage(message) {
     return { type: SEND_MESSAGE, access: TableActionAccessTypes.verificationRequired, message };
+}
+export function changeChatInput(value) {
+    return { type: CHANGE_CHAT_INPUT, access: TableActionAccessTypes.private, value };
 }
 
 export function tableScale(scale) {

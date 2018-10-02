@@ -198,12 +198,14 @@ body {
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+        height: 0;
     }
 
     & > .tt-hud-bottom {
         display: flex;
-        flex-direction: column;
+        flex-direction: column-reverse;
         justify-content: space-between;
+        height: 0;
     }
 }
 
