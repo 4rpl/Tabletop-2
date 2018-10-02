@@ -53,6 +53,7 @@ class Deck extends React.Component {
             || (isOwner && this.props.mouse.y !== nextProps.mouse.y)
             || (active && this.props.x !== nextProps.x)
             || (active && this.props.y !== nextProps.y)
+            || this.props.length !== nextProps.length
             || this.props.content !== nextProps.content;
     }
 
