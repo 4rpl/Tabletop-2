@@ -9,6 +9,7 @@ namespace Tabletop.Logic.Models.Actions.Out.Deck
     {
         public OutChangeDeckContent( DeckModel deck, bool visible )
         {
+            Id = deck.Id;
             Type = OutActionNames.ChangeDeckContent;
             Resiever = Resiever.Caller;
             Content = visible ? deck.GetContent() : null;

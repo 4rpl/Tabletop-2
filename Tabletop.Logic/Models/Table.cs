@@ -10,10 +10,12 @@ using Tabletop.Logic.Models.Actions.Filter;
 using Tabletop.Logic.Models.Actions.In.Card;
 using Tabletop.Logic.Models.Actions.In.Chat;
 using Tabletop.Logic.Models.Actions.In.Deck;
+using Tabletop.Logic.Models.Actions.In.Filter;
 using Tabletop.Logic.Models.Actions.In.User;
 using Tabletop.Logic.Models.Actions.Out.Card;
 using Tabletop.Logic.Models.Actions.Out.Chat;
 using Tabletop.Logic.Models.Actions.Out.Deck;
+using Tabletop.Logic.Models.Actions.Out.Filter;
 using Tabletop.Logic.Models.Actions.Out.Table;
 using Tabletop.Logic.Models.Actions.Out.User;
 using Tabletop.Logic.Models.Actions.User;
@@ -130,21 +132,26 @@ namespace Tabletop.Logic.Models
         #endregion
 
         #region Filters
-        public IEnumerable<ITableAction> Dispatch( AddFilterAction action )
+        public IEnumerable<ITableAction> Dispatch( InAddFilterAction action, string userId )
         {
-            var user = _users.FirstOrDefault( i => i.Id == action.OwnerId );
+            var user = _users.FirstOrDefault( i => i.Id == userId );
             if( user == null )
             {
                 throw new ArgumentException( "Пользователь не найден" );
             }
-            var filter = new Filter( user, action.X, action.Y, action.H, action.W );
-            action.Id = filter.Id;
-            action.Name = user.Name;
-            action.Color = user.Color;
+            var filter = new Filter( user, action.X, action.Y, action.H, action.W, action.Alpha );
             _filters.Add( filter );
+
+            var canSee = _users.Where( i => i.Id != userId ).Select( i => i.Id ).ToList();
+            var canNotSee = new List<string> { userId };
+
+            var cardsToHide = _cards.Where( i => filter.IsFiltered( i ) ).ToList();
+            var decksToHide = _decks.Where( i => filter.IsFiltered( i ) ).ToList();
+
             return new List<ITableAction>
             {
-                action
+                new OutAddFilterAction( user, filter, new List<Card>(), new List<Deck>(), canSee ),
+                new OutAddFilterAction( user, filter, cardsToHide, decksToHide, canNotSee )
             };
         }
         public IEnumerable<ITableAction> Dispatch( RemoveFilterAction action )
@@ -198,7 +205,7 @@ namespace Tabletop.Logic.Models
                 new OutFlipCardAction( card, canSee, true ),
                 new OutFlipCardAction( card, canNotSee, false )
             };
-            return result.Where( i => i.ResieverIds.Any() );
+            return result.Where( i => i.Resiever != Resiever.Special || i.ResieverIds.Any() );
         }
         public IEnumerable<ITableAction> Dispatch( InCardUpAction action, string userId )
         {
@@ -331,7 +338,7 @@ namespace Tabletop.Logic.Models
                 result.Add( new OutMoveCardAndChangeContentAction( card, hideFromIds, false ) );
             }
             result.Add( new OutMoveCardAction( card, notChanged ) );
-            return result.Where( i => i.ResieverIds.Any() );
+            return result.Where( i => i.Resiever != Resiever.Special || i.ResieverIds.Any() );
         }
         #endregion
 
@@ -352,7 +359,7 @@ namespace Tabletop.Logic.Models
                 new OutFlipDeckAction( deck, canSee, true ),
                 new OutFlipDeckAction( deck, canNotSee, false )
             };
-            return result.Where( i => i.ResieverIds.Any() );
+            return result.Where( i => i.Resiever != Resiever.Special || i.ResieverIds.Any() );
         }
         public IEnumerable<ITableAction> Dispatch( InDeckUpAction action, string userId )
         {
@@ -412,7 +419,7 @@ namespace Tabletop.Logic.Models
                 result.Add( new OutMoveDeckAndChangeContentAction( deck, hideFromIds, false ) );
             }
             result.Add( new OutMoveDeckAction( deck, notChanged ) );
-            return result.Where( i => i.ResieverIds.Any() );
+            return result.Where( i => i.Resiever != Resiever.Special || i.ResieverIds.Any() );
         }
         public IEnumerable<ITableAction> Dispatch( InDropDeckAction action, string userId )
         {

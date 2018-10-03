@@ -10,9 +10,4 @@
     </Reference>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Models\Actions\In\Filter\" />
-    <Folder Include="Models\Actions\Out\Filter\" />
-  </ItemGroup>
-
 </Project>

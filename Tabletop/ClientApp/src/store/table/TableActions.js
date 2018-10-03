@@ -1,51 +1,55 @@
-﻿const OPEN_CONTEXT_MENU =   'OpenContextMenu';
+﻿const OPEN_CONTEXT_MENU =               'OpenContextMenu';
 
-const CHANGE_CHAT_INPUT =   'ChangeChatInput';
-const SEND_MESSAGE =        'SendMessage';
+const CHANGE_CHAT_INPUT =               'ChangeChatInput';
+const SEND_MESSAGE =                    'SendMessage';
 
-const GET_TABLE =           'GetTable';
+const GET_TABLE =                       'GetTable';
 
-const ADD_USER =            'AddUser';
-const REMOVE_USER =         'RemoveUser';
-const MOVE_USER =           'MoveUser';
+const ADD_USER =                        'AddUser';
+const REMOVE_USER =                     'RemoveUser';
+const MOVE_USER =                       'MoveUser';
 
-const ADD_FILTER =          'AddFilter';
-const SET_FILTER_ACTIVE =   'SetFilterActive';
-const REMOVE_FILTER =       'RemoveFilter';
+const ADD_FILTER =                      'AddFilter';
+const TOGGLE_FILTER_CHANGES =           'ToggleFilterChanges';
+const SET_FILTER_CHANGES =              'SetFilterChanges';
+const APPLY_FILTER_CHANGES =            'ApplyFilterChanges';
+const REMOVE_FILTER =                   'RemoveFilter';
 
-const TABLE_SCALE =         'TableScale';
-const TABLE_MOVE =          'TableMove';
-const TABLE_MOUSE_DOWN =    'TableMouseDown';
-const TABLE_MOUSE_UP =      'TableMouseUp';
-const TABLE_ROTATE =        'TableRotate';
-const CURSOR_MOVE =         'CursorMove';
+const TABLE_SCALE =                     'TableScale';
+const TABLE_MOVE =                      'TableMove';
+const TABLE_MOUSE_DOWN =                'TableMouseDown';
+const TABLE_MOUSE_UP =                  'TableMouseUp';
+const TABLE_ROTATE =                    'TableRotate';
+const CURSOR_MOVE =                     'CursorMove';
 
-const FLIP_CARD =           'FlipCard';
-const MOVE_CARD =           'MoveCard';
-const CARD_UP =             'CardUp';
-const CARD_DROP =           'DropCard';
-const ADD_CARD =            'AddCard';
-const REMOVE_CARD =         'RemoveCard';
-const HIDE_CARD_CONTENT =   'HideCardContent';
-const SHOW_CARD_CONTENT =   'ShowCardContent';
-const CARD_GRAB =           'GrabCard';
-const CARD_PUT_IN_DECK =    'PutCardInDeck';
+const FLIP_CARD =                       'FlipCard';
+const MOVE_CARD =                       'MoveCard';
+const CARD_UP =                         'CardUp';
+const CARD_DROP =                       'DropCard';
+const ADD_CARD =                        'AddCard';
+const REMOVE_CARD =                     'RemoveCard';
+const CHANGE_CARD_CONTENT =             'ChangeCardContent';
+const MOVE_CARD_ANG_CHANGE_CONTENT =    'MoveCardAndChangeContent';
+const CARD_GRAB =                       'GrabCard';
+const CARD_PUT_IN_DECK =                'PutCardInDeck';
 
-const CREATE_DECK =         'CreateDeck';
-const ADD_DECK =            'AddDeck';
-const CHANGE_DECK =         'ChangeDeck';
-const FLIP_DECK =           'FlipDeck';
-const MOVE_DECK =           'MoveDeck';
-const DECK_UP =             'DeckUp';
-const DECK_DOWN =           'DeckDown';
-const DECK_DROP =           'DropDeck';
-const SHUFFLE_DECK =        'ShuffleDeck';
-const TAKE_TOP_DECK_CARD =  'TakeTopDeckCard';
-const REMOVE_DECK =         'RemoveDeck';
-const HIDE_DECK_CONTENT =   'HideDeckContent';
-const SHOW_DECK_CONTENT =   'ShowDeckContent';
-const DECK_GRAB =           'GrabDeck';
-const DECK_MERGE =          'MergeDecks';
+const CREATE_DECK =                     'CreateDeck';
+const ADD_DECK =                        'AddDeck';
+const CHANGE_DECK =                     'ChangeDeck';
+const FLIP_DECK =                       'FlipDeck';
+const MOVE_DECK =                       'MoveDeck';
+const DECK_UP =                         'DeckUp';
+const DECK_DOWN =                       'DeckDown';
+const DECK_DROP =                       'DropDeck';
+const SHUFFLE_DECK =                    'ShuffleDeck';
+const TAKE_TOP_DECK_CARD =              'TakeTopDeckCard';
+const REMOVE_DECK =                     'RemoveDeck';
+const HIDE_DECK_CONTENT =               'HideDeckContent';
+const SHOW_DECK_CONTENT =               'ShowDeckContent';
+const DECK_GRAB =                       'GrabDeck';
+const DECK_MERGE =                      'MergeDecks';
+const CHANGE_DECK_CONTENT =             'ChangeDeckContent';
+const MOVE_DECK_AND_CHANGE_CONTENT =    'MoveDeckAndChangeContent';
 
 export const TableActionAccessTypes = {
     // Приватное действие. Не отсылается на сервер, пропускается в редьюсер
@@ -69,7 +73,9 @@ export const TableActions = {
     MOVE_USER,
 
     ADD_FILTER,
-    SET_FILTER_ACTIVE,
+    TOGGLE_FILTER_CHANGES,
+    SET_FILTER_CHANGES,
+    APPLY_FILTER_CHANGES,
     REMOVE_FILTER,
 
     TABLE_SCALE,
@@ -86,8 +92,8 @@ export const TableActions = {
     CARD_DROP,
     ADD_CARD,
     REMOVE_CARD,
-    HIDE_CARD_CONTENT,
-    SHOW_CARD_CONTENT,
+    CHANGE_CARD_CONTENT,
+    MOVE_CARD_ANG_CHANGE_CONTENT,
 
     CREATE_DECK,
     ADD_DECK,
@@ -105,17 +111,22 @@ export const TableActions = {
     TAKE_TOP_DECK_CARD,
     CARD_PUT_IN_DECK,
     DECK_MERGE,
+    CHANGE_DECK_CONTENT,
+    MOVE_DECK_AND_CHANGE_CONTENT,
 }
 
 export function openContextMenu(x, y, menuItems) {
     return { type: OPEN_CONTEXT_MENU, access: TableActionAccessTypes.private, x, y, menuItems };
 }
 
-export function addFilter(x, y, h, w) {
-    return { type: ADD_FILTER, access: TableActionAccessTypes.verificationRequired, x, y, h, w };
+export function addFilter(x, y, h, w, alpha) {
+    return { type: ADD_FILTER, access: TableActionAccessTypes.verificationRequired, x, y, h, w, alpha };
 }
 export function setFilterActive(id, isActive) {
-    return { type: SET_FILTER_ACTIVE, access: TableActionAccessTypes.private, id, isActive };
+    return { type: TOGGLE_FILTER_CHANGES, access: TableActionAccessTypes.private, id, isActive };
+}
+export function setFilterChange(id, x, y, w, h, alpha) {
+    return { type: SET_FILTER_CHANGES, access: TableActionAccessTypes.private, id, x, y, w, h, alpha };
 }
 export function removeFilter(id) {
     return { type: REMOVE_FILTER, id };

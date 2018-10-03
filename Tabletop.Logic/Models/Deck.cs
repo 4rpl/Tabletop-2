@@ -25,8 +25,6 @@ namespace Tabletop.Logic.Models
             _cards = cards.ToList();
             X = Convert.ToInt32( cards.Average( i => i.X ) );
             Y = Convert.ToInt32( cards.Average( i => i.Y ) );
-            _hd2 = Height / 2;
-            _wd2 = Width / 2;
             Radius = Convert.ToInt32( Math.Sqrt( Height * Height + Width * Width ) );
         }
 
@@ -39,14 +37,25 @@ namespace Tabletop.Logic.Models
 
         public readonly int Width;
 
-        private readonly int _hd2;
-        private readonly int _wd2;
-
         #region impl
         private bool _isGrabbed;
 
         public int X { get; protected set; }
+        public int Cx
+        {
+            get
+            {
+                return X + Width / 2;
+            }
+        }
         public int Y { get; protected set; }
+        public int Cy
+        {
+            get
+            {
+                return Y + Height / 2;
+            }
+        }
         public int Z { get; protected set; }
         public double Alpha { get; protected set; }
         public int Mx { get; protected set; }

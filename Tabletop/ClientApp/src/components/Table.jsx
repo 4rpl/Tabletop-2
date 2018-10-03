@@ -5,10 +5,8 @@ import Card from './Card';
 import Deck from './Deck';
 import Cursor from './Cursor';
 import Filter from './Filter';
-import ContextMenu from './ContextMenu';
 import { addCard, tableScale, tableMove, addFilter, tableRotate, moveCursor, moveUser, openContextMenu } from '../store/table/TableActions';
 import CallbackService from '../services/CallbackService';
-import ServerListener from './ServerListener';
 
 const mapDispatchToProps = function (dispatch) {
     return {
@@ -18,8 +16,8 @@ const mapDispatchToProps = function (dispatch) {
         onTableMove: function (ax, ay, vx, vy, x, y) {
             dispatch(tableMove(ax, ay, vx, vy, x, y));
         },
-        onAddFilter: (x, y, h, w) => {
-            dispatch(addFilter(x, y, h, w));
+        onAddFilter: (x, y, h, w, alpha) => {
+            dispatch(addFilter(x, y, h, w, alpha));
         },
         onRotate: (alpha, x, y) => {
             dispatch(tableRotate(alpha, x, y));
@@ -244,9 +242,10 @@ class Table extends React.Component {
     onContextMenu(e) {
         e.preventDefault();
         e.stopPropagation();
+        const { alpha } = this.props.camera;
         const v = this.project(e.clientX, e.clientY);
         const zoneSize = 100;
-        this.props.onOpenContextMenu(v.x, v.y, [
+        this.props.onOpenContextMenu(e.clientX, e.clientY, [
             {
                 name: 'Добавить случайную карту',
                 callback: () => this.props.onAddCard(v.x, v.y),
@@ -258,7 +257,7 @@ class Table extends React.Component {
             {
                 name: 'Создать приватную зону',
                 callback: () => {
-                    this.props.onAddFilter(v.x - zoneSize / 2, v.y - zoneSize / 2, zoneSize, zoneSize);
+                    this.props.onAddFilter(v.x - zoneSize / 2, v.y - zoneSize / 2, zoneSize, zoneSize, alpha);
                 },
             },
         ]);
@@ -368,7 +367,8 @@ class Table extends React.Component {
                     id={filter.id}
                     name={filter.name}
                     color={filter.color}
-                    isActive={filter.isActive}
+                    changes={filter.changes}
+                    alpha={filter.alpha}
                     x={filter.x}
                     y={filter.y}
                     h={filter.h}
@@ -397,8 +397,6 @@ class Table extends React.Component {
                 {deckViews}
                 {cardViews}
                 {filterViews}
-                <ContextMenu />
-                <ServerListener />
             </div>
         );
     }

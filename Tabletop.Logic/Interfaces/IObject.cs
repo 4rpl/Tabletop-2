@@ -11,5 +11,7 @@ namespace Tabletop.Logic.Interfaces
         int Y { get; }
         double Alpha { get; }
         int Radius { get; }
+        int Cx { get; }
+        int Cy { get; }
     }
 }

@@ -67,6 +67,32 @@ function cardsReducer(state = [], action) {
                 }
             })
         }
+        case TableActions.CHANGE_DECK_CONTENT: {
+            return state.map(deck => {
+                if (deck.id === action.id) {
+                    return {
+                        ...deck,
+                        content: action.content
+                    };
+                } else {
+                    return deck;
+                }
+            });
+        }
+        case TableActions.MOVE_DECK_AND_CHANGE_CONTENT: {
+            return state.map(deck => {
+                if (deck.id === action.id) {
+                    return {
+                        ...deck,
+                        content: action.content,
+                        x: action.x,
+                        y: action.y,
+                    };
+                } else {
+                    return deck;
+                }
+            });
+        }
         case TableActions.DECK_UP: {
             const z = state.find(i => i.id === action.id).z;
             return state.map(deck => {

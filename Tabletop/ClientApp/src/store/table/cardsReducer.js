@@ -126,19 +126,21 @@ function cardsReducer(state = [], action) {
         case TableActions.REMOVE_CARD: {
             return state.filter(card => card.id !== action.id);
         }
-        case TableActions.HIDE_CARD_CONTENT: {
+        case TableActions.MOVE_CARD_ANG_CHANGE_CONTENT: {
             return state.map(card => {
                 if (card.id === action.id) {
                     return {
                         ...card,
-                        content: null
+                        content: action.content,
+                        x: action.x,
+                        y: action.y,
                     };
                 } else {
                     return card;
                 }
             });
         }
-        case TableActions.SHOW_CARD_CONTENT: {
+        case TableActions.CHANGE_CARD_CONTENT: {
             return state.map(card => {
                 if (card.id === action.id) {
                     return {

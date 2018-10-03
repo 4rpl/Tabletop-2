@@ -2,6 +2,8 @@
 import { connect } from 'react-redux';
 import Hud from './Hud';
 import Table from './Table';
+import ContextMenu from './ContextMenu';
+import ServerListener from './ServerListener';
 
 const mapDispatchToProps = function (dispatch) {
     return {
@@ -35,6 +37,8 @@ class Game extends React.Component {
             <div className="tt-game">
                 <Table></Table>
                 <Hud></Hud>
+                <ContextMenu />
+                <ServerListener />
             </div>
         );
     }

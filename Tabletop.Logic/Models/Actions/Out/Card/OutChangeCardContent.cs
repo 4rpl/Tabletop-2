@@ -12,6 +12,7 @@ namespace Tabletop.Logic.Models.Actions.Out.Card
             Type = OutActionNames.ChangeCardContent;
             Resiever = Resiever.Caller;
             Content = visible ? card.GetContent() : null;
+            Id = card.Id;
         }
 
         public Guid Id { get; set; }

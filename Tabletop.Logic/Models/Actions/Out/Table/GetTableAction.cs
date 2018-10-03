@@ -109,10 +109,13 @@ namespace Tabletop.Logic.Models.Actions.Out.Table
         public TableFilter( FilterModel filter )
         {
             Id = filter.Id;
+            Alpha = filter.Alpha;
             X = filter.X;
             Y = filter.Y;
             H = filter.H;
             W = filter.W;
+            Color = filter.Color;
+            Name = filter.Name;
         }
 
         public Guid Id { get; protected set; }
@@ -120,5 +123,8 @@ namespace Tabletop.Logic.Models.Actions.Out.Table
         public int Y { get; set; }
         public int H { get; protected set; }
         public int W { get; protected set; }
+        public double Alpha { get; protected set; }
+        public string Color { get; protected set; }
+        public string Name { get; protected set; }
     }
 }

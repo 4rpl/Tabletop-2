@@ -9,7 +9,10 @@ function usersReducer(state = [], action) {
                     x: filter.x,
                     y: filter.y,
                     h: filter.h,
-                    w: filter.w
+                    w: filter.w,
+                    color: filter.color,
+                    name: filter.name,
+                    alpha: filter.alpha,
                 };
             });
         }
@@ -20,6 +23,7 @@ function usersReducer(state = [], action) {
                     id: action.id,
                     name: action.name,
                     color: action.color,
+                    alpha: action.alpha,
                     x: action.x,
                     y: action.y,
                     h: action.h,
@@ -27,11 +31,38 @@ function usersReducer(state = [], action) {
                 }
             ]
         }
-        case TableActions.SET_FILTER_ACTIVE: {
+        case TableActions.TOGGLE_FILTER_CHANGES: {
+            console.warn(action);
+            return state.map(i => {
+                return i.id === action.id ? {
+                    ...i,
+                    changes: action.isActive ? {
+                        x: i.x,
+                        y: i.y,
+                        h: i.h,
+                        w: i.w,
+                    } : null,
+                } : i;
+            });
+        }
+        case TableActions.CHANGE_FILTER: {
             return state.map(i => {
                 return i.id === action.id ? {
                     ...i,
                     isActive: action.isActive,
+                } : i;
+            });
+        }
+        case TableActions.SET_FILTER_CHANGES: {
+            return state.map(i => {
+                return i.id === action.id ? {
+                    ...i,
+                    changes: {
+                        x: action.x,
+                        y: action.y,
+                        h: action.h,
+                        w: action.w,
+                    },
                 } : i;
             });
         }

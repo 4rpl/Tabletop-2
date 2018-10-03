@@ -6,7 +6,7 @@ using Tabletop.Logic.Interfaces;
 
 namespace Tabletop.Logic.Models
 {
-    public class User : IObject
+    public class User
     {
         public User( string id, string name, int x, int y, string color )
         {

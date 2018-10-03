@@ -9,6 +9,7 @@ using Tabletop.Logic.Models.Actions.Filter;
 using Tabletop.Logic.Models.Actions.In.Card;
 using Tabletop.Logic.Models.Actions.In.Chat;
 using Tabletop.Logic.Models.Actions.In.Deck;
+using Tabletop.Logic.Models.Actions.In.Filter;
 using Tabletop.Logic.Models.Actions.In.User;
 using Tabletop.Logic.Models.Actions.User;
 
@@ -45,10 +46,9 @@ namespace Tabletop.Hubs
             await PerformActions( _table.Dispatch( action ) );
         }
 
-        public async Task AddFilter( AddFilterAction action )
+        public async Task AddFilter( InAddFilterAction action )
         {
-            action.OwnerId = Context.ConnectionId;
-            await PerformActions( _table.Dispatch( action ) );
+            await PerformActions( _table.Dispatch( action, Context.ConnectionId ) );
         }
         public async Task RemoveFilter( RemoveFilterAction action )
         {
