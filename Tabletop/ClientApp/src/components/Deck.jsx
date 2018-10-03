@@ -131,7 +131,7 @@ class Deck extends React.Component {
         if (content) {
             deckContent = <img alt={content} src={process.env.PUBLIC_URL + content} />;
         } else {
-            deckContent = <img alt="" src={process.env.PUBLIC_URL + 'Cards/logo.svg'} className="table-logo" />
+            deckContent = null;
         }
 
         return (

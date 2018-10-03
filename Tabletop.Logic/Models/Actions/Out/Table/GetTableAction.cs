@@ -30,11 +30,11 @@ namespace Tabletop.Logic.Models.Actions.Out.Table
 
     public class TableCard
     {
-        public TableCard( CardModel card, UserModel user )
+        public TableCard( CardModel card, UserModel user, bool visible )
         {
             Active = card.IsGrabbed;
             IsOwner = card.Owner == user;
-            Content = card.GetContent();
+            Content = visible ? card.GetContent() : null;
             H = card.Height;
             Id = card.Id;
             W = card.Width;
@@ -58,11 +58,11 @@ namespace Tabletop.Logic.Models.Actions.Out.Table
 
     public class TableDeck
     {
-        public TableDeck( DeckModel deck, UserModel user )
+        public TableDeck( DeckModel deck, UserModel user, bool visible )
         {
             Active = deck.IsGrabbed;
             IsOwner = deck.Owner == user;
-            Content = deck.GetContent();
+            Content = visible ? deck.GetContent() : null;
             H = deck.Height;
             Id = deck.Id;
             W = deck.Width;

@@ -101,7 +101,7 @@ class Card extends React.Component {
         if (content) {
             cardContent = <img alt="" src={process.env.PUBLIC_URL + content} />;
         } else {
-            cardContent = <img alt="" src={process.env.PUBLIC_URL + 'Cards/logo.svg'} className="table-logo" />
+            cardContent = null;
         }
         return (
             <div

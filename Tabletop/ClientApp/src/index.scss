@@ -1,4 +1,6 @@
 ﻿$card-border-radius: 5px;
+$color-active: #fb9;
+$color-active-dark: #d96;
 
 body {
     background-color: #333;
@@ -21,7 +23,8 @@ body {
     transition: box-shadow .2s ease-in-out, transform .2s ease-in-out;
 
     &:hover {
-        border: 1px solid #fb9;
+        background-color: $color-active;
+        border: 1px solid $color-active-dark;
     }
 
     & * {
@@ -29,6 +32,7 @@ body {
         object-fit: cover;
         height: 100%;
         width: 100%;
+        background-color: $color-active;
     }
 }
 
@@ -39,28 +43,13 @@ body {
     }
 }
 
-.tt-table-logo {
-    animation: Table-logo-spin infinite 20s linear;
-    height: 80px;
-}
-
-@keyframes Table-logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
-}
-
 .tt-deck {
     outline: none;
     border: 1px solid #999;
     border-right: 3px solid #777;
     border-bottom: 2px solid #999;
     border-radius: $card-border-radius;
-    background-color: #999;
+    background-color: #dedede;
     position: absolute;
     cursor: move;
     transition: box-shadow .2s ease-in-out, transform .2s ease-in-out;
@@ -72,10 +61,10 @@ body {
     }
 
     &:hover {
-        border: 1px solid #fb9;
-        border-right: 3px solid #d96;
-        border-bottom: 2px solid #fb9;
-        background-color: #fb9;
+        border: 1px solid $color-active-dark;
+        border-right: 3px solid $color-active-dark;
+        border-bottom: 2px solid $color-active-dark;
+        background-color: $color-active;
     }
     //&:active {
     //    box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3);
@@ -356,7 +345,7 @@ ul.tt-users {
                 background: #ccc;
 
                 &:active {
-                    background: #fb9;
+                    background: $color-active;
                 }
             }
         }

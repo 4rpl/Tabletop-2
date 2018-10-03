@@ -77,8 +77,8 @@ namespace Tabletop.Logic.Models
                 new OutAddUserAction( user ),
                 new OutGetTableAction( this )
                 {
-                    Cards = _cards.Select( card => new TableCard( card, user ) ).ToList(),
-                    Decks = _decks.Select( deck => new TableDeck( deck, user ) ).ToList(),
+                    Cards = _cards.Select( card => new TableCard( card, user, !_filters.Any( i => i.IsFiltered( card ) && i.Owner != user ) ) ).ToList(),
+                    Decks = _decks.Select( deck => new TableDeck( deck, user, !_filters.Any( i => i.IsFiltered( deck ) && i.Owner != user ) ) ).ToList(),
                     Users = _users.Select( u => new TableUser( u ) ).ToList(),
                     Filters = _filters.Select( filter => new TableFilter( filter ) ).ToList(),
                 },
