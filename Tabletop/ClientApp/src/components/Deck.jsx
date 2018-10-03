@@ -84,6 +84,7 @@ class Deck extends React.Component {
     onContextMenu(e) {
         let { id, onFlipDeck } = this.props;
         e.preventDefault();
+        e.stopPropagation();
         onFlipDeck(id);
         return false;
     }

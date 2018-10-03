@@ -30,14 +30,25 @@ const mapDispatchToProps = function (dispatch) {
         onUserMove: function (x, y) {
             dispatch(moveUser(x, y));
         },
-        onAddCard: () => {
+        onAddCard: (x, y) => {
             let rnd = Math.floor(Math.random() * 20 + 1);
 
             dispatch(addCard(
-                null, 0, 0, 0, 0, 140, 92, false, false,
+                null, x - 46, y - 70, 0, 0, 140, 92, false, false,
                 `Cards/${rnd}.jpg`,
                 'Cards/0.jpg'
             ));
+        },
+        onAddDeck: (x, y) => {
+            let rnd = Math.floor(Math.random() * 20 + 1);
+
+            for (let i = 1; i < 20; ++i) {
+                dispatch(addCard(
+                    null, x - 46, y - 70, 0, 0, 140, 92, false, false,
+                    `Cards/${i}.jpg`,
+                    'Cards/0.jpg'
+                ));
+            }
         },
         onOpenContextMenu: (x, y, menuItems) => {
             dispatch(openContextMenu(x, y, menuItems));
@@ -237,6 +248,14 @@ class Table extends React.Component {
         const zoneSize = 100;
         this.props.onOpenContextMenu(v.x, v.y, [
             {
+                name: 'Добавить случайную карту',
+                callback: () => this.props.onAddCard(v.x, v.y),
+            },
+            {
+                name: 'Добавить колоду',
+                callback: () => this.props.onAddDeck(v.x, v.y),
+            },
+            {
                 name: 'Создать приватную зону',
                 callback: () => {
                     this.props.onAddFilter(v.x - zoneSize / 2, v.y - zoneSize / 2, zoneSize, zoneSize);
@@ -374,7 +393,6 @@ class Table extends React.Component {
                 onMouseDown={this.onMouseDown}
                 onContextMenu={this.onContextMenu}
                 onWheel={this.wheel}>
-                <button onClick={onAddCard}>+</button>
                 {userViews}
                 {deckViews}
                 {cardViews}
