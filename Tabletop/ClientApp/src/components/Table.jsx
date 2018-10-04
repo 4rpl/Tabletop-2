@@ -101,13 +101,14 @@ class Table extends React.Component {
     //}
 
     updateCursor(e) {
-        const { onCursorMove, onUserMove, cards, decks } = this.props;
+        const { onCursorMove, onUserMove, cards, decks, filters } = this.props;
         const { x, y } = this.project(e.clientX, e.clientY);
         const mx = Math.round(x);
         const my = Math.round(y);
 
         if (cards.filter(i => i.active && i.isOwner).length === 0 &&
-            decks.filter(i => i.active && i.isOwner).length === 0) {
+            decks.filter(i => i.active && i.isOwner).length === 0 &&
+            filters.filter(i => i.changes && i.changes.changeFunc).length === 0) {
             onUserMove(mx, my);
         } else {
             onCursorMove(mx, my);
@@ -369,6 +370,7 @@ class Table extends React.Component {
                     color={filter.color}
                     changes={filter.changes}
                     alpha={filter.alpha}
+                    mouse={mouse}
                     x={filter.x}
                     y={filter.y}
                     h={filter.h}

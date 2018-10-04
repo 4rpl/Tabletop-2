@@ -1,22 +1,26 @@
 ﻿import React from 'react';
 import { connect } from 'react-redux';
-import { setFilterActive, setFilterChange } from '../store/table/TableActions';
+import { toggleFilterChanges, setFilterChange, setFilterChangeFunc, saveFilterChanges } from '../store/table/TableActions';
 import CallbackService from '../services/CallbackService';
 
 const mapStateToProps = state => {
     return {
-        mouse: state.mouse,
+        table: state.game.table,
     };
 };
 
 const mapDispatchToProps = dispatch => {
     return {
         onToggleFilterChanges: (id, isActive) => {
-            dispatch(setFilterActive(id, isActive));
+            dispatch(toggleFilterChanges(id, isActive));
         },
-        onFilterChange: (id, x, y, w, h, alpha) => {
-            dispatch(setFilterChange(id, x, y, w, h, alpha));
+        onFilterChange: (x, y, w, h, alpha) => {
+            dispatch(setFilterChange(x, y, w, h, alpha));
         },
+        onSetFilterChangeFunc: func => {
+            dispatch(setFilterChangeFunc(func));
+        },
+        onSaveFilterChanges: () => dispatch(saveFilterChanges()),
     };
 };
 
@@ -26,9 +30,9 @@ class Filter extends React.Component {
         super();
         this.onDoubleClick = this.onDoubleClick.bind(this);
         this.onTlDown = this.onTlDown.bind(this);
-        this.onTrDown = this.onTlDown.bind(this);
-        this.onBlDown = this.onTlDown.bind(this);
-        this.onBrDown = this.onTlDown.bind(this);
+        this.onTrDown = this.onTrDown.bind(this);
+        this.onBlDown = this.onBlDown.bind(this);
+        this.onBrDown = this.onBrDown.bind(this);
     }
 
     onDoubleClick(e) {
@@ -39,26 +43,103 @@ class Filter extends React.Component {
     callbackService = CallbackService.getInstance();
 
     onTlDown(e) {
-        //const { x, y, h, w, mouse, changes } = this.props;
-        this.onMouseDown();
+        const { onSetFilterChangeFunc, changes } = this.props;
+        const { x, y, w, h } = changes;
+        this.onChangesDown((mx, my, alpha) => {
+            return {
+                x: (w + x > mx) ? mx : (x + w),
+                y: (h + y > my) ? my : (y + h),
+                w: (w + x > mx) ? (w + x - mx) : mx - x - w,
+                h: (h + y > my) ? (h + y - my) : my - y - h,
+                alpha: alpha,
+            };
+        });
     }
     onTrDown(e) {
-        //const { x, y, h, w, mouse, changes } = this.props;
+        const { onSetFilterChangeFunc, changes } = this.props;
+        const { x, y, w, h } = changes;
+        this.onChangesDown((mx, my, alpha) => {
+            return {
+                x: (mx > x) ? x : mx,
+                y: (h + y > my) ? my : (y + h),
+                w: (mx > x) ? (mx - x) : (x - mx),
+                h: (h + y > my) ? (h + y - my) : my - y - h,
+                alpha: alpha,
+            };
+        });
     }
     onBlDown(e) {
-        //const { x, y, h, w, mouse, changes } = this.props;
+        const { onSetFilterChangeFunc, changes } = this.props;
+        const { x, y, w, h } = changes;
+        this.onChangesDown((mx, my, alpha) => {
+
+            return {
+                x: (w + x > mx) ? mx : (x + w),
+                y: (my > y) ? y : my,
+                w: (w + x > mx) ? (w + x - mx) : mx - x - w,
+                h: (my > y) ? (my - y) : (y - my),
+                alpha: alpha,
+            };
+        });
     }
     onBrDown(e) {
-        //const { x, y, h, w, mouse, changes } = this.props;
+        const { onSetFilterChangeFunc, changes } = this.props;
+        const { x, y, w, h } = changes;
+        this.onChangesDown((mx, my, alpha) => {
+            return {
+                x: (mx > x) ? x : mx,
+                y: (my > y) ? y : my,
+                w: (mx > x) ? (mx - x) : (x - mx),
+                h: (my > y) ? (my - y) : (y - my),
+                alpha: alpha,
+            };
+        });
+    }
+    onBodyDown(e) {
+        const { onSetFilterChangeFunc, changes } = this.props;
+        const { x, y, w, h } = changes;
+        this.onChangesDown((mx, my, alpha) => {
+            return {
+                x: (mx > x) ? x : mx,
+                y: (my > y) ? y : my,
+                w: (mx > x) ? (mx - x) : (x - mx),
+                h: (my > y) ? (my - y) : (y - my),
+                alpha: alpha,
+            };
+        });
     }
 
-    onMouseDown(x, y) {
-        const { id, onFilterChange } = this.props;
-        //if (!active && e.button === 0) {
-        //    onCardUp(id, mouse.alpha % (2 * Math.PI), x, y);
-        //    this.callbackService.onMouseUp(id, this.mouseUp.bind(this));
-        //}
-        return false;
+    onChangesDown(func) {
+        const { onSetFilterChangeFunc } = this.props;
+        onSetFilterChangeFunc(func);
+        this.callbackService.onMouseUp('filterChange', () => {
+            onSetFilterChangeFunc(null);
+            this.callbackService.unsubscribeOnMouseUp('filterChange');
+        });
+    }
+    
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        const { x, y, h, w, name, color, changes, mouse, table, onFilterChange } = this.props;
+
+        //console.warn(mouse);
+        if (changes && changes.changeFunc && (mouse.x !== prevProps.mouse.x || mouse.y !== prevProps.mouse.y)) {
+            let mx = mouse.x;
+            let my = mouse.y;
+            if (mx > table.w - w) {
+                mx = table.w - w;
+            } else if (mx < 0) {
+                mx = 0;
+            }
+            if (my > table.h - h) {
+                my = table.h - h;
+            } else if (my < 0) {
+                my = 0;
+            }
+
+            const { x, y, w, h, alpha } = changes.changeFunc(mx, my);
+
+            onFilterChange(x, y, w, h, alpha);
+        }
     }
 
     mouseUp(e) {
@@ -70,12 +151,12 @@ class Filter extends React.Component {
     }
 
     render() {
-        const { x, y, h, w, name, color, changes, alpha } = this.props;
+        const { x, y, h, w, name, color, changes, alpha, onSaveFilterChanges } = this.props;
         const changesView = changes ? (
-            <div style={{ top: y, left: x, height: h, width: w, transform: `rotate(${-alpha}rad)` }}
+            <div style={{ top: changes.y, left: changes.x, height: changes.h, width: changes.w, transform: `rotate(${-changes.alpha}rad)` }}
                 className="tt-filter-ch">
 
-                <div className="tt-filter-ch-inner"></div>
+                <div className="tt-filter-ch-inner" onDoubleClick={onSaveFilterChanges}></div>
 
                 <div className="tt-filter-ch-corner tl" onMouseDown={this.onTlDown}></div>
                 <div className="tt-filter-ch-corner tr" onMouseDown={this.onTrDown}></div>

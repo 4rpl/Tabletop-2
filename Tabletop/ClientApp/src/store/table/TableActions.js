@@ -12,7 +12,8 @@ const MOVE_USER =                       'MoveUser';
 const ADD_FILTER =                      'AddFilter';
 const TOGGLE_FILTER_CHANGES =           'ToggleFilterChanges';
 const SET_FILTER_CHANGES =              'SetFilterChanges';
-const APPLY_FILTER_CHANGES =            'ApplyFilterChanges';
+const SET_FILTER_CHANGE_FUNC =          'SetFilterChangeFunc';
+const SAVE_FILTER_CHANGES =             'SaveFilterChanges';
 const REMOVE_FILTER =                   'RemoveFilter';
 
 const TABLE_SCALE =                     'TableScale';
@@ -75,7 +76,8 @@ export const TableActions = {
     ADD_FILTER,
     TOGGLE_FILTER_CHANGES,
     SET_FILTER_CHANGES,
-    APPLY_FILTER_CHANGES,
+    SET_FILTER_CHANGE_FUNC,
+    SAVE_FILTER_CHANGES,
     REMOVE_FILTER,
 
     TABLE_SCALE,
@@ -122,11 +124,17 @@ export function openContextMenu(x, y, menuItems) {
 export function addFilter(x, y, h, w, alpha) {
     return { type: ADD_FILTER, access: TableActionAccessTypes.verificationRequired, x, y, h, w, alpha };
 }
-export function setFilterActive(id, isActive) {
+export function toggleFilterChanges(id, isActive) {
     return { type: TOGGLE_FILTER_CHANGES, access: TableActionAccessTypes.private, id, isActive };
 }
-export function setFilterChange(id, x, y, w, h, alpha) {
-    return { type: SET_FILTER_CHANGES, access: TableActionAccessTypes.private, id, x, y, w, h, alpha };
+export function setFilterChangeFunc(func) {
+    return { type: SET_FILTER_CHANGE_FUNC, access: TableActionAccessTypes.private, func };
+}
+export function setFilterChange(x, y, w, h, alpha) {
+    return { type: SET_FILTER_CHANGES, access: TableActionAccessTypes.private, x, y, w, h, alpha };
+}
+export function saveFilterChanges() {
+    return { type: SAVE_FILTER_CHANGES, access: TableActionAccessTypes.private };
 }
 export function removeFilter(id) {
     return { type: REMOVE_FILTER, id };

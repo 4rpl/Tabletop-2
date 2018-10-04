@@ -13,6 +13,7 @@ function usersReducer(state = [], action) {
                     color: filter.color,
                     name: filter.name,
                     alpha: filter.alpha,
+                    changes: null,
                 };
             });
         }
@@ -27,12 +28,12 @@ function usersReducer(state = [], action) {
                     x: action.x,
                     y: action.y,
                     h: action.h,
-                    w: action.w
+                    w: action.w,
+                    changes: null,
                 }
             ]
         }
         case TableActions.TOGGLE_FILTER_CHANGES: {
-            console.warn(action);
             return state.map(i => {
                 return i.id === action.id ? {
                     ...i,
@@ -41,27 +42,46 @@ function usersReducer(state = [], action) {
                         y: i.y,
                         h: i.h,
                         w: i.w,
+                        alpha: i.alpha,
                     } : null,
                 } : i;
             });
         }
-        case TableActions.CHANGE_FILTER: {
+        case TableActions.SAVE_FILTER_CHANGES: {
             return state.map(i => {
-                return i.id === action.id ? {
+                return i.changes ? {
                     ...i,
-                    isActive: action.isActive,
+                    x: i.changes.x,
+                    y: i.changes.y,
+                    h: i.changes.h,
+                    w: i.changes.w,
+                    alpha: i.changes.alpha,
+                    changes: null,
                 } : i;
             });
         }
         case TableActions.SET_FILTER_CHANGES: {
             return state.map(i => {
-                return i.id === action.id ? {
+                return i.changes ? {
                     ...i,
                     changes: {
+                        ...i.changes,
                         x: action.x,
                         y: action.y,
                         h: action.h,
                         w: action.w,
+                        alpha: action.alpha,
+                    },
+                } : i;
+            });
+        }
+        case TableActions.SET_FILTER_CHANGE_FUNC: {
+            return state.map(i => {
+                return i.changes ? {
+                    ...i,
+                    changes: {
+                        ...i.changes,
+                        changeFunc: action.func,
                     },
                 } : i;
             });
