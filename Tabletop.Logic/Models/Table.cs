@@ -154,6 +154,25 @@ namespace Tabletop.Logic.Models
                 new OutAddFilterAction( user, filter, cardsToHide, decksToHide, canNotSee )
             };
         }
+        public IEnumerable<ITableAction> Dispatch( InSaveFilterChangesAction action, string userId )
+        {
+            var user = _users.FirstOrDefault( i => i.Id == userId );
+            if( user == null )
+            {
+                throw new ArgumentException( "Пользователь не найден" );
+            }
+            var filter = _filters.FirstOrDefault( i => i.Id == action.Id );
+            if( filter == null )
+            {
+                throw new ArgumentException( "Фильтр не найден" );
+            }
+            filter.Modify( action.X, action.Y, action.H, action.W, action.Alpha );
+
+            return new List<ITableAction>
+            {
+                new OutSaveFilterChangesAction( filter ),
+            };
+        }
         public IEnumerable<ITableAction> Dispatch( RemoveFilterAction action )
         {
             var filter = _filters.FirstOrDefault( i => i.Id == action.Id );

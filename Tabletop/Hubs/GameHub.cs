@@ -50,6 +50,10 @@ namespace Tabletop.Hubs
         {
             await PerformActions( _table.Dispatch( action, Context.ConnectionId ) );
         }
+        public async Task SaveFilterChanges( InSaveFilterChangesAction action )
+        {
+            await PerformActions( _table.Dispatch( action, Context.ConnectionId ) );
+        }
         public async Task RemoveFilter( RemoveFilterAction action )
         {
             await PerformActions( _table.Dispatch( action ) );

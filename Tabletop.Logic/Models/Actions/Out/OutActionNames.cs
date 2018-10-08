@@ -11,6 +11,7 @@ namespace Tabletop.Logic.Models.Actions.Out
         public static string GetTable = "GetTable";
 
         public static string AddFilter = "AddFilter";
+        public static string SaveFilterChanges = "SaveFilterChanges";
 
         public static string AddCard = "AddCard";
         public static string FlipCard = "FlipCard";

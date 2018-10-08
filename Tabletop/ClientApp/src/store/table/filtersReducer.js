@@ -49,13 +49,13 @@ function usersReducer(state = [], action) {
         }
         case TableActions.SAVE_FILTER_CHANGES: {
             return state.map(i => {
-                return i.changes ? {
+                return i.id === action.id ? {
                     ...i,
-                    x: i.changes.x,
-                    y: i.changes.y,
-                    h: i.changes.h,
-                    w: i.changes.w,
-                    alpha: i.changes.alpha,
+                    x: action.x,
+                    y: action.y,
+                    h: action.h,
+                    w: action.w,
+                    alpha: action.alpha,
                     changes: null,
                 } : i;
             });

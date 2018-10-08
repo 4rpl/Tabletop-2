@@ -20,7 +20,7 @@ const mapDispatchToProps = dispatch => {
         onSetFilterChangeFunc: func => {
             dispatch(setFilterChangeFunc(func));
         },
-        onSaveFilterChanges: () => dispatch(saveFilterChanges()),
+        onSaveFilterChanges: (id, x, y, w, h, alpha) => dispatch(saveFilterChanges(id, x, y, w, h, alpha)),
     };
 };
 
@@ -33,6 +33,7 @@ class Filter extends React.Component {
         this.onTrDown = this.onTrDown.bind(this);
         this.onBlDown = this.onBlDown.bind(this);
         this.onBrDown = this.onBrDown.bind(this);
+        this.onSaveChanges = this.onSaveChanges.bind(this);
     }
 
     onDoubleClick(e) {
@@ -43,7 +44,7 @@ class Filter extends React.Component {
     callbackService = CallbackService.getInstance();
 
     onTlDown(e) {
-        const { onSetFilterChangeFunc, changes } = this.props;
+        const { changes } = this.props;
         const { x, y, w, h } = changes;
         this.onChangesDown((mx, my, alpha) => {
             return {
@@ -56,7 +57,7 @@ class Filter extends React.Component {
         });
     }
     onTrDown(e) {
-        const { onSetFilterChangeFunc, changes } = this.props;
+        const { changes } = this.props;
         const { x, y, w, h } = changes;
         this.onChangesDown((mx, my, alpha) => {
             return {
@@ -69,7 +70,7 @@ class Filter extends React.Component {
         });
     }
     onBlDown(e) {
-        const { onSetFilterChangeFunc, changes } = this.props;
+        const { changes } = this.props;
         const { x, y, w, h } = changes;
         this.onChangesDown((mx, my, alpha) => {
 
@@ -83,7 +84,7 @@ class Filter extends React.Component {
         });
     }
     onBrDown(e) {
-        const { onSetFilterChangeFunc, changes } = this.props;
+        const { changes } = this.props;
         const { x, y, w, h } = changes;
         this.onChangesDown((mx, my, alpha) => {
             return {
@@ -96,7 +97,7 @@ class Filter extends React.Component {
         });
     }
     onBodyDown(e) {
-        const { onSetFilterChangeFunc, changes } = this.props;
+        const { changes } = this.props;
         const { x, y, w, h } = changes;
         this.onChangesDown((mx, my, alpha) => {
             return {
@@ -116,6 +117,12 @@ class Filter extends React.Component {
             onSetFilterChangeFunc(null);
             this.callbackService.unsubscribeOnMouseUp('filterChange');
         });
+    }
+
+    onSaveChanges(e) {
+        const { id, changes, onSaveFilterChanges } = this.props;
+        const { x, y, w, h, alpha } = changes;
+        onSaveFilterChanges(id, x, y, w, h, alpha);
     }
     
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -151,12 +158,12 @@ class Filter extends React.Component {
     }
 
     render() {
-        const { x, y, h, w, name, color, changes, alpha, onSaveFilterChanges } = this.props;
+        const { x, y, h, w, name, color, changes, alpha } = this.props;
         const changesView = changes ? (
             <div style={{ top: changes.y, left: changes.x, height: changes.h, width: changes.w, transform: `rotate(${-changes.alpha}rad)` }}
                 className="tt-filter-ch">
 
-                <div className="tt-filter-ch-inner" onDoubleClick={onSaveFilterChanges}></div>
+                <div className="tt-filter-ch-inner" onDoubleClick={this.onSaveChanges}></div>
 
                 <div className="tt-filter-ch-corner tl" onMouseDown={this.onTlDown}></div>
                 <div className="tt-filter-ch-corner tr" onMouseDown={this.onTrDown}></div>

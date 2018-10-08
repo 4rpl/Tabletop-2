@@ -32,10 +32,13 @@ namespace Tabletop.Logic.Models
 
         public double Alpha { get; protected set; } = 0;
 
-        public void Move( int x, int y )
+        public void Modify( int x, int y, int h, int w, double alpha )
         {
             X = x;
             Y = y;
+            H = h;
+            W = w;
+            Alpha = alpha;
         }
 
         #endregion

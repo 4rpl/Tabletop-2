@@ -133,8 +133,8 @@ export function setFilterChangeFunc(func) {
 export function setFilterChange(x, y, w, h, alpha) {
     return { type: SET_FILTER_CHANGES, access: TableActionAccessTypes.private, x, y, w, h, alpha };
 }
-export function saveFilterChanges() {
-    return { type: SAVE_FILTER_CHANGES, access: TableActionAccessTypes.private };
+export function saveFilterChanges(id, x, y, w, h, alpha) {
+    return { type: SAVE_FILTER_CHANGES, access: TableActionAccessTypes.verificationRequired, id, x, y, w, h, alpha };
 }
 export function removeFilter(id) {
     return { type: REMOVE_FILTER, id };
