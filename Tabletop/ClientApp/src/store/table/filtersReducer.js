@@ -40,8 +40,6 @@ function usersReducer(state = [], action) {
                     changes: action.isActive ? {
                         x: i.x,
                         y: i.y,
-                        mx: 0,
-                        my: 0,
                         h: i.h,
                         w: i.w,
                         alpha: i.alpha,

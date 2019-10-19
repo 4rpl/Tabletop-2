@@ -33,7 +33,6 @@ class Filter extends React.Component {
         this.onTrDown = this.onTrDown.bind(this);
         this.onBlDown = this.onBlDown.bind(this);
         this.onBrDown = this.onBrDown.bind(this);
-        this.onBodyDown = this.onBodyDown.bind(this);
         this.onSaveChanges = this.onSaveChanges.bind(this);
     }
 
@@ -53,6 +52,7 @@ class Filter extends React.Component {
                 y: (h + y > my) ? my : (y + h),
                 w: (w + x > mx) ? (w + x - mx) : mx - x - w,
                 h: (h + y > my) ? (h + y - my) : my - y - h,
+                alpha: alpha,
             };
         });
     }
@@ -65,6 +65,7 @@ class Filter extends React.Component {
                 y: (h + y > my) ? my : (y + h),
                 w: (mx > x) ? (mx - x) : (x - mx),
                 h: (h + y > my) ? (h + y - my) : my - y - h,
+                alpha: alpha,
             };
         });
     }
@@ -72,11 +73,13 @@ class Filter extends React.Component {
         const { changes } = this.props;
         const { x, y, w, h } = changes;
         this.onChangesDown((mx, my, alpha) => {
+
             return {
                 x: (w + x > mx) ? mx : (x + w),
                 y: (my > y) ? y : my,
                 w: (w + x > mx) ? (w + x - mx) : mx - x - w,
                 h: (my > y) ? (my - y) : (y - my),
+                alpha: alpha,
             };
         });
     }
@@ -89,22 +92,19 @@ class Filter extends React.Component {
                 y: (my > y) ? y : my,
                 w: (mx > x) ? (mx - x) : (x - mx),
                 h: (my > y) ? (my - y) : (y - my),
+                alpha: alpha,
             };
         });
     }
     onBodyDown(e) {
-        const { changes, onFilterChange, mouse } = this.props;
-        {
-            const { x, y, w, h, alpha } = changes;
-            onFilterChange(x, y, w, h, alpha);
-        }
-        this.onChangesDown((mouseX, mouseY, alpha) => {
-            const { x, y, w, h } = changes;
+        const { changes } = this.props;
+        const { x, y, w, h } = changes;
+        this.onChangesDown((mx, my, alpha) => {
             return {
-                x: x + mouseX - mouse.x,
-                y: y + mouseY - mouse.y,
-                w: w,
-                h: h,
+                x: (mx > x) ? x : mx,
+                y: (my > y) ? y : my,
+                w: (mx > x) ? (mx - x) : (x - mx),
+                h: (my > y) ? (my - y) : (y - my),
                 alpha: alpha,
             };
         });
@@ -126,7 +126,7 @@ class Filter extends React.Component {
     }
     
     componentDidUpdate(prevProps, prevState, snapshot) {
-        const { changes, mouse, table, onFilterChange } = this.props;
+        const { x, y, h, w, name, color, changes, mouse, table, onFilterChange } = this.props;
 
         //console.warn(mouse);
         if (changes && changes.changeFunc && (mouse.x !== prevProps.mouse.x || mouse.y !== prevProps.mouse.y)) {
@@ -143,7 +143,7 @@ class Filter extends React.Component {
                 my = 0;
             }
 
-            const { x, y, w, h, alpha } = changes.changeFunc(mx, my, mouse.alpha);
+            const { x, y, w, h, alpha } = changes.changeFunc(mx, my);
 
             onFilterChange(x, y, w, h, alpha);
         }
@@ -163,7 +163,7 @@ class Filter extends React.Component {
             <div style={{ top: changes.y, left: changes.x, height: changes.h, width: changes.w, transform: `rotate(${-changes.alpha}rad)` }}
                 className="tt-filter-ch">
 
-                <div className="tt-filter-ch-inner" onMouseDown={this.onBodyDown} onDoubleClick={this.onSaveChanges}></div>
+                <div className="tt-filter-ch-inner" onDoubleClick={this.onSaveChanges}></div>
 
                 <div className="tt-filter-ch-corner tl" onMouseDown={this.onTlDown}></div>
                 <div className="tt-filter-ch-corner tr" onMouseDown={this.onTrDown}></div>
