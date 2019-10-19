@@ -8,7 +8,7 @@ import MainMenu from './components/MainMenu';
 export default () => (
     <div>
         <Route exact path='/' component={MainMenu} />
-        <Route exact path='/table/:id' component={Game} />
-        <Route exact path='/editor' component={Editor} />
+        <Route exact path='/t/:id' component={Game} />
+        <Route exact path='/e' component={Editor} />
     </div>
 );
